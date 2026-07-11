@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://AnalyticalToolsHub.com/sitemap.xml
+Sitemap: https://analyticaltoolshub.com/sitemap.xml

@@ -1,72 +1,35 @@
-# Analytical Tools Hub Landing Page
+# Analytical Tools Hub
 
-Production-ready static landing page and working tool pages for Analytical Tools Hub (ATH).
+Static landing page and working browser-based tool pages for Analytical Tools Hub (ATH).
 
-## Folder Structure
+Website: https://analyticaltoolshub.com/
 
-```text
-.
-|-- index.html
-|-- styles.css
-|-- script.js
-|-- tool-theme.css
-|-- robots.txt
-|-- sitemap.xml
-|-- assets/
-|   |-- ath-logo-horizontal.png
-|   |-- ath-logo-stacked.png
-|   |-- ath-symbol.png
-|   |-- ath-badge.png
-|   |-- ath-favicon.png
-|   `-- ath-logo-dark.png
-|-- ABC Analysis/
-|-- Exponential Smoothing/
-|-- Kraljic Matrix/
-`-- Gantt Chart/
-```
+## Current Tools
+
+- ABC Analysis
+- Exponential Smoothing
+- Kraljic Matrix
+- Gantt Chart Planner
 
 ## Run Locally
-
-Open `index.html` directly in a browser, or serve the folder with any static server:
 
 ```bash
 python -m http.server 8000
 ```
 
-Then visit `http://localhost:8000`.
+Then open `http://localhost:8000`.
 
-## Deploy
+## Contact
 
-This is a static site. Deploy the full folder to Netlify, Vercel, Cloudflare Pages, GitHub Pages, or any standard web host.
-
-Before launch, update the canonical, sitemap, and metadata URLs if the production domain differs from:
+Contact, feedback, and update-interest emails currently use:
 
 ```text
-https://AnalyticalToolsHub.com/
+analyticaltoolshub@gmail.com
 ```
 
-## Placeholder Content
+## Notes Before Launch
 
-- Legal content is currently shown in an on-page overlay.
-- Contact, feedback, and update interest currently use `mailto:analyticaltoolshub@gmail.com`.
-- Some featured tools are labelled as coming soon until their working pages exist.
-
-## URL Strategy
-
-The current static files use the existing local folder paths. For production, prefer clean routes such as:
-
-- `/abc-analysis/`
-- `/exponential-smoothing/`
-- `/kraljic-matrix/`
-- `/gantt-chart/`
-
-Add redirects from the current file paths before changing canonical URLs and sitemap entries.
-
-## Launch Recommendations
-
-- Create real pages for featured tools, categories, methodology standards, privacy policy, terms, cookie policy, and disclaimer.
-- Replace mailto-based update interest with a proper email service when the project is ready.
-- Add visible FAQ content before adding FAQ schema.
-- Confirm which tools run fully in-browser before making stronger privacy claims.
-- Compress exported logo assets further before production if your hosting pipeline does not optimize images.
-- Add analytics only after defining a privacy policy and cookie approach.
+- Update canonical URLs and `sitemap.xml` if the production domain or routes change.
+- Replace `mailto:` update interest with a proper email service when ready.
+- Keep legal content in the current overlay or move it to dedicated pages later.
+- Some featured tools are intentionally marked as coming soon.
