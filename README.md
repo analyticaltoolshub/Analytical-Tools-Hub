@@ -1,22 +1,28 @@
 # Analytical Tools Hub Landing Page
 
-Production-ready static landing page for Analytical Tools Hub (ATH).
+Production-ready static landing page and working tool pages for Analytical Tools Hub (ATH).
 
 ## Folder Structure
 
 ```text
 .
-├── index.html
-├── styles.css
-├── script.js
-├── Logo.png
-└── assets/
-    ├── ath-logo-horizontal.png
-    ├── ath-logo-stacked.png
-    ├── ath-symbol.png
-    ├── ath-badge.png
-    ├── ath-favicon.png
-    └── ath-logo-dark.png
+|-- index.html
+|-- styles.css
+|-- script.js
+|-- tool-theme.css
+|-- robots.txt
+|-- sitemap.xml
+|-- assets/
+|   |-- ath-logo-horizontal.png
+|   |-- ath-logo-stacked.png
+|   |-- ath-symbol.png
+|   |-- ath-badge.png
+|   |-- ath-favicon.png
+|   `-- ath-logo-dark.png
+|-- ABC Analysis/
+|-- Exponential Smoothing/
+|-- Kraljic Matrix/
+`-- Gantt Chart/
 ```
 
 ## Run Locally
@@ -33,7 +39,7 @@ Then visit `http://localhost:8000`.
 
 This is a static site. Deploy the full folder to Netlify, Vercel, Cloudflare Pages, GitHub Pages, or any standard web host.
 
-Before launch, update the canonical and metadata URLs if the production domain differs from:
+Before launch, update the canonical, sitemap, and metadata URLs if the production domain differs from:
 
 ```text
 https://AnalyticalToolsHub.com/
@@ -41,20 +47,25 @@ https://AnalyticalToolsHub.com/
 
 ## Placeholder Content
 
-- Tool counts in category cards.
-- Legal pages linked from the footer.
-- Contact and feedback destinations.
-- Search results currently link to the featured tools section.
-- Newsletter form currently validates locally and needs an email provider integration.
-- Individual tool pages are not included in this static landing page.
-- SoftwareApplication schema should be added on individual tool pages once those pages exist.
-- Methodology standards link currently points to the methodology section.
+- Legal content is currently shown in an on-page overlay.
+- Contact, feedback, and update interest currently use `mailto:analyticaltoolshub@gmail.com`.
+- Some featured tools are labelled as coming soon until their working pages exist.
+
+## URL Strategy
+
+The current static files use the existing local folder paths. For production, prefer clean routes such as:
+
+- `/abc-analysis/`
+- `/exponential-smoothing/`
+- `/kraljic-matrix/`
+- `/gantt-chart/`
+
+Add redirects from the current file paths before changing canonical URLs and sitemap entries.
 
 ## Launch Recommendations
 
-- Replace tool count placeholders with real counts.
-- Connect global search to the live tools index.
 - Create real pages for featured tools, categories, methodology standards, privacy policy, terms, cookie policy, and disclaimer.
+- Replace mailto-based update interest with a proper email service when the project is ready.
 - Add visible FAQ content before adding FAQ schema.
 - Confirm which tools run fully in-browser before making stronger privacy claims.
 - Compress exported logo assets further before production if your hosting pipeline does not optimize images.

@@ -811,6 +811,16 @@ h3 {
   box-shadow: var(--shadow-sm);
 }
 
+.tool-card.is-coming-soon {
+  background: linear-gradient(180deg, #fff 0%, var(--surface) 100%);
+}
+
+.tool-card.is-coming-soon:hover {
+  transform: none;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
 .card-meta {
   display: inline-block;
   margin: 8px 0 14px;
@@ -822,6 +832,20 @@ h3 {
 .text-link,
 .card-link {
   color: var(--blue-600);
+  font-weight: 800;
+}
+
+.coming-soon-label {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 34px;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--surface);
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -1300,7 +1324,19 @@ h3 {
   gap: 9px;
 }
 
-.site-footer a:hover { color: #fff; }
+.site-footer button {
+  width: fit-content;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.site-footer a:hover,
+.site-footer button:hover { color: #fff; }
 
 .footer-bottom {
   margin-top: 46px;
@@ -1310,7 +1346,8 @@ h3 {
 
 .footer-bottom p { margin: 0; }
 
-.search-modal {
+.search-modal,
+.legal-modal {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -1329,6 +1366,18 @@ h3 {
 .search-dialog {
   position: relative;
   width: min(720px, calc(100% - 32px));
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow-lg);
+  padding: 20px;
+}
+
+.legal-dialog {
+  position: relative;
+  width: min(860px, calc(100% - 32px));
+  max-height: min(760px, calc(100vh - 120px));
+  overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, .2);
   border-radius: 14px;
   background: #fff;
@@ -1381,6 +1430,42 @@ h3 {
   font-size: 12px;
   font-style: normal;
   font-weight: 800;
+}
+
+.legal-content {
+  display: grid;
+  gap: 18px;
+}
+
+.legal-content section {
+  display: grid;
+  gap: 7px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.legal-content section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.legal-content h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.legal-content p,
+.legal-content li {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.legal-content ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 1.2rem;
 }
 
 .sr-only {

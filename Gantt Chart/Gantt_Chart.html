@@ -5,12 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gantt Chart Planner | Analytical Tools Hub</title>
   <meta name="description" content="Plan project tasks, dates, progress, and milestones with a browser-based Gantt chart planner from Analytical Tools Hub.">
+  <link rel="canonical" href="https://AnalyticalToolsHub.com/Gantt%20Chart/Gantt_Chart.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Gantt Chart Planner | Analytical Tools Hub">
+  <meta property="og:description" content="Plan tasks, dates, progress, and milestones with a browser-based Gantt chart planner and JSON project export.">
+  <meta property="og:url" content="https://AnalyticalToolsHub.com/Gantt%20Chart/Gantt_Chart.html">
+  <meta property="og:image" content="https://AnalyticalToolsHub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Gantt Chart Planner | Analytical Tools Hub">
+  <meta name="twitter:description" content="Plan tasks, dates, progress, and milestones with a browser-based Gantt chart planner and JSON project export.">
+  <meta name="twitter:image" content="https://AnalyticalToolsHub.com/assets/ath-logo-horizontal.png">
   <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="Gantt_Chart.css">
   <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://AnalyticalToolsHub.com/Gantt%20Chart/Gantt_Chart.html#software",
+          "name": "Gantt Chart Planner",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://AnalyticalToolsHub.com/Gantt%20Chart/Gantt_Chart.html",
+          "description": "A browser-based Gantt chart planner for tasks, dates, progress, milestones, and JSON project export.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "Manual task entry",
+            "Date-based Gantt timeline",
+            "Milestone display",
+            "Full-screen timeline view",
+            "JSON save and load"
+          ],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://AnalyticalToolsHub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://AnalyticalToolsHub.com/Gantt%20Chart/Gantt_Chart.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://AnalyticalToolsHub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Gantt Chart Planner", "item": "https://AnalyticalToolsHub.com/Gantt%20Chart/Gantt_Chart.html" }
+          ]
+        }
+      ]
+    }
+  </script>
 </head>
 <body class="gantt-page">
   <nav class="tool-topnav">
@@ -32,7 +75,7 @@
   <main class="container">
     <section class="tool-hero" aria-labelledby="gantt-page-title">
       <span class="tool-badge">Project Management</span>
-      <h2 id="gantt-page-title">Gantt Chart Planner</h2>
+      <h1 id="gantt-page-title">Gantt Chart Planner</h1>
       <p>Build a simple project schedule, track task progress, highlight milestones, and export or reload the plan as JSON.</p>
       <div class="tool-reassurance" aria-label="Tool assurances">
         <span>Browser-based planning</span>
@@ -151,6 +194,28 @@
           </div>
         </section>
 
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Method Logic</span>
+              <p>The planner places each task on a date-based timeline using the task start date, end date, progress percentage, and milestone setting.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Required Inputs</span>
+              <p>Each timeline row needs a task name, valid start date, valid end date, progress value from 0 to 100, and a milestone selection.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Assumptions</span>
+              <p>The tool assumes task dates are manually estimated and reviewed by the user. It does not calculate dependencies, resource capacity, or critical path automatically.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Limitations</span>
+              <p>This is a lightweight planning aid. For complex projects, validate dependencies, constraints, and resource availability in a full project management workflow.</p>
+            </div>
+          </div>
+        </section>
+
         <section class="panel content-section faq-section" id="faq">
           <h2>FAQ</h2>
           <details>
@@ -180,6 +245,7 @@
           <a href="#about-gantt">About</a>
           <a href="#how-to-use">How to Use</a>
           <a href="#planning-guidance">Guidance</a>
+          <a href="#methodology">Methodology</a>
           <a href="#faq">FAQ</a>
         </nav>
       </aside>

@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exponential Smoothing | Analytical Tools Hub</title>
     <meta name="description" content="Create practical demand forecasts with simple, Holt, and Holt-Winters exponential smoothing in your browser.">
+    <link rel="canonical" href="https://AnalyticalToolsHub.com/Exponential%20Smoothing/Exponential_Smoothing.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Exponential Smoothing Forecasting Tool | Analytical Tools Hub">
+    <meta property="og:description" content="Create browser-based demand forecasts with simple exponential smoothing, Holt's trend method, and Holt-Winters seasonality.">
+    <meta property="og:url" content="https://AnalyticalToolsHub.com/Exponential%20Smoothing/Exponential_Smoothing.html">
+    <meta property="og:image" content="https://AnalyticalToolsHub.com/assets/ath-logo-horizontal.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Exponential Smoothing Forecasting Tool | Analytical Tools Hub">
+    <meta name="twitter:description" content="Create browser-based demand forecasts with simple exponential smoothing, Holt's trend method, and Holt-Winters seasonality.">
+    <meta name="twitter:image" content="https://AnalyticalToolsHub.com/assets/ath-logo-horizontal.png">
     <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
     <link rel="stylesheet" href="Exponential_Smoothing.css">
     <link rel="stylesheet" href="../tool-theme.css">
@@ -14,6 +24,39 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
     <script src="Exponential_Smoothing.js" defer></script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "SoftwareApplication",
+                    "@id": "https://AnalyticalToolsHub.com/Exponential%20Smoothing/Exponential_Smoothing.html#software",
+                    "name": "Exponential Smoothing Forecasting Tool",
+                    "applicationCategory": "BusinessApplication",
+                    "operatingSystem": "Web browser",
+                    "url": "https://AnalyticalToolsHub.com/Exponential%20Smoothing/Exponential_Smoothing.html",
+                    "description": "A browser-based forecasting tool for simple exponential smoothing, Holt's trend method, and Holt-Winters seasonality.",
+                    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+                    "featureList": [
+                        "CSV and Excel import",
+                        "Manual demand entry",
+                        "Simple exponential smoothing",
+                        "Holt and Holt-Winters forecasting",
+                        "Forecast chart and CSV export"
+                    ],
+                    "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://AnalyticalToolsHub.com/" }
+                },
+                {
+                    "@type": "BreadcrumbList",
+                    "@id": "https://AnalyticalToolsHub.com/Exponential%20Smoothing/Exponential_Smoothing.html#breadcrumb",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://AnalyticalToolsHub.com/" },
+                        { "@type": "ListItem", "position": 2, "name": "Exponential Smoothing", "item": "https://AnalyticalToolsHub.com/Exponential%20Smoothing/Exponential_Smoothing.html" }
+                    ]
+                }
+            ]
+        }
+    </script>
 </head>
 <body class="forecast-page">
     <nav class="tool-topnav">
@@ -35,7 +78,7 @@
     <main class="container">
         <section class="tool-hero" aria-labelledby="forecast-page-title">
             <span class="tool-badge">Forecasting</span>
-            <h2 id="forecast-page-title">Exponential Smoothing</h2>
+            <h1 id="forecast-page-title">Exponential Smoothing</h1>
             <p>Create practical demand forecasts with simple smoothing, Holt's trend method, or Holt-Winters seasonality, then review the forecast table and chart.</p>
             <div class="tool-reassurance" aria-label="Tool assurances">
                 <span>Browser-based calculation</span>
@@ -209,6 +252,28 @@
                     </div>
                 </section>
 
+                <section class="panel content-section" id="methodology">
+                    <h2>Methodology, Assumptions, and Limitations</h2>
+                    <div class="guidance-grid">
+                        <div class="guidance-card">
+                            <span>Formula Logic</span>
+                            <p>Simple exponential smoothing blends the latest demand with the previous forecast. Holt's method adds a trend component, while Holt-Winters adds a repeating seasonal component.</p>
+                        </div>
+                        <div class="guidance-card">
+                            <span>Required Inputs</span>
+                            <p>The tool needs a clean numeric demand series in chronological order. Holt-Winters requires enough history to represent at least two full seasonal cycles.</p>
+                        </div>
+                        <div class="guidance-card">
+                            <span>Assumptions</span>
+                            <p>The method assumes recent history is a useful guide to near-term demand and that major structural changes are reviewed by the user before relying on the forecast.</p>
+                        </div>
+                        <div class="guidance-card">
+                            <span>Limitations</span>
+                            <p>Exponential smoothing does not explain why demand changes. Promotional events, stockouts, one-off orders, and market shocks should be reviewed before interpreting the output.</p>
+                        </div>
+                    </div>
+                </section>
+
                 <section class="panel content-section faq-section" id="faq">
                     <h2>FAQ</h2>
                     <details>
@@ -237,6 +302,7 @@
                     <a href="#about-method">About</a>
                     <a href="#how-to-use">How to Use</a>
                     <a href="#parameter-guidance">Guidance</a>
+                    <a href="#methodology">Methodology</a>
                     <a href="#faq">FAQ</a>
                 </nav>
             </aside>

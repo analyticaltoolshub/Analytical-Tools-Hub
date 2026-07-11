@@ -18,11 +18,6 @@ const pillars = [
 
 const problems = [
   {
-    title: 'How much stock should I order?',
-    detail: 'Recommended method: EOQ Calculator',
-    href: '#tools'
-  },
-  {
     title: 'Which inventory items need the most control?',
     detail: 'Recommended tool: ABC Analysis',
     href: 'ABC%20Analysis/ABC_Analysis.html'
@@ -38,16 +33,6 @@ const problems = [
     href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
   },
   {
-    title: 'Is this investment financially viable?',
-    detail: 'Recommended category: Finance',
-    href: '#categories'
-  },
-  {
-    title: 'How capable is my manufacturing process?',
-    detail: 'Recommended category: Quality and Engineering',
-    href: '#categories'
-  },
-  {
     title: 'How can I plan project tasks over time?',
     detail: 'Recommended tool: Gantt Chart Planner',
     href: 'Gantt%20Chart/Gantt_Chart.html'
@@ -55,14 +40,14 @@ const problems = [
 ];
 
 const categories = [
-  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: 'Tool count placeholder', icon: 'boxes' },
-  { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: 'Tool count placeholder', icon: 'chart' },
-  { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Tool count placeholder', icon: 'settings' },
-  { title: 'Statistics', benefit: 'Analyze relationships, distributions, samples, and uncertainty.', count: 'Tool count placeholder', icon: 'compare' },
-  { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: 'Tool count placeholder', icon: 'calculator' },
-  { title: 'Quality and Engineering', benefit: 'Measure process capability, reliability, variation, and performance.', count: 'Tool count placeholder', icon: 'shield' },
-  { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: 'Tool count placeholder', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: 'Tool count placeholder', icon: 'chart' }
+  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '2 tools available', icon: 'boxes' },
+  { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
+  { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Expanding soon', icon: 'settings' },
+  { title: 'Statistics', benefit: 'Analyze relationships, distributions, samples, and uncertainty.', count: 'Expanding soon', icon: 'compare' },
+  { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: 'Expanding soon', icon: 'calculator' },
+  { title: 'Quality and Engineering', benefit: 'Measure process capability, reliability, variation, and performance.', count: 'Expanding soon', icon: 'shield' },
+  { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: 'Expanding soon', icon: 'chart' }
 ];
 
 const tools = [
@@ -80,35 +65,32 @@ const tools = [
     description: 'Estimate the order quantity that balances ordering and holding costs.',
     category: 'Inventory Management',
     input: 'Demand, order cost, holding cost',
-    output: 'Recommended order quantity'
+    output: 'Recommended order quantity',
+    status: 'Coming soon'
   },
   {
     name: 'Safety Stock Calculator',
     description: 'Estimate reserve stock needed to protect service levels under uncertainty.',
     category: 'Supply Chain',
     input: 'Demand variability, lead time, service level',
-    output: 'Safety stock recommendation'
+    output: 'Safety stock recommendation',
+    status: 'Coming soon'
   },
   {
     name: 'Reorder Point Calculator',
     description: 'Calculate when replenishment should be triggered based on demand and lead time.',
     category: 'Inventory Management',
     input: 'Lead time demand and safety stock',
-    output: 'Reorder point threshold'
+    output: 'Reorder point threshold',
+    status: 'Coming soon'
   },
   {
-    name: 'Demand Forecasting',
-    description: 'Create practical demand forecasts from historical patterns.',
+    name: 'Exponential Smoothing',
+    description: 'Forecast demand using simple smoothing, Holt’s trend method, or Holt-Winters seasonality.',
     category: 'Forecasting',
     input: 'Historical demand series',
-    output: 'Forecast values and trend view'
-  },
-  {
-    name: 'Holt-Winters Forecasting',
-    description: 'Forecast demand with trend and seasonality using exponential smoothing.',
-    category: 'Forecasting',
-    input: 'Seasonal time series',
-    output: 'Seasonal forecast and parameters',
+    output: 'Forecast table, error metric, and chart',
+    cta: 'Open Exponential Smoothing',
     href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
   },
   {
@@ -124,7 +106,8 @@ const tools = [
     description: 'Find the volume or revenue needed to cover fixed and variable costs.',
     category: 'Finance',
     input: 'Price, fixed cost, variable cost',
-    output: 'Break-even quantity and margin'
+    output: 'Break-even quantity and margin',
+    status: 'Coming soon'
   },
   {
     name: 'Gantt Chart Planner',
@@ -156,18 +139,103 @@ const roadmap = [
 ];
 
 const searchItems = [
-  ...tools.map((tool) => ({
+  ...tools.filter((tool) => tool.href).map((tool) => ({
     title: tool.name,
     detail: `${tool.category} • ${tool.output}`,
-    href: tool.href || '#tools'
+    href: tool.href
   })),
   ...categories.map((category) => ({ title: category.title, detail: category.benefit, href: '#categories' })),
-  ...problems.map((problem) => ({ title: problem.title, detail: problem.detail, href: problem.href })),
-  { title: 'EOQ', detail: 'Economic order quantity method', href: '#tools' },
-  { title: 'Exponential Smoothing', detail: 'Forecasting • Simple, Holt, and Holt-Winters smoothing', href: 'Exponential%20Smoothing/Exponential_Smoothing.html' },
-  { title: 'Regression', detail: 'Statistical relationship analysis', href: '#tools' },
-  { title: 'NPV', detail: 'Investment viability method', href: '#tools' }
+  ...problems.map((problem) => ({ title: problem.title, detail: problem.detail, href: problem.href }))
 ];
+
+const contactEmail = 'analyticaltoolshub@gmail.com';
+
+const legalDocuments = {
+  privacy: {
+    title: 'Privacy Policy',
+    sections: [
+      {
+        heading: 'Overview',
+        body: ['Analytical Tools Hub is designed as a browser-based analytical workspace. Current tools process typical calculations locally in your browser unless a tool clearly states otherwise.']
+      },
+      {
+        heading: 'Information You Enter',
+        body: ['Tool inputs may include inventory, forecasting, procurement, project, or business data that you choose to enter or upload. For the current static tools, this data is used in the browser to produce calculations, tables, charts, and exports.']
+      },
+      {
+        heading: 'Email and Updates',
+        body: ['The updates form opens an email draft addressed to Analytical Tools Hub. Newsletter delivery may be added later if a dedicated email service is configured.']
+      },
+      {
+        heading: 'Local Files and Exports',
+        body: ['When you export CSV, Excel, image, or JSON files, the files are generated for your own use. You are responsible for storing and protecting files downloaded to your device.']
+      },
+      {
+        heading: 'Contact',
+        body: [`For privacy questions, contact ${contactEmail}.`]
+      }
+    ]
+  },
+  terms: {
+    title: 'Terms of Use',
+    sections: [
+      {
+        heading: 'Use of the Site',
+        body: ['Analytical Tools Hub provides practical analytical tools and educational content for general informational and decision-support purposes.']
+      },
+      {
+        heading: 'User Responsibility',
+        body: ['You are responsible for checking the data you enter, reviewing assumptions, validating outputs, and deciding whether a method is appropriate for your situation.']
+      },
+      {
+        heading: 'No Guaranteed Availability',
+        body: ['Tools may be updated, changed, removed, or expanded over time. Features labelled as coming soon are not yet available.']
+      },
+      {
+        heading: 'Acceptable Use',
+        body: ['Do not use the site in a way that attempts to disrupt, reverse engineer, overload, or misuse the tools, code, or services.']
+      }
+    ]
+  },
+  cookies: {
+    title: 'Cookie Policy',
+    sections: [
+      {
+        heading: 'Current Cookie Use',
+        body: ['The current static site does not intentionally set analytics, advertising, or tracking cookies.']
+      },
+      {
+        heading: 'Local Browser Storage',
+        body: ['Some tool features may use browser storage or locally generated files to support the user experience. Where persistence exists, it should be explained in the relevant tool.']
+      },
+      {
+        heading: 'Future Analytics',
+        body: ['If analytics, embedded services, or newsletter tools are added later, this policy should be updated before those services are enabled.']
+      }
+    ]
+  },
+  disclaimer: {
+    title: 'Disclaimer',
+    sections: [
+      {
+        heading: 'Decision Support Only',
+        body: ['ATH tools are provided to support analysis and learning. They do not replace professional judgement, expert review, or organisation-specific procedures.']
+      },
+      {
+        heading: 'No Professional Advice',
+        body: ['Outputs should not be treated as legal, financial, engineering, procurement, or operational advice. Consult qualified professionals where decisions carry material risk.']
+      },
+      {
+        heading: 'Accuracy and Validation',
+        body: ['Although the tools are designed to be practical and transparent, you should verify formulas, assumptions, data quality, and results before relying on outputs.']
+      },
+      {
+        heading: 'Limitation of Liability',
+        body: ['Use the tools at your own discretion. Analytical Tools Hub is not responsible for losses or decisions made from unverified inputs, assumptions, or outputs.']
+      }
+    ]
+  }
+};
 
 function renderCards(selector, items, template) {
   const target = document.querySelector(selector);
@@ -199,7 +267,7 @@ function initRenderedContent() {
   `);
 
   renderCards('[data-render="tools"]', tools, (tool) => `
-    <article class="tool-card">
+    <article class="tool-card${tool.status ? ' is-coming-soon' : ''}">
       <div class="tool-card-header">
         <div>
           <span class="card-meta">${tool.category}</span>
@@ -212,7 +280,9 @@ function initRenderedContent() {
         <span><strong>Input:</strong> ${tool.input}</span>
         <span><strong>Output:</strong> ${tool.output}</span>
       </div>
-      <a class="card-link" href="${tool.href || '#'}" aria-label="${tool.cta || `Open ${tool.name}`}">${tool.cta || `Open ${tool.name}`}</a>
+      ${tool.href
+        ? `<a class="card-link" href="${tool.href}" aria-label="${tool.cta || `Open ${tool.name}`}">${tool.cta || `Open ${tool.name}`}</a>`
+        : `<span class="coming-soon-label" aria-label="${tool.name} is coming soon">${tool.status || 'Coming soon'}</span>`}
     </article>
   `);
 
@@ -386,15 +456,62 @@ function initNewsletter() {
     message.classList.remove('error', 'success');
 
     if (!valid) {
-      message.textContent = 'Enter a valid email address to subscribe.';
+      message.textContent = 'Enter a valid email address to register interest.';
       message.classList.add('error');
       form.querySelector('input')?.focus();
       return;
     }
 
-    message.textContent = 'Thanks. This placeholder form is ready to connect to an email service.';
+    const subject = encodeURIComponent('Register interest in Analytical Tools Hub updates');
+    const body = encodeURIComponent(`Hello Analytical Tools Hub,\n\nPlease register my interest in future ATH updates.\n\nEmail: ${email}\n\nThank you.`);
+    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+
+    message.textContent = 'Your email app should open with a prefilled message to ATH.';
     message.classList.add('success');
     form.reset();
+  });
+}
+
+function initLegalModal() {
+  const modal = document.querySelector('[data-legal-modal]');
+  const title = document.querySelector('[data-legal-title]');
+  const content = document.querySelector('[data-legal-content]');
+  const openButtons = document.querySelectorAll('[data-legal-open]');
+  const closeButtons = document.querySelectorAll('[data-legal-close]');
+  if (!modal || !title || !content) return;
+
+  const renderLegalDocument = (documentKey) => {
+    const document = legalDocuments[documentKey];
+    if (!document) return;
+
+    title.textContent = document.title;
+    content.innerHTML = document.sections.map((section) => `
+      <section>
+        <h3>${section.heading}</h3>
+        ${section.body.map((paragraph) => `<p>${paragraph}</p>`).join('')}
+      </section>
+    `).join('');
+  };
+
+  const openLegal = (documentKey) => {
+    renderLegalDocument(documentKey);
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+    modal.querySelector('[data-legal-close]')?.focus();
+  };
+
+  const closeLegal = () => {
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+  };
+
+  openButtons.forEach((button) => {
+    button.addEventListener('click', () => openLegal(button.dataset.legalOpen));
+  });
+  closeButtons.forEach((button) => button.addEventListener('click', closeLegal));
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !modal.hidden) closeLegal();
   });
 }
 
@@ -404,3 +521,4 @@ initMobileMenu();
 initSearch();
 initCounters();
 initNewsletter();
+initLegalModal();

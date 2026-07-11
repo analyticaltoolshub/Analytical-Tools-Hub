@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABC Analysis | Analytical Tools Hub</title>
     <meta name="description" content="Classify inventory items by consumption value with a practical ABC analysis tool from Analytical Tools Hub.">
+    <link rel="canonical" href="https://AnalyticalToolsHub.com/ABC%20Analysis/ABC_Analysis.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ABC Analysis Tool | Analytical Tools Hub">
+    <meta property="og:description" content="Classify inventory items by consumption value with a browser-based ABC analysis tool, Pareto chart, and export-ready results.">
+    <meta property="og:url" content="https://AnalyticalToolsHub.com/ABC%20Analysis/ABC_Analysis.html">
+    <meta property="og:image" content="https://AnalyticalToolsHub.com/assets/ath-logo-horizontal.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ABC Analysis Tool | Analytical Tools Hub">
+    <meta name="twitter:description" content="Classify inventory items by consumption value with a browser-based ABC analysis tool, Pareto chart, and export-ready results.">
+    <meta name="twitter:image" content="https://AnalyticalToolsHub.com/assets/ath-logo-horizontal.png">
     <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
     <link rel="stylesheet" href="ABC_Analysis.css">
     <!-- Site theme: fonts and core CSS from main site -->
@@ -24,6 +34,39 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "SoftwareApplication",
+                    "@id": "https://AnalyticalToolsHub.com/ABC%20Analysis/ABC_Analysis.html#software",
+                    "name": "ABC Analysis Tool",
+                    "applicationCategory": "BusinessApplication",
+                    "operatingSystem": "Web browser",
+                    "url": "https://AnalyticalToolsHub.com/ABC%20Analysis/ABC_Analysis.html",
+                    "description": "A browser-based tool for classifying inventory items by consumption value and reviewing the Pareto curve.",
+                    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+                    "featureList": [
+                        "CSV and Excel import",
+                        "Manual inventory entry",
+                        "ABC threshold settings",
+                        "Pareto chart",
+                        "CSV and Excel export"
+                    ],
+                    "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://AnalyticalToolsHub.com/" }
+                },
+                {
+                    "@type": "BreadcrumbList",
+                    "@id": "https://AnalyticalToolsHub.com/ABC%20Analysis/ABC_Analysis.html#breadcrumb",
+                    "itemListElement": [
+                        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://AnalyticalToolsHub.com/" },
+                        { "@type": "ListItem", "position": 2, "name": "ABC Analysis", "item": "https://AnalyticalToolsHub.com/ABC%20Analysis/ABC_Analysis.html" }
+                    ]
+                }
+            ]
+        }
+    </script>
 </head>
 
 <body class="abc-page">
@@ -47,7 +90,7 @@
     <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
         <section class="tool-hero" aria-labelledby="abc-page-title">
             <span class="tool-badge">Inventory and Supply Chain</span>
-            <h2 id="abc-page-title">ABC Analysis</h2>
+            <h1 id="abc-page-title">ABC Analysis</h1>
             <p>Classify inventory items by value contribution, review the Pareto curve, and decide where tighter stock control will have the greatest impact.</p>
             <div class="tool-reassurance" aria-label="Tool assurances">
                 <span>Browser-based calculation</span>
@@ -416,6 +459,24 @@
             </div>
         </section>
 
+        <section id="abc-methodology" class="themed-card p-6 rounded-xl shadow-xs border border-gray-700 space-y-4">
+            <h2 class="text-lg font-semibold">Methodology, Assumptions, and Limitations</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="abc-content-card">
+                    <span>Formula</span>
+                    <p>Item value is either the supplied value field or Quantity x Unit Price. Individual share is item value divided by total value. Cumulative share is calculated after sorting items from highest value to lowest value.</p>
+                </div>
+                <div class="abc-content-card">
+                    <span>Assumptions</span>
+                    <p>The method assumes value contribution is the right prioritisation measure. It does not automatically account for criticality, lead time, substitution risk, shelf life, or customer impact.</p>
+                </div>
+                <div class="abc-content-card">
+                    <span>Limitations</span>
+                    <p>ABC classes are a decision aid, not a final policy. Review high-risk or operationally critical items separately, even when their calculated value class is B or C.</p>
+                </div>
+            </div>
+        </section>
+
         <section id="faq" class="abc-faq themed-card p-6 rounded-xl shadow-xs border border-gray-700">
             <h2 class="text-lg font-semibold">FAQ</h2>
             <details>
@@ -451,6 +512,7 @@
                     <a href="#output-dashboard">Results</a>
                     <a href="#about-abc">About ABC</a>
                     <a href="#abc-guidance">Guidance</a>
+                    <a href="#abc-methodology">Methodology</a>
                     <a href="#faq">FAQ</a>
                 </nav>
             </aside>

@@ -69,7 +69,7 @@
           <img class="brand-logo" src="assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="265" height="90">
         </a>
         <nav class="desktop-nav" aria-label="Primary navigation">
-          <a href="#tools">Tools</a>
+          <a href="#featured-tools">Tools</a>
           <a href="#categories">Categories</a>
           <a href="#how-it-works">How It Works</a>
           <a href="#learn">Resources</a>
@@ -79,7 +79,7 @@
           <button class="icon-button" type="button" data-search-open aria-label="Open tool search">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.35-4.35M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"/></svg>
           </button>
-          <a class="button button-small button-primary" href="#tools">Explore Tools</a>
+          <a class="button button-small button-primary" href="#featured-tools">Explore Tools</a>
           <button class="mobile-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation">
             <span></span><span></span><span></span>
           </button>
@@ -87,12 +87,12 @@
       </div>
       <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
         <div class="container mobile-menu-inner">
-          <a href="#tools">Tools</a>
+          <a href="#featured-tools">Tools</a>
           <a href="#categories">Categories</a>
           <a href="#how-it-works">How It Works</a>
           <a href="#learn">Resources</a>
           <a href="#about">About</a>
-          <a class="button button-primary" href="#tools">Explore Tools</a>
+          <a class="button button-primary" href="#featured-tools">Explore Tools</a>
         </div>
       </div>
     </header>
@@ -112,6 +112,22 @@
         <label class="sr-only" for="global-search">Search tools, methods, or business problems</label>
         <input id="global-search" data-search-input type="search" placeholder="Search tools, methods, or business problems..." autocomplete="off">
         <div class="search-suggestions" data-search-results aria-live="polite"></div>
+      </section>
+    </div>
+
+    <div class="legal-modal" data-legal-modal hidden>
+      <div class="search-backdrop" data-legal-close></div>
+      <section class="legal-dialog" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+        <div class="search-header">
+          <div>
+            <p class="eyebrow">ATH Legal</p>
+            <h2 id="legal-title" data-legal-title>Legal Information</h2>
+          </div>
+          <button class="icon-button" type="button" data-legal-close aria-label="Close legal information">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="legal-content" data-legal-content></div>
       </section>
     </div>
 
@@ -153,7 +169,7 @@
                 <div class="preview-main">
                   <div class="tool-search-mini">
                     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.35-4.35M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"/></svg>
-                    <span>Search EOQ, ABC, seasonal demand...</span>
+                    <span>Search ABC, smoothing, supplier risk...</span>
                   </div>
                   <div class="kpi-grid">
                     <article><span>Forecast Accuracy</span><strong data-count="92">0</strong><em>%</em></article>
@@ -251,7 +267,7 @@
             <article>
               <span class="card-icon">02</span>
               <h3>Search by Method</h3>
-              <p>Find EOQ, ABC analysis, regression, Holt-Winters, NPV, and other specific methods.</p>
+              <p>Find available methods such as ABC analysis, exponential smoothing, Kraljic Matrix, and Gantt planning.</p>
             </article>
             <article class="problem-card">
               <span class="card-icon">03</span>
@@ -276,7 +292,7 @@
         </div>
       </section>
 
-      <section class="section">
+      <section class="section" id="featured-tools">
         <div class="container">
           <div class="section-heading split-heading">
             <div>
@@ -381,7 +397,7 @@
         </div>
       </section>
 
-      <section class="section roadmap-section">
+      <section class="section roadmap-section" id="roadmap">
         <div class="container">
           <div class="section-heading">
             <span class="eyebrow">Roadmap</span>
@@ -395,16 +411,16 @@
         <div class="container newsletter">
           <div>
             <span class="eyebrow">Product Updates</span>
-            <h2>Follow the Growth of ATH</h2>
-            <p>Receive updates when new analytical tools, guides, and features are released.</p>
+            <h2>Updates List Coming Soon</h2>
+            <p>Send a quick email to register interest in updates when new analytical tools, guides, and features are released.</p>
           </div>
           <form class="newsletter-form" novalidate data-newsletter>
             <label for="email">Email address</label>
             <div>
               <input id="email" name="email" type="email" placeholder="you@example.com" required>
-              <button class="button button-primary" type="submit">Subscribe</button>
+              <button class="button button-primary" type="submit">Register Interest</button>
             </div>
-            <p class="form-message" data-form-message>Occasional product updates. No spam.</p>
+            <p class="form-message" data-form-message>Submitting opens your email app so you can send your interest directly.</p>
           </form>
         </div>
       </section>
@@ -431,10 +447,10 @@
           <p>Calculate • Analyze • Decide</p>
           <p>Free and practical analytical tools for better real-world decisions.</p>
         </div>
-        <nav aria-label="Footer tools"><h2>Tools</h2><a href="#tools">Featured Tools</a><a href="#tools">All Tools</a><a href="#tools">New Tools</a><a href="#categories">Tool Categories</a></nav>
+        <nav aria-label="Footer tools"><h2>Tools</h2><a href="#featured-tools">Featured Tools</a><a href="#featured-tools">All Tools</a><a href="#featured-tools">New Tools</a><a href="#categories">Tool Categories</a></nav>
         <nav aria-label="Footer learning"><h2>Learn</h2><a href="#learn">Guides</a><a href="#learn">Examples</a><a href="#learn">Glossary</a><a href="#learn">Method Comparisons</a></nav>
-        <nav aria-label="Footer company"><h2>Company</h2><a href="#about">About</a><a href="mailto:hello@AnalyticalToolsHub.com">Contact</a><a href="#about">Feedback</a><a href="#about">Roadmap</a></nav>
-        <nav aria-label="Footer legal"><h2>Legal</h2><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Cookie Policy</a><a href="#">Disclaimer</a></nav>
+        <nav aria-label="Footer project"><h2>ATH</h2><a href="#about">About</a><a href="mailto:analyticaltoolshub@gmail.com">Contact</a><a href="mailto:analyticaltoolshub@gmail.com?subject=ATH%20Feedback">Feedback</a><a href="#roadmap">Roadmap</a></nav>
+        <nav aria-label="Footer legal"><h2>Legal</h2><button type="button" data-legal-open="privacy">Privacy Policy</button><button type="button" data-legal-open="terms">Terms of Use</button><button type="button" data-legal-open="cookies">Cookie Policy</button><button type="button" data-legal-open="disclaimer">Disclaimer</button></nav>
       </div>
       <div class="container footer-bottom">
         <p>© 2026 Analytical Tools Hub. All rights reserved.</p>

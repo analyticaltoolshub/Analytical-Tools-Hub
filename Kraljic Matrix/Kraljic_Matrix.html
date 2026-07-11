@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kraljic Matrix | Analytical Tools Hub</title>
   <meta name="description" content="Map procurement categories by supply risk and profit impact with a practical Kraljic Matrix tool from Analytical Tools Hub." />
+  <link rel="canonical" href="https://AnalyticalToolsHub.com/Kraljic%20Matrix/Kraljic_Matrix.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Kraljic Matrix Tool | Analytical Tools Hub" />
+  <meta property="og:description" content="Map procurement categories by supply risk and profit impact with a browser-based Kraljic Matrix tool." />
+  <meta property="og:url" content="https://AnalyticalToolsHub.com/Kraljic%20Matrix/Kraljic_Matrix.html" />
+  <meta property="og:image" content="https://AnalyticalToolsHub.com/assets/ath-logo-horizontal.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Kraljic Matrix Tool | Analytical Tools Hub" />
+  <meta name="twitter:description" content="Map procurement categories by supply risk and profit impact with a browser-based Kraljic Matrix tool." />
+  <meta name="twitter:image" content="https://AnalyticalToolsHub.com/assets/ath-logo-horizontal.png" />
   <link rel="icon" type="image/png" href="../assets/ath-favicon.png" />
   <link rel="stylesheet" href="Kraljic_Matrix.css" />
   <link rel="stylesheet" href="../tool-theme.css" />
@@ -12,6 +22,39 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://AnalyticalToolsHub.com/Kraljic%20Matrix/Kraljic_Matrix.html#software",
+          "name": "Kraljic Matrix Tool",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://AnalyticalToolsHub.com/Kraljic%20Matrix/Kraljic_Matrix.html",
+          "description": "A browser-based procurement tool for mapping categories by supply risk and profit impact.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "CSV and Excel import",
+            "Category aggregation",
+            "Supply risk scoring",
+            "Kraljic quadrant matrix",
+            "CSV and image export"
+          ],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://AnalyticalToolsHub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://AnalyticalToolsHub.com/Kraljic%20Matrix/Kraljic_Matrix.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://AnalyticalToolsHub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Kraljic Matrix", "item": "https://AnalyticalToolsHub.com/Kraljic%20Matrix/Kraljic_Matrix.html" }
+          ]
+        }
+      ]
+    }
+  </script>
 </head>
 <body class="kraljic-page">
   <nav class="tool-topnav">
@@ -33,7 +76,7 @@
   <main class="container">
     <section class="tool-hero" aria-labelledby="kraljic-page-title">
       <span class="tool-badge">Procurement and Supply Chain</span>
-      <h2 id="kraljic-page-title">Kraljic Matrix</h2>
+      <h1 id="kraljic-page-title">Kraljic Matrix</h1>
       <p>Aggregate purchasing categories, score supply risk, and map each category into a procurement strategy quadrant.</p>
       <div class="tool-reassurance" aria-label="Tool assurances">
         <span>Browser-based analysis</span>
@@ -194,6 +237,28 @@
           </div>
         </section>
 
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Method Logic</span>
+              <p>The tool aggregates annual spend by category, converts relative spend into a profit impact score, and combines that score with a user-entered supply risk rating.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Required Inputs</span>
+              <p>Use category, supplier, and annual spend fields for the import. Supply risk is intentionally entered by the user because it depends on market knowledge and operational judgement.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Assumptions</span>
+              <p>Annual spend is used as a practical proxy for profit impact. This is useful for screening categories, but it may not fully capture margin, customer impact, or production criticality.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Limitations</span>
+              <p>The matrix should support procurement discussion, not replace supplier due diligence. Review strategic or bottleneck items with additional risk, quality, and continuity information.</p>
+            </div>
+          </div>
+        </section>
+
         <section class="panel content-section faq-section" id="faq">
           <h2>FAQ</h2>
           <details>
@@ -220,6 +285,7 @@
           <a href="#about-kraljic">About</a>
           <a href="#how-to-use">How to Use</a>
           <a href="#category-guidance">Guidance</a>
+          <a href="#methodology">Methodology</a>
           <a href="#faq">FAQ</a>
         </nav>
       </aside>
