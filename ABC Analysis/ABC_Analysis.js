@@ -1,0 +1,757 @@
+// Module level state variables
+let uploadedRawData = null;
+let finalAnalysisResults = [];
+let paretoChartInstance = null;
+const ALLOWED_FILE_EXTENSIONS = [".csv", ".xlsx", ".xls"];
+const MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024;
+const SAMPLE_INVENTORY_ITEMS = [
+  { name: "Laptop Docking Station", quantity: 120, unitPrice: 155 },
+  { name: "Industrial Safety Gloves", quantity: 950, unitPrice: 15 },
+  { name: "Barcode Scanner", quantity: 40, unitPrice: 320 },
+  { name: "Printer Toner Cartridge", quantity: 160, unitPrice: 60 },
+  { name: "Packing Tape Rolls", quantity: 740, unitPrice: 10 },
+  { name: "Wireless Keyboard", quantity: 150, unitPrice: 41 },
+  { name: "Shipping Labels", quantity: 1300, unitPrice: 4 },
+  { name: "USB-C Cable", quantity: 410, unitPrice: 10 },
+  { name: "Desk Organizer Tray", quantity: 175, unitPrice: 16 },
+  { name: "Replacement Mouse Pads", quantity: 270, unitPrice: 5 },
+];
+
+// UI Element References
+const dropZone = document.getElementById("drop-zone");
+const fileInput = document.getElementById("file-input");
+const mappingSection = document.getElementById("mapping-section");
+const calcMethodSelect = document.getElementById("calc-method");
+const manualTbody = document.getElementById("manual-tbody");
+const manualSearchInput = document.getElementById("manual-search");
+const resultsDashboard = document.getElementById("output-dashboard");
+
+// Initial setup hook
+window.addEventListener("DOMContentLoaded", () => {
+  initializeManualInputTable();
+  setupDragAndDrop();
+});
+
+// Initialize Manual Input with empty template fields
+function initializeManualInputTable() {
+  manualTbody.innerHTML = "";
+  for (let i = 0; i < 5; i++) {
+    addManualRow();
+  }
+}
+
+function resetOutputState() {
+  finalAnalysisResults = [];
+  resultsDashboard.classList.add("hidden");
+  document.getElementById("results-tbody").innerHTML = "";
+  document.getElementById("stat-total-value").innerText = "$0.00";
+  document.getElementById("stat-class-a").innerText = "0 (0%)";
+  document.getElementById("stat-class-b").innerText = "0 (0%)";
+  document.getElementById("stat-class-c").innerText = "0 (0%)";
+
+  if (paretoChartInstance) {
+    paretoChartInstance.destroy();
+    paretoChartInstance = null;
+  }
+}
+
+function resetImportedFileState() {
+  uploadedRawData = null;
+  fileInput.value = "";
+  mappingSection.classList.add("hidden");
+  ["map-item", "map-val1", "map-val2"].forEach((selectId) => {
+    document.getElementById(selectId).innerHTML = "";
+  });
+}
+
+function clearAllData() {
+  resetImportedFileState();
+  resetOutputState();
+  clearThresholdWarning();
+  manualSearchInput.value = "";
+  calcMethodSelect.value = "single";
+  calcMethodSelect.dispatchEvent(new Event("change"));
+  document.getElementById("threshold-a").value = "80";
+  document.getElementById("threshold-b").value = "95";
+  initializeManualInputTable();
+}
+
+function loadSampleData() {
+  resetImportedFileState();
+  resetOutputState();
+  clearThresholdWarning();
+  manualSearchInput.value = "";
+  calcMethodSelect.dispatchEvent(new Event("change"));
+  manualTbody.innerHTML = "";
+  SAMPLE_INVENTORY_ITEMS.forEach((item) => {
+    if (calcMethodSelect.value === "multiply") {
+      addManualRow(item.name, item.quantity, item.unitPrice);
+      return;
+    }
+
+    addManualRow(item.name, item.quantity * item.unitPrice);
+  });
+  applyManualSearchFilter();
+}
+
+function applyManualSearchFilter() {
+  const query = manualSearchInput.value.trim().toLowerCase();
+
+  manualTbody.querySelectorAll("tr").forEach((row) => {
+    const itemName = row.querySelector(".manual-item").value.toLowerCase();
+    row.classList.toggle("hidden", query !== "" && !itemName.includes(query));
+  });
+}
+
+function addManualRow(item = "", val1 = "", val2 = "") {
+  const row = document.createElement("tr");
+  row.className = "hover:bg-gray-50/50 transition-colors group";
+
+  const isMultiply = calcMethodSelect.value === "multiply";
+
+  const itemCell = document.createElement("td");
+  itemCell.className = "p-2";
+  const itemInput = document.createElement("input");
+  itemInput.type = "text";
+  itemInput.value = item;
+  itemInput.placeholder = `e.g. SKU-${Math.floor(1000 + Math.random() * 9000)}`;
+  itemInput.className =
+    "w-full border border-gray-200 rounded px-2 py-1 text-sm manual-item";
+  itemCell.appendChild(itemInput);
+
+  const val1Cell = document.createElement("td");
+  val1Cell.className = "p-2";
+  const val1Input = document.createElement("input");
+  val1Input.type = "number";
+  val1Input.value = val1;
+  val1Input.min = "0";
+  val1Input.step = "any";
+  val1Input.placeholder = "0.00";
+  val1Input.className =
+    "w-full border border-gray-200 rounded px-2 py-1 text-sm manual-val1";
+  val1Cell.appendChild(val1Input);
+
+  const val2Cell = document.createElement("td");
+  val2Cell.className = `p-2 ${isMultiply ? "" : "hidden"} manual-val2-cell`;
+  const val2Input = document.createElement("input");
+  val2Input.type = "number";
+  val2Input.value = val2;
+  val2Input.min = "0";
+  val2Input.step = "any";
+  val2Input.placeholder = "0.00";
+  val2Input.className =
+    "w-full border border-gray-200 rounded px-2 py-1 text-sm manual-val2";
+  val2Cell.appendChild(val2Input);
+
+  const actionCell = document.createElement("td");
+  actionCell.className = "p-2 text-center";
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.className =
+    "manual-delete-btn";
+  removeButton.textContent = "x";
+  removeButton.addEventListener("click", () => row.remove());
+  actionCell.appendChild(removeButton);
+
+  row.append(itemCell, val1Cell, val2Cell, actionCell);
+  manualTbody.appendChild(row);
+  applyManualSearchFilter();
+}
+
+document
+  .getElementById("btn-add-row")
+  .addEventListener("click", () => addManualRow());
+document
+  .getElementById("btn-load-sample")
+  .addEventListener("click", loadSampleData);
+document.getElementById("btn-clear-all").addEventListener("click", clearAllData);
+manualSearchInput.addEventListener("input", applyManualSearchFilter);
+
+// Respond to structural formulas changing
+calcMethodSelect.addEventListener("change", (e) => {
+  const isMultiply = e.target.value === "multiply";
+
+  // Adjust Manual Input Column visibility headers
+  document
+    .getElementById("manual-th-val2")
+    .classList.toggle("hidden", !isMultiply);
+  document
+    .querySelectorAll(".manual-val2-cell")
+    .forEach((cell) => cell.classList.toggle("hidden", !isMultiply));
+  document.getElementById("manual-th-val1").innerText = isMultiply
+    ? "Quantity"
+    : "Value";
+
+  // Adjust Import Parser UI mappings
+  document.getElementById("formula-label-1").innerText = isMultiply
+    ? "Quantity Column"
+    : "Value Column";
+  document
+    .getElementById("mapping-val2-container")
+    .classList.toggle("hidden", !isMultiply);
+});
+
+// Drag & Drop event bindings
+function setupDragAndDrop() {
+  dropZone.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", (e) =>
+    handleFileSelection(e.target.files[0]),
+  );
+
+  ["dragenter", "dragover"].forEach((name) => {
+    dropZone.addEventListener(
+      name,
+      (e) => {
+        e.preventDefault();
+        dropZone.classList.add("bg-indigo-100", "border-indigo-500");
+      },
+      false,
+    );
+  });
+  ["dragleave", "drop"].forEach((name) => {
+    dropZone.addEventListener(
+      name,
+      (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("bg-indigo-100", "border-indigo-500");
+      },
+      false,
+    );
+  });
+  dropZone.addEventListener("drop", (e) => {
+    const dt = e.dataTransfer;
+    if (dt.files.length) handleFileSelection(dt.files[0]);
+  });
+}
+
+// File loading extraction using SheetJS
+function handleFileSelection(file) {
+  if (!file) return;
+
+  const fileName = file.name.toLowerCase();
+  const isAllowedFileType = ALLOWED_FILE_EXTENSIONS.some((extension) =>
+    fileName.endsWith(extension),
+  );
+
+  if (!isAllowedFileType) {
+    alert("Please upload a valid CSV, XLS, or XLSX file.");
+    fileInput.value = "";
+    return;
+  }
+
+  if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+    alert("File is too large. Please upload a file under 5 MB.");
+    fileInput.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const firstSheetName = workbook.SheetNames && workbook.SheetNames[0];
+
+      if (!firstSheetName) {
+        throw new Error("Workbook does not contain any sheets.");
+      }
+
+      const worksheet = workbook.Sheets[firstSheetName];
+      if (!worksheet || !worksheet["!ref"]) {
+        throw new Error("First sheet is empty.");
+      }
+
+      const rawRows = XLSX.utils.sheet_to_json(worksheet, {
+        defval: "",
+        header: 1,
+      });
+      const headerRow = rawRows.find((row) =>
+        row.some((cell) => String(cell).trim() !== ""),
+      );
+
+      if (!headerRow) {
+        throw new Error("File does not contain a header row.");
+      }
+
+      const headers = headerRow
+        .map((header) => String(header).trim())
+        .filter((header) => header !== "");
+
+      if (headers.length < 2) {
+        throw new Error("File needs at least two usable columns.");
+      }
+
+      // Parse rows using the first non-empty row as headers.
+      uploadedRawData = XLSX.utils
+        .sheet_to_json(worksheet, {
+          defval: "",
+          range: rawRows.indexOf(headerRow),
+        })
+        .filter((row) =>
+          Object.values(row).some((value) => String(value).trim() !== ""),
+        );
+
+      if (uploadedRawData.length === 0) {
+        throw new Error("File does not contain data rows below the header.");
+      }
+
+      populateColumnMappingSelectors(Object.keys(uploadedRawData[0]));
+    } catch (error) {
+      uploadedRawData = null;
+      mappingSection.classList.add("hidden");
+      fileInput.value = "";
+      alert(
+        "We could not read this file. Please upload a valid CSV, XLS, or XLSX file with a header row and at least one data row.",
+      );
+    }
+  };
+  reader.onerror = function () {
+    uploadedRawData = null;
+    mappingSection.classList.add("hidden");
+    fileInput.value = "";
+    alert("We could not read this file. Please try again.");
+  };
+
+  try {
+    reader.readAsArrayBuffer(file);
+  } catch (error) {
+    uploadedRawData = null;
+    mappingSection.classList.add("hidden");
+    fileInput.value = "";
+    alert("We could not read this file. Please try again.");
+  }
+}
+
+// Expose dynamic dropdown settings options maps
+function populateColumnMappingSelectors(headers) {
+  const selectItem = document.getElementById("map-item");
+  const selectVal1 = document.getElementById("map-val1");
+  const selectVal2 = document.getElementById("map-val2");
+
+  [selectItem, selectVal1, selectVal2].forEach((sel) => {
+    sel.innerHTML = "";
+    headers.forEach((h) => {
+      const opt = document.createElement("option");
+      opt.value = h;
+      opt.innerText = h;
+      sel.appendChild(opt);
+    });
+  });
+
+  // Fuzzy logic heuristics to set default index targets natively
+  selectItem.selectedIndex = Math.max(
+    headers.findIndex((h) => /name|item|sku|id/i.test(h)),
+    0,
+  );
+  selectVal1.selectedIndex = Math.max(
+    headers.findIndex((h) => /val|qty|quantity/i.test(h)),
+    0,
+  );
+  selectVal2.selectedIndex = Math.max(
+    headers.findIndex((h) => /price|cost/i.test(h)),
+    0,
+  );
+
+  mappingSection.classList.remove("hidden");
+}
+
+// Processing trigger for explicit raw spreadsheets conversion
+document.getElementById("btn-process-file").addEventListener("click", () => {
+  if (!uploadedRawData) return;
+
+  const itemKey = document.getElementById("map-item").value;
+  const val1Key = document.getElementById("map-val1").value;
+  const val2Key = document.getElementById("map-val2").value;
+  const isMultiply = calcMethodSelect.value === "multiply";
+
+  manualTbody.innerHTML = ""; // Wipe manual array context fields
+
+  uploadedRawData.forEach((row) => {
+    if (row[itemKey] !== undefined) {
+      addManualRow(
+        row[itemKey],
+        row[val1Key] || 0,
+        isMultiply ? row[val2Key] || 0 : "",
+      );
+    }
+  });
+
+  alert(
+    `Successfully integrated ${uploadedRawData.length} records! Review configs and hit 'Calculate ABC Analysis'.`,
+  );
+});
+
+function showThresholdWarning(message) {
+  const thresholdWarning = document.getElementById("threshold-warning");
+  thresholdWarning.textContent = message;
+  thresholdWarning.classList.remove("hidden");
+}
+
+function clearThresholdWarning() {
+  const thresholdWarning = document.getElementById("threshold-warning");
+  thresholdWarning.textContent = "";
+  thresholdWarning.classList.add("hidden");
+}
+
+function getValidatedThresholds() {
+  const thresholdAValue = parseFloat(
+    document.getElementById("threshold-a").value,
+  );
+  const thresholdBValue = parseFloat(
+    document.getElementById("threshold-b").value,
+  );
+
+  if (!Number.isFinite(thresholdAValue) || !Number.isFinite(thresholdBValue)) {
+    return {
+      isValid: false,
+      message: "Please enter valid numeric threshold percentages for Class A and Class B.",
+    };
+  }
+
+  if (
+    thresholdAValue < 0 ||
+    thresholdAValue > 100 ||
+    thresholdBValue < 0 ||
+    thresholdBValue > 100
+  ) {
+    return {
+      isValid: false,
+      message: "Class A and Class B thresholds must both be between 0% and 100%.",
+    };
+  }
+
+  if (thresholdAValue >= thresholdBValue) {
+    return {
+      isValid: false,
+      message: "Class A threshold must be less than Class B threshold.",
+    };
+  }
+
+  return {
+    isValid: true,
+    thresholdA: thresholdAValue / 100,
+    thresholdB: thresholdBValue / 100,
+  };
+}
+
+["threshold-a", "threshold-b"].forEach((inputId) => {
+  document.getElementById(inputId).addEventListener("input", () => {
+    if (getValidatedThresholds().isValid) {
+      clearThresholdWarning();
+    }
+  });
+});
+
+// Core Mathematical Processing Engine
+document.getElementById("btn-calculate").addEventListener("click", () => {
+  const dataToProcess = [];
+  const isMultiply = calcMethodSelect.value === "multiply";
+
+  const items = document.querySelectorAll(".manual-item");
+  const val1s = document.querySelectorAll(".manual-val1");
+  const val2s = document.querySelectorAll(".manual-val2");
+  const thresholdConfig = getValidatedThresholds();
+
+  if (!thresholdConfig.isValid) {
+    showThresholdWarning(thresholdConfig.message);
+    return;
+  }
+
+  clearThresholdWarning();
+
+  // 1. Gather raw context inputs
+  items.forEach((elem, index) => {
+    const name = elem.value.trim();
+    const v1 = parseFloat(val1s[index].value) || 0;
+    const v2 = isMultiply ? parseFloat(val2s[index].value) || 0 : 0;
+
+    if (name !== "") {
+      const finalCalculatedValue = isMultiply ? v1 * v2 : v1;
+      dataToProcess.push({ name, calculatedValue: finalCalculatedValue });
+    }
+  });
+
+  if (dataToProcess.length === 0) {
+    alert(
+      "Please add at least one item with valid dataset metadata measurements.",
+    );
+    return;
+  }
+
+  // 2. Sorting array sequence by individual items value weights (Descending structural sort)
+  dataToProcess.sort((a, b) => b.calculatedValue - a.calculatedValue);
+
+  // 3. Mathematical aggregation metrics computations
+  const totalValue = dataToProcess.reduce(
+    (sum, item) => sum + item.calculatedValue,
+    0,
+  );
+
+  if (totalValue <= 0) {
+    alert(
+      "Total cumulative sum aggregate value must be strictly greater than 0 to calculate fractional values.",
+    );
+    return;
+  }
+
+  // 4. Threshold parsing configurations variables maps
+  const { thresholdA, thresholdB } = thresholdConfig;
+
+  let runningSum = 0;
+  finalAnalysisResults = dataToProcess.map((item, index) => {
+    runningSum += item.calculatedValue;
+    const individualPercent = item.calculatedValue / totalValue;
+    const cumulativePercent = runningSum / totalValue;
+
+    // ABC Conditional Assignment logic blocks
+    let abcClass = "C";
+    if (cumulativePercent <= thresholdA) {
+      abcClass = "A";
+    } else if (
+      cumulativePercent <= thresholdB ||
+      cumulativePercent - individualPercent < thresholdB
+    ) {
+      // Inclusion edge logic catches cutoff bounds efficiently
+      abcClass = "B";
+    }
+
+    return {
+      rank: index + 1,
+      name: item.name,
+      value: item.calculatedValue,
+      percent: individualPercent,
+      cumulative: cumulativePercent,
+      class: abcClass,
+    };
+  });
+
+  renderDashboardOutputs(totalValue, finalAnalysisResults);
+});
+
+// Presentation Layout Handler Engine Functions
+function renderDashboardOutputs(totalSum, datasets) {
+  resultsDashboard.classList.remove("hidden");
+
+  // Compute structural widget summary sets
+  const countA = datasets.filter((d) => d.class === "A").length;
+  const countB = datasets.filter((d) => d.class === "B").length;
+  const countC = datasets.filter((d) => d.class === "C").length;
+
+  const sumValA = datasets
+    .filter((d) => d.class === "A")
+    .reduce((s, i) => s + i.value, 0);
+  const sumValB = datasets
+    .filter((d) => d.class === "B")
+    .reduce((s, i) => s + i.value, 0);
+  const sumValC = datasets
+    .filter((d) => d.class === "C")
+    .reduce((s, i) => s + i.value, 0);
+
+  document.getElementById("stat-total-value").innerText =
+    `$${totalSum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  document.getElementById("stat-class-a").innerText =
+    `${countA} (${((sumValA / totalSum) * 100).toFixed(1)}%)`;
+  document.getElementById("stat-class-b").innerText =
+    `${countB} (${((sumValB / totalSum) * 100).toFixed(1)}%)`;
+  document.getElementById("stat-class-c").innerText =
+    `${countC} (${((sumValC / totalSum) * 100).toFixed(1)}%)`;
+
+  // Display table compilation
+  const tbody = document.getElementById("results-tbody");
+  tbody.innerHTML = "";
+
+  datasets.forEach((row) => {
+    const tr = document.createElement("tr");
+    tr.className = "hover:bg-gray-50 transition-colors";
+
+    let badgeStyle = "bg-rose-100 text-rose-800 font-bold";
+    if (row.class === "A")
+      badgeStyle = "bg-emerald-100 text-emerald-800 font-bold";
+    if (row.class === "B") badgeStyle = "bg-amber-100 text-amber-800 font-bold";
+
+    const rankCell = document.createElement("td");
+    rankCell.className = "p-4 font-medium text-gray-500";
+    rankCell.textContent = row.rank;
+
+    const nameCell = document.createElement("td");
+    nameCell.className = "p-4 font-semibold text-gray-800";
+    nameCell.textContent = row.name;
+
+    const valueCell = document.createElement("td");
+    valueCell.className = "p-4 text-right font-mono";
+    valueCell.textContent = row.value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    const percentCell = document.createElement("td");
+    percentCell.className = "p-4 text-right font-mono text-gray-600";
+    percentCell.textContent = `${(row.percent * 100).toFixed(2)}%`;
+
+    const cumulativeCell = document.createElement("td");
+    cumulativeCell.className = "p-4 text-right font-mono text-gray-600 font-medium";
+    cumulativeCell.textContent = `${(row.cumulative * 100).toFixed(2)}%`;
+
+    const classCell = document.createElement("td");
+    classCell.className = "p-4 text-center";
+    const classBadge = document.createElement("span");
+    classBadge.className = `px-3 py-1 rounded text-xs tracking-wider uppercase ${badgeStyle}`;
+    classBadge.textContent = row.class;
+    classCell.appendChild(classBadge);
+
+    tr.append(
+      rankCell,
+      nameCell,
+      valueCell,
+      percentCell,
+      cumulativeCell,
+      classCell,
+    );
+    tbody.appendChild(tr);
+  });
+
+  // Rebuild interactive Pareto Multi-Axis Canvas Charts
+  buildParetoChart(datasets);
+
+  // Auto scroll down directly into view smoothly
+  resultsDashboard.scrollIntoView({ behavior: "smooth" });
+}
+
+function buildParetoChart(datasets) {
+  const ctx = document.getElementById("paretoChart").getContext("2d");
+
+  if (paretoChartInstance) {
+    paretoChartInstance.destroy();
+  }
+
+  // Sub-sample rendering if records exceed visual viewport boundaries safely
+  const maxChartBars = 30;
+  const displayData = datasets.slice(0, maxChartBars);
+
+  const labels = displayData.map((d) => d.name);
+  const absoluteValues = displayData.map((d) => d.value);
+  const cumulativePercentages = displayData.map((d) =>
+    (d.cumulative * 100).toFixed(1),
+  );
+
+  // Dynamic color determination for the bars based on classification type map context
+  const barColors = displayData.map((d) => {
+    if (d.class === "A") return "rgba(16, 185, 129, 0.75)"; // Emerald
+    if (d.class === "B") return "rgba(245, 158, 11, 0.75)"; // Amber
+    return "rgba(239, 68, 68, 0.6)"; // Rose
+  });
+
+  paretoChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Absolute Dollar Value ($)",
+          data: absoluteValues,
+          backgroundColor: barColors,
+          borderColor: barColors.map((c) =>
+            c.replace("0.75", "1").replace("0.6", "1"),
+          ),
+          borderWidth: 1.5,
+          yAxisID: "yAbsolute",
+          order: 2,
+        },
+        {
+          label: "Cumulative Percent (%)",
+          data: cumulativePercentages,
+          type: "line",
+          borderColor: "#1F6FEB",
+          borderWidth: 3,
+          pointBackgroundColor: "#1F6FEB",
+          pointHoverRadius: 6,
+          fill: false,
+          tension: 0.1,
+          yAxisID: "yCumulative",
+          order: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+          labels: { font: { weight: "bold" }, color: "#101828" },
+        },
+        tooltip: {
+          mode: "index",
+          intersect: false,
+          titleColor: "#101828",
+          bodyColor: "#475467",
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: "#475467" },
+          title: { color: "#475467" },
+        },
+        yAbsolute: {
+          type: "linear",
+          position: "left",
+          title: {
+            display: true,
+            text: "Individual Value ($)",
+            font: { weight: "bold" },
+            color: "#475467",
+          },
+          ticks: { color: "#475467" },
+          grid: { color: "#E4E7EC", borderDash: [4, 4] },
+        },
+        yCumulative: {
+          type: "linear",
+          position: "right",
+          min: 0,
+          max: 100,
+          title: {
+            display: true,
+            text: "Cumulative Percent (%)",
+            font: { weight: "bold" },
+            color: "#475467",
+          },
+          ticks: { color: "#475467" },
+          grid: { display: false },
+        },
+      },
+    },
+  });
+}
+
+// Data Export Utility Modules
+window.exportData = function (format) {
+  if (finalAnalysisResults.length === 0) return;
+
+  // Structure data cleanly mapping programmatic attributes into human-readable export maps
+  const exportRows = finalAnalysisResults.map((r) => ({
+    Rank: r.rank,
+    "Item/SKU Code": r.name,
+    "Total Value ($)": r.value,
+    "Percentage Share (%)": +(r.percent * 100).toFixed(4),
+    "Cumulative Percentage (%)": +(r.cumulative * 100).toFixed(4),
+    "ABC Classification": r.class,
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportRows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "ABC Analysis Results");
+
+  if (format === "xlsx") {
+    XLSX.writeFile(
+      workbook,
+      `ABC_Analysis_Report_${new Date().toISOString().slice(0, 10)}.xlsx`,
+    );
+  } else {
+    XLSX.writeFile(
+      workbook,
+      `ABC_Analysis_Report_${new Date().toISOString().slice(0, 10)}.csv`,
+      { bookType: "csv" },
+    );
+  }
+};

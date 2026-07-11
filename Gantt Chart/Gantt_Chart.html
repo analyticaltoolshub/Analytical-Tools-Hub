@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gantt Chart Planner | Analytical Tools Hub</title>
+  <meta name="description" content="Plan project tasks, dates, progress, and milestones with a browser-based Gantt chart planner from Analytical Tools Hub.">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Gantt_Chart.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+</head>
+<body class="gantt-page">
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text">
+          <strong>Gantt Chart Planner</strong>
+          <span>Project planning workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="tool-hero" aria-labelledby="gantt-page-title">
+      <span class="tool-badge">Project Management</span>
+      <h2 id="gantt-page-title">Gantt Chart Planner</h2>
+      <p>Build a simple project schedule, track task progress, highlight milestones, and export or reload the plan as JSON.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based planning</span>
+        <span>Timeline and milestone view</span>
+        <span>JSON export and import</span>
+      </div>
+    </section>
+
+    <div class="gantt-layout">
+      <div class="gantt-content">
+        <section class="panel" id="task-editor">
+          <div class="section-header">
+            <div>
+              <h2>1. Task Editor</h2>
+              <p>Add tasks, dates, progress, and milestones before reviewing the timeline.</p>
+            </div>
+            <div class="editor-actions">
+              <button id="addTaskButton" type="button">Add Task</button>
+              <button id="saveJsonButton" type="button">Save JSON</button>
+              <button id="loadJsonButton" type="button">Load JSON</button>
+            </div>
+          </div>
+
+          <div class="privacy-note" role="note">
+            Project data is processed locally in the browser and is not saved after refresh. Save your plan as JSON, then load that file when you return.
+          </div>
+
+          <div class="sample-actions" aria-label="Sample Gantt chart scenarios">
+            <span>Load sample template:</span>
+            <button class="secondary-action sample-plan-button" type="button" data-sample="implementation">Implementation plan</button>
+            <button class="secondary-action sample-plan-button" type="button" data-sample="improvement">Process improvement</button>
+            <button class="secondary-action sample-plan-button" type="button" data-sample="launch">Launch milestones</button>
+          </div>
+
+          <div class="table-wrap">
+            <table id="taskTable" class="task-table">
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Progress %</th>
+                  <th>Milestone</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="error" id="ganttError" role="alert"></p>
+        </section>
+
+        <section class="panel" id="gantt-output">
+          <div class="section-header">
+            <div>
+              <h2>2. Gantt Timeline</h2>
+              <p>Scroll horizontally to inspect the plan across weeks and months.</p>
+            </div>
+            <div class="timeline-actions">
+              <span class="today-key">Today</span>
+              <button id="fullscreenTimelineButton" class="secondary-action" type="button" aria-pressed="false">Full Screen</button>
+            </div>
+          </div>
+
+          <div class="gantt-wrapper">
+            <div class="task-panel" aria-label="Task list">
+              <div class="task-panel-header">Tasks</div>
+              <div id="taskList"></div>
+            </div>
+            <div class="timeline-panel" aria-label="Gantt timeline">
+              <div id="gantt"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="about-gantt">
+          <h2>About Gantt Charts</h2>
+          <p>
+            A Gantt chart shows tasks against time, making it easier to see schedule order, duration, progress, and important project milestones.
+          </p>
+          <p>
+            This tool is designed for lightweight planning where a clear visual schedule is more useful than a complex project management system.
+          </p>
+        </section>
+
+        <section class="panel content-section" id="how-to-use">
+          <h2>How to Use This Tool</h2>
+          <ol class="method-list">
+            <li>Add or edit task names in the task editor.</li>
+            <li>Set start and end dates for each task.</li>
+            <li>Enter progress as a percentage to show completion on each bar.</li>
+            <li>Mark key events as milestones when the task has a single target date.</li>
+            <li>Save the plan as JSON before refreshing or closing the page, then load that JSON file when you return.</li>
+          </ol>
+        </section>
+
+        <section class="panel content-section" id="planning-guidance">
+          <h2>Planning Guidance</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Task Duration</span>
+              <p>Use realistic start and end dates. Very long tasks may hide the actual work that needs active follow-up.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Milestones</span>
+              <p>Use milestones for key dates such as approvals, releases, handovers, or go-live decisions.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Progress</span>
+              <p>Progress should reflect meaningful completion, not only elapsed time. Update it during project reviews.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Review</span>
+              <p>Revisit the schedule when dependencies, resource availability, or scope changes affect delivery dates.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details>
+            <summary>Can I save my plan?</summary>
+            <p>Yes. Use Save JSON to download the current task list, then Load JSON to restore it later.</p>
+          </details>
+          <details>
+            <summary>Is my project data uploaded?</summary>
+            <p>No server upload is used by this static tool. The data is handled in your browser unless you choose to save or load a local JSON file.</p>
+          </details>
+          <details>
+            <summary>Will my project still be here after refresh?</summary>
+            <p>No. This browser-based planner does not store projects automatically. Use Save JSON before leaving the page, then use Load JSON to continue later.</p>
+          </details>
+          <details>
+            <summary>What is a milestone?</summary>
+            <p>A milestone is a key event or decision date. In the chart it appears as a diamond instead of a duration bar.</p>
+          </details>
+        </section>
+      </div>
+
+      <aside class="gantt-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Gantt Chart page sections">
+          <a href="#task-editor">Task Editor</a>
+          <a href="#gantt-output">Timeline</a>
+          <a href="#about-gantt">About</a>
+          <a href="#how-to-use">How to Use</a>
+          <a href="#planning-guidance">Guidance</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <input type="file" id="fileInput" accept="application/json,.json" hidden>
+  <script src="Gantt_Chart.js"></script>
+</body>
+</html>
