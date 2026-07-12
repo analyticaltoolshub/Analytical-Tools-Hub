@@ -58,7 +58,8 @@ const tools = [
     input: 'Item demand, unit cost, annual usage',
     output: 'Classification table and Pareto chart',
     cta: 'Open ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC%20Analysis/ABC_Analysis.html',
+    categories: ['Inventory and Supply Chain']
   },
   {
     name: 'EOQ Calculator',
@@ -91,7 +92,8 @@ const tools = [
     input: 'Historical demand series',
     output: 'Forecast table, error metric, and chart',
     cta: 'Open Exponential Smoothing',
-    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+    href: 'Exponential%20Smoothing/Exponential_Smoothing.html',
+    categories: ['Forecasting']
   },
   {
     name: 'Kraljic Matrix',
@@ -99,7 +101,8 @@ const tools = [
     category: 'Procurement',
     input: 'Risk and impact ratings',
     output: 'Portfolio quadrant and strategy',
-    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+    href: 'Kraljic%20Matrix/Kraljic_Matrix.html',
+    categories: ['Inventory and Supply Chain']
   },
   {
     name: 'Break-Even Analysis',
@@ -115,7 +118,8 @@ const tools = [
     category: 'Project Management',
     input: 'Tasks, dates, progress, milestones',
     output: 'Gantt timeline and JSON plan export',
-    href: 'Gantt%20Chart/Gantt_Chart.html'
+    href: 'Gantt%20Chart/Gantt_Chart.html',
+    categories: ['Project Management']
   }
 ];
 
@@ -142,7 +146,9 @@ const searchItems = [
   ...tools.filter((tool) => tool.href).map((tool) => ({
     title: tool.name,
     detail: `${tool.category} • ${tool.output}`,
-    href: tool.href
+    href: tool.href,
+    type: 'tool',
+    categories: tool.categories || []
   })),
   ...categories.map((category) => ({ title: category.title, detail: category.benefit, href: '#categories' })),
   ...problems.map((problem) => ({ title: problem.title, detail: problem.detail, href: problem.href }))
@@ -262,7 +268,7 @@ function initRenderedContent() {
       <h3>${item.title}</h3>
       <span class="card-meta">${item.count}</span>
       <p>${item.benefit}</p>
-      <a class="card-link" href="#tools" aria-label="Explore ${item.title} category">Explore category</a>
+      <button class="card-link card-link-button" type="button" data-category-search="${item.title}" aria-label="Explore ${item.title} category">Explore category</button>
     </article>
   `);
 
@@ -346,6 +352,21 @@ function getSearchResults(query) {
   return results.slice(0, 7);
 }
 
+function getCategoryResults(category) {
+  return searchItems.filter((item) => item.type === 'tool' && item.categories?.includes(category));
+}
+
+function renderSearchItems(items, emptyMessage) {
+  const target = document.querySelector('[data-search-results]');
+  if (!target) return;
+  target.innerHTML = items.length
+    ? items.map((item) => {
+      const label = item.detail.toLowerCase().startsWith('recommended') ? '<em>Recommended</em>' : '';
+      return `<a href="${item.href}">${label}<strong>${item.title}</strong><span>${item.detail}</span></a>`;
+    }).join('')
+    : `<p class="search-empty">${emptyMessage}</p>`;
+}
+
 function renderSearchResults(query = '') {
   const target = document.querySelector('[data-search-results]');
   if (!target) return;
@@ -355,12 +376,7 @@ function renderSearchResults(query = '') {
   }
 
   const results = getSearchResults(query);
-  target.innerHTML = results.length
-    ? results.map((item) => {
-      const label = item.detail.toLowerCase().startsWith('recommended') ? '<em>Recommended</em>' : '';
-      return `<a href="${item.href}">${label}<strong>${item.title}</strong><span>${item.detail}</span></a>`;
-    }).join('')
-    : '<p class="search-empty">No exact match yet. Try a method, category, or practical question.</p>';
+  renderSearchItems(results, 'No exact match yet. Try a method, category, or practical question.');
 }
 
 function initSearch() {
@@ -374,6 +390,17 @@ function initSearch() {
     modal.hidden = false;
     document.body.classList.add('modal-open');
     renderSearchResults(input.value);
+    window.setTimeout(() => input.focus(), 0);
+  };
+
+  const openCategorySearch = (category) => {
+    input.value = category;
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+    renderSearchItems(
+      getCategoryResults(category),
+      `No available tools in ${category} yet. This category is expanding soon.`
+    );
     window.setTimeout(() => input.focus(), 0);
   };
 
@@ -400,9 +427,15 @@ function initSearch() {
 
   document.addEventListener('click', (event) => {
     const problem = event.target.closest('[data-problem]');
-    if (!problem) return;
-    input.value = problem.dataset.problem;
-    openSearch();
+    if (problem) {
+      input.value = problem.dataset.problem;
+      openSearch();
+      return;
+    }
+
+    const category = event.target.closest('[data-category-search]');
+    if (!category) return;
+    openCategorySearch(category.dataset.categorySearch);
   });
 }
 
