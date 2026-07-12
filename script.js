@@ -36,6 +36,11 @@ const problems = [
     title: 'How can I plan project tasks over time?',
     detail: 'Recommended tool: Gantt Chart Planner',
     href: 'Gantt%20Chart/Gantt_Chart.html'
+  },
+  {
+    title: 'How many units do I need to sell to break even?',
+    detail: 'Recommended tool: Break-Even Analysis',
+    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
   }
 ];
 
@@ -44,10 +49,10 @@ const categories = [
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
   { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Expanding soon', icon: 'settings' },
   { title: 'Statistics', benefit: 'Analyze relationships, distributions, samples, and uncertainty.', count: 'Expanding soon', icon: 'compare' },
-  { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: 'Expanding soon', icon: 'calculator' },
+  { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: '1 tool available', icon: 'calculator' },
   { title: 'Quality and Engineering', benefit: 'Measure process capability, reliability, variation, and performance.', count: 'Expanding soon', icon: 'shield' },
   { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: 'Expanding soon', icon: 'chart' }
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '1 tool available', icon: 'chart' }
 ];
 
 const tools = [
@@ -110,7 +115,9 @@ const tools = [
     category: 'Finance',
     input: 'Price, fixed cost, variable cost',
     output: 'Break-even quantity and margin',
-    status: 'Coming soon'
+    cta: 'Open Break-Even Analysis',
+    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html',
+    categories: ['Finance', 'Business Analysis']
   },
   {
     name: 'Gantt Chart Planner',

@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Break-Even Analysis | Analytical Tools Hub</title>
+  <meta name="description" content="Calculate break-even quantity, break-even revenue, contribution margin, target profit volume, and margin of safety in your browser.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Break%20Even%20Analysis/Break_Even_Analysis.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Break-Even Analysis Tool | Analytical Tools Hub">
+  <meta property="og:description" content="Calculate break-even quantity, revenue, contribution margin, target profit volume, and margin of safety with a browser-based tool.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Break%20Even%20Analysis/Break_Even_Analysis.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Break-Even Analysis Tool | Analytical Tools Hub">
+  <meta name="twitter:description" content="Calculate break-even quantity, revenue, contribution margin, target profit volume, and margin of safety with a browser-based tool.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Break_Even_Analysis.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Break%20Even%20Analysis/Break_Even_Analysis.html#software",
+          "name": "Break-Even Analysis Tool",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Break%20Even%20Analysis/Break_Even_Analysis.html",
+          "description": "A browser-based tool for calculating break-even quantity, break-even revenue, contribution margin, target profit volume, and margin of safety.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "Break-even quantity",
+            "Break-even revenue",
+            "Contribution margin",
+            "Target profit units",
+            "Profit and revenue chart",
+            "CSV export"
+          ],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://analyticaltoolshub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Break%20Even%20Analysis/Break_Even_Analysis.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Break-Even Analysis", "item": "https://analyticaltoolshub.com/Break%20Even%20Analysis/Break_Even_Analysis.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="break-even-page">
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text">
+          <strong>Break-Even Analysis</strong>
+          <span>Finance decision workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="tool-hero" aria-labelledby="break-even-page-title">
+      <span class="tool-badge">Finance and Business Analysis</span>
+      <h1 id="break-even-page-title">Break-Even Analysis</h1>
+      <p>Calculate the sales volume needed to cover fixed and variable costs, then review target profit volume, margin of safety, and profit behaviour.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based calculation</span>
+        <span>Break-even chart</span>
+        <span>CSV export support</span>
+      </div>
+    </section>
+
+    <div class="break-even-layout">
+      <div class="break-even-content">
+        <section class="panel" id="inputs">
+          <div class="section-header">
+            <div>
+              <h2>1. Cost and Revenue Inputs</h2>
+              <p>Enter fixed cost, selling price, variable cost, expected sales, and target profit.</p>
+            </div>
+            <div class="editor-actions">
+              <button id="loadSampleButton" type="button">Load Sample</button>
+              <button class="reset" id="resetButton" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="privacy-note" role="note">
+            Data is processed locally in the browser and is not uploaded to a server.
+          </div>
+
+          <div class="input-grid">
+            <label>
+              <span>Fixed Costs</span>
+              <input id="fixedCosts" type="number" min="0" step="0.01" placeholder="25000">
+            </label>
+            <label>
+              <span>Selling Price per Unit</span>
+              <input id="pricePerUnit" type="number" min="0" step="0.01" placeholder="120">
+            </label>
+            <label>
+              <span>Variable Cost per Unit</span>
+              <input id="variableCost" type="number" min="0" step="0.01" placeholder="72">
+            </label>
+            <label>
+              <span>Expected Sales Units</span>
+              <input id="expectedUnits" type="number" min="0" step="1" placeholder="750">
+            </label>
+            <label>
+              <span>Target Profit</span>
+              <input id="targetProfit" type="number" min="0" step="0.01" placeholder="15000">
+            </label>
+            <label>
+              <span>Currency Symbol</span>
+              <input id="currencySymbol" type="text" maxlength="4" value="&pound;" aria-label="Currency symbol">
+            </label>
+          </div>
+
+          <div class="cost-guidance-grid" aria-label="Cost input guidance">
+            <article>
+              <h3>Fixed Costs</h3>
+              <p>Costs that usually stay the same within the decision range, such as rent, salaried labour, insurance, software subscriptions, equipment leases, and committed overheads.</p>
+            </article>
+            <article>
+              <h3>Variable Costs</h3>
+              <p>Costs that change with each unit sold, such as materials, packaging, direct labour per unit, payment fees, shipping per order, sales commission, or unit-level outsourcing cost.</p>
+            </article>
+            <article>
+              <h3>What to Exclude or Treat Carefully</h3>
+              <p>Exclude sunk costs already spent. Treat one-off setup costs, stepped labour, taxes, financing, and mixed overheads carefully because they may need a separate scenario.</p>
+            </article>
+          </div>
+
+          <div class="error" id="errorMessage" role="alert"></div>
+
+          <div class="actions">
+            <button id="calculateButton" type="button">Calculate Break-Even</button>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="results">
+          <div class="results-header">
+            <h2>2. Results Summary</h2>
+            <button id="exportCsvButton" type="button">Export CSV</button>
+          </div>
+          <div class="summary-grid">
+            <article>
+              <span>Break-Even Units</span>
+              <strong id="breakEvenUnits">0</strong>
+            </article>
+            <article>
+              <span>Break-Even Revenue</span>
+              <strong id="breakEvenRevenue">&pound;0</strong>
+            </article>
+            <article>
+              <span>Contribution Margin</span>
+              <strong id="contributionMargin">&pound;0</strong>
+            </article>
+            <article>
+              <span>Margin of Safety</span>
+              <strong id="marginOfSafety">0%</strong>
+            </article>
+          </div>
+          <div class="interpretation" id="interpretation"></div>
+        </section>
+
+        <section class="panel hidden" id="chart-section">
+          <div class="section-header">
+            <div>
+              <h2>3. Interactive Break-Even Chart</h2>
+              <p>Turn on scenario planning to inspect revenue, variable cost, total cost, and operating profit at different sales volumes.</p>
+            </div>
+            <button class="scenario-toggle" id="scenarioToggle" type="button" aria-pressed="false">
+              <span class="scenario-toggle-text">Scenario Planning</span>
+              <span class="scenario-switch" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-workspace">
+              <div class="chart-readout" id="chartReadout" hidden aria-live="polite">
+                <span id="readoutLabel">Current</span>
+                <dl>
+                  <div><dt>Units</dt><dd id="readoutUnits">0</dd></div>
+                  <div><dt>Revenue</dt><dd id="readoutRevenue">&pound;0</dd></div>
+                  <div><dt>Variable Costs</dt><dd id="readoutVariableCosts">&pound;0</dd></div>
+                  <div><dt>Total Costs</dt><dd id="readoutTotalCosts">&pound;0</dd></div>
+                  <div><dt>Operating Profit</dt><dd id="readoutProfit">&pound;0</dd></div>
+                </dl>
+              </div>
+              <div class="chart-stage">
+                <canvas id="breakEvenChart" width="960" height="520" aria-label="Break-even chart"></canvas>
+              </div>
+            </div>
+          </div>
+          <p class="chart-note" id="chartNote"></p>
+          <p class="sr-only" id="chartSummary"></p>
+        </section>
+
+        <section class="panel content-section" id="about-break-even">
+          <h2>About Break-Even Analysis</h2>
+          <p>
+            Break-even analysis estimates the sales volume needed for total revenue to equal total cost. It helps teams understand whether pricing, cost structure, and expected demand can support a viable business decision.
+          </p>
+          <p>
+            The method is useful for product launches, service pricing, cost planning, capacity decisions, and quick financial viability checks before deeper analysis.
+          </p>
+        </section>
+
+        <section class="panel content-section" id="how-to-use">
+          <h2>How to Use This Tool</h2>
+          <ol class="method-list">
+            <li>Enter total fixed costs for the period or decision being reviewed.</li>
+            <li>Enter the selling price and variable cost per unit.</li>
+            <li>Enter expected sales units to calculate margin of safety.</li>
+            <li>Enter a target profit to estimate the units needed for that profit level.</li>
+            <li>Review the result cards, interactive chart, and interpretation.</li>
+          </ol>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Formula Logic</span>
+              <div class="formula-list" aria-label="Break-even formulas">
+                <p><strong>Notation</strong><br><var>FC</var> = fixed costs, <var>P</var> = selling price per unit, <var>VC</var> = variable cost per unit</p>
+                <p><strong>Contribution margin per unit</strong><br><var>CM</var> = <var>P</var> - <var>VC</var></p>
+                <p><strong>Break-even units</strong><br><var>Q</var><sub>BE</sub> = <var>FC</var> / (<var>P</var> - <var>VC</var>)</p>
+                <p><strong>Break-even revenue</strong><br><var>R</var><sub>BE</sub> = <var>Q</var><sub>BE</sub> &times; <var>P</var></p>
+                <p><strong>Target profit units</strong><br><var>Q</var><sub>Target</sub> = (<var>FC</var> + <var>Target Profit</var>) / (<var>P</var> - <var>VC</var>)</p>
+              </div>
+            </div>
+            <div class="guidance-card">
+              <span>Required Inputs</span>
+              <p>The model requires fixed costs, selling price per unit, variable cost per unit, expected sales units, and optional target profit.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Assumptions</span>
+              <p>The calculation assumes a constant selling price, constant variable cost per unit, and fixed costs that do not change across the relevant volume range.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Limitations</span>
+              <p>Break-even analysis does not capture demand uncertainty, stepped fixed costs, capacity limits, product mix changes, taxes, financing, or cash-flow timing.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="strategies">
+          <h2>Strategies to Improve Your Break-Even Point</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Increase Contribution Margin</span>
+              <p>Review pricing, discounts, product mix, and value-added bundles. Even a small price increase can reduce the units needed to break even when demand remains stable.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Reduce Variable Cost per Unit</span>
+              <p>Negotiate supplier costs, reduce scrap, improve labour efficiency, optimize packaging, or reduce per-order fulfilment costs.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Control Fixed Costs</span>
+              <p>Review subscriptions, rent, salaried capacity, equipment commitments, and overheads. Lower fixed costs reduce the starting cost base that sales must recover.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Test Practical Scenarios</span>
+              <p>Compare conservative, expected, and optimistic cases. Break-even analysis is most useful when it supports a range of decision scenarios rather than one fixed answer.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details>
+            <summary>What does break-even quantity mean?</summary>
+            <p>It is the number of units that must be sold for total revenue to equal total cost, before profit begins.</p>
+          </details>
+          <details>
+            <summary>What if variable cost is higher than price?</summary>
+            <p>The model cannot produce a viable break-even quantity because each unit loses money before fixed costs are considered.</p>
+          </details>
+          <details>
+            <summary>What is margin of safety?</summary>
+            <p>Margin of safety compares expected sales to break-even sales. A higher value means expected demand is further above the break-even point.</p>
+          </details>
+        </section>
+      </div>
+
+      <aside class="break-even-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Break-Even Analysis page sections">
+          <a href="#inputs">Inputs</a>
+          <a href="#results">Results</a>
+          <a href="#chart-section">Chart</a>
+          <a href="#about-break-even">About</a>
+          <a href="#how-to-use">How to Use</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#strategies">Strategies</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <script src="Break_Even_Analysis.js"></script>
+</body>
+</html>

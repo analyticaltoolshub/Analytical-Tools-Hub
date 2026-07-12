@@ -10,6 +10,7 @@ Website: https://analyticaltoolshub.com/
 - Exponential Smoothing
 - Kraljic Matrix
 - Gantt Chart Planner
+- Break-Even Analysis
 
 ## Run Locally
 
