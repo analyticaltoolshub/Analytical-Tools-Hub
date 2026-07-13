@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Economic Order Quantity | Analytical Tools Hub</title>
+  <meta name="description" content="Calculate economic order quantity, ordering cost, holding cost, reorder point, order frequency, and EOQ cost trade-offs in your browser.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Economic%20Order%20Quantity/Economic_Order_Quantity.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Economic Order Quantity Tool | Analytical Tools Hub">
+  <meta property="og:description" content="Calculate EOQ, annual ordering and holding costs, reorder point, and cost trade-offs with a browser-based inventory tool.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Economic%20Order%20Quantity/Economic_Order_Quantity.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Economic Order Quantity Tool | Analytical Tools Hub">
+  <meta name="twitter:description" content="Calculate EOQ, annual ordering and holding costs, reorder point, and cost trade-offs with a browser-based inventory tool.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Economic_Order_Quantity.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Economic%20Order%20Quantity/Economic_Order_Quantity.html#software",
+          "name": "Economic Order Quantity Tool",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Economic%20Order%20Quantity/Economic_Order_Quantity.html",
+          "description": "A browser-based inventory tool for calculating economic order quantity, annual ordering cost, annual holding cost, reorder point, and order frequency.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "Economic order quantity",
+            "Annual ordering cost",
+            "Annual holding cost",
+            "Reorder point estimate",
+            "Cost trade-off chart",
+            "CSV export"
+          ],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://analyticaltoolshub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Economic%20Order%20Quantity/Economic_Order_Quantity.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Economic Order Quantity", "item": "https://analyticaltoolshub.com/Economic%20Order%20Quantity/Economic_Order_Quantity.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="eoq-page">
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text">
+          <strong>Economic Order Quantity</strong>
+          <span>Inventory decision workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="tool-hero" aria-labelledby="eoq-page-title">
+      <span class="tool-badge">Inventory and Supply Chain</span>
+      <h1 id="eoq-page-title">Economic Order Quantity</h1>
+      <p>Estimate the order quantity that balances ordering costs and holding costs, then review order frequency, reorder point, and cost trade-offs.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based calculation</span>
+        <span>EOQ cost curve</span>
+        <span>CSV export support</span>
+      </div>
+    </section>
+
+    <div class="eoq-layout">
+      <div class="eoq-content">
+        <section class="panel" id="inputs">
+          <div class="section-header">
+            <div>
+              <h2>1. Demand and Cost Inputs</h2>
+              <p>Enter annual demand, ordering cost, holding cost, working days, lead time, and optional comparison values.</p>
+            </div>
+            <div class="editor-actions">
+              <button id="loadSampleButton" type="button">Load Sample</button>
+              <button class="reset" id="resetButton" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="privacy-note" role="note">
+            Data is processed locally in the browser and is not uploaded to a server.
+          </div>
+
+          <div class="input-grid">
+            <label>
+              <span>Annual Demand</span>
+              <input id="annualDemand" type="number" min="0" step="1" placeholder="12000">
+            </label>
+            <label>
+              <span>Ordering Cost per Order</span>
+              <input id="orderingCost" type="number" min="0" step="0.01" placeholder="75">
+            </label>
+            <label>
+              <span>Holding Cost per Unit per Year</span>
+              <input id="holdingCost" type="number" min="0" step="0.01" placeholder="3.2">
+            </label>
+            <label>
+              <span>Unit Cost</span>
+              <input id="unitCost" type="number" min="0" step="0.01" placeholder="18">
+            </label>
+            <label>
+              <span>Working Days per Year</span>
+              <input id="workingDays" type="number" min="1" step="1" placeholder="250">
+            </label>
+            <label>
+              <span>Lead Time in Days</span>
+              <input id="leadTime" type="number" min="0" step="1" placeholder="10">
+            </label>
+            <label>
+              <span>Current Order Quantity</span>
+              <input id="currentOrderQty" type="number" min="0" step="1" placeholder="1000">
+            </label>
+            <label>
+              <span>Currency Symbol</span>
+              <input id="currencySymbol" type="text" maxlength="4" value="&pound;" aria-label="Currency symbol">
+            </label>
+          </div>
+
+          <div class="input-guidance-grid" aria-label="EOQ input guidance">
+            <article>
+              <h3>Demand</h3>
+              <p>Use annual demand for the item or SKU being reviewed. Use units, not revenue.</p>
+            </article>
+            <article>
+              <h3>Ordering Cost</h3>
+              <p>Include admin, purchasing, receiving, setup, inspection, and processing cost per order.</p>
+            </article>
+            <article>
+              <h3>Holding Cost</h3>
+              <p>Include storage, insurance, obsolescence, shrinkage, handling, and capital cost per unit per year.</p>
+            </article>
+          </div>
+
+          <div class="error" id="errorMessage" role="alert"></div>
+
+          <div class="actions">
+            <button id="calculateButton" type="button">Calculate EOQ</button>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="results">
+          <div class="results-header">
+            <h2>2. Results Summary</h2>
+            <button id="exportCsvButton" type="button">Export CSV</button>
+          </div>
+          <div class="summary-grid">
+            <article>
+              <span>Economic Order Quantity</span>
+              <strong id="eoqValue">0</strong>
+            </article>
+            <article>
+              <span>Annual Relevant Cost</span>
+              <strong id="totalRelevantCost">&pound;0</strong>
+            </article>
+            <article>
+              <span>Orders per Year</span>
+              <strong id="ordersPerYear">0</strong>
+            </article>
+            <article>
+              <span>Reorder Point</span>
+              <strong id="reorderPoint">0</strong>
+            </article>
+          </div>
+          <div class="interpretation" id="interpretation"></div>
+        </section>
+
+        <section class="panel hidden" id="cost-breakdown">
+          <h2>3. Cost Breakdown</h2>
+          <div class="breakdown-grid">
+            <article>
+              <span>Annual Ordering Cost</span>
+              <strong id="annualOrderingCost">&pound;0</strong>
+            </article>
+            <article>
+              <span>Annual Holding Cost</span>
+              <strong id="annualHoldingCost">&pound;0</strong>
+            </article>
+            <article>
+              <span>Average Inventory</span>
+              <strong id="averageInventory">0</strong>
+            </article>
+            <article>
+              <span>Days Between Orders</span>
+              <strong id="cycleDays">0</strong>
+            </article>
+            <article>
+              <span>Purchase Spend</span>
+              <strong id="purchaseSpend">&pound;0</strong>
+            </article>
+            <article>
+              <span>Current Quantity Difference</span>
+              <strong id="currentDifference">Not set</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="chart-section">
+          <div class="section-header">
+            <div>
+              <h2>4. EOQ Cost Curve</h2>
+              <p>Turn on scenario planning to inspect ordering cost, holding cost, total relevant cost, and difference from EOQ across order quantities.</p>
+            </div>
+            <button class="scenario-toggle" id="scenarioToggle" type="button" aria-pressed="false">
+              <span class="scenario-toggle-text">Scenario Planning</span>
+              <span class="scenario-switch" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-workspace">
+              <div class="chart-readout" id="chartReadout" hidden aria-live="polite">
+                <span id="readoutLabel">Current</span>
+                <dl>
+                  <div><dt>Order Quantity</dt><dd id="readoutQuantity">0</dd></div>
+                  <div><dt>Ordering Cost</dt><dd id="readoutOrderingCost">&pound;0</dd></div>
+                  <div><dt>Holding Cost</dt><dd id="readoutHoldingCost">&pound;0</dd></div>
+                  <div><dt>Total Relevant Cost</dt><dd id="readoutTotalCost">&pound;0</dd></div>
+                  <div><dt>Difference from EOQ</dt><dd id="readoutDifference">&pound;0</dd></div>
+                </dl>
+              </div>
+              <div class="chart-stage">
+                <canvas id="eoqChart" width="960" height="500" aria-label="EOQ cost curve chart"></canvas>
+              </div>
+            </div>
+          </div>
+          <p class="chart-note" id="chartNote"></p>
+          <p class="sr-only" id="chartSummary"></p>
+        </section>
+
+        <section class="panel content-section" id="about-eoq">
+          <h2>About Economic Order Quantity</h2>
+          <p>
+            Economic Order Quantity estimates the order size that minimizes the combined annual cost of ordering inventory and holding inventory. It is useful when demand is reasonably stable and replenishment decisions are repeated through the year.
+          </p>
+          <p>
+            EOQ does not decide whether an item should be stocked. It helps decide how much to order once the item, demand estimate, ordering cost, and holding cost assumptions are understood.
+          </p>
+        </section>
+
+        <section class="panel content-section" id="how-to-use">
+          <h2>How to Use This Tool</h2>
+          <ol class="method-list">
+            <li>Enter annual demand for one item or SKU.</li>
+            <li>Enter the cost of placing or processing one order.</li>
+            <li>Enter annual holding cost per unit.</li>
+            <li>Add working days and lead time if you want a reorder point estimate.</li>
+            <li>Optionally enter your current order quantity to compare it with EOQ.</li>
+          </ol>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Formula Logic</span>
+              <div class="formula-list" aria-label="EOQ formulas">
+                <p><strong>Notation</strong><br><var>D</var> = annual demand, <var>S</var> = ordering cost, <var>H</var> = holding cost per unit per year, <var>Q</var> = order quantity</p>
+                <p><strong>Economic order quantity</strong><br><var>Q</var><sub>EOQ</sub> = sqrt((2 &times; <var>D</var> &times; <var>S</var>) / <var>H</var>)</p>
+                <p><strong>Annual ordering cost</strong><br>(<var>D</var> / <var>Q</var>) &times; <var>S</var></p>
+                <p><strong>Annual holding cost</strong><br>(<var>Q</var> / 2) &times; <var>H</var></p>
+                <p><strong>Reorder point</strong><br>(<var>D</var> / working days) &times; lead time</p>
+              </div>
+            </div>
+            <div class="guidance-card">
+              <span>Required Inputs</span>
+              <p>EOQ requires annual demand, ordering cost per order, and holding cost per unit per year. Unit cost, lead time, and current order quantity add context but are not required for the core EOQ formula.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Assumptions</span>
+              <p>The classic EOQ model assumes stable demand, constant ordering cost, constant holding cost, instant replenishment, and no stockouts or quantity discounts.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Limitations</span>
+              <p>EOQ may need adjustment when demand is seasonal, suppliers require minimum order quantities, capacity is constrained, lead time is variable, or price breaks change the total cost decision.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="practical-guidance">
+          <h2>Practical EOQ Guidance</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Use EOQ as a Starting Point</span>
+              <p>Round EOQ to practical pack sizes, pallet quantities, supplier minimums, and storage constraints.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Review Cost Assumptions</span>
+              <p>Ordering and holding costs are often estimated. If the result looks unrealistic, review these inputs before changing policy.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Combine With Reorder Point</span>
+              <p>EOQ answers how much to order. Reorder point answers when to order. Both are needed for practical replenishment control.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Separate Stable and Unstable Items</span>
+              <p>EOQ works best for predictable demand. Highly intermittent or volatile items may need safety stock and service-level analysis.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details>
+            <summary>What does EOQ tell me?</summary>
+            <p>EOQ estimates the order quantity that minimizes annual ordering and holding costs for a single item under classic EOQ assumptions.</p>
+          </details>
+          <details>
+            <summary>Should I always order exactly the EOQ?</summary>
+            <p>No. EOQ is a decision guide. Practical order quantities may need to reflect pack size, supplier minimums, budget limits, storage space, and operational constraints.</p>
+          </details>
+          <details>
+            <summary>Is holding cost the same as unit cost?</summary>
+            <p>No. Unit cost is the purchase price. Holding cost is the annual cost of carrying one unit in inventory.</p>
+          </details>
+          <details>
+            <summary>Does EOQ include safety stock?</summary>
+            <p>The classic EOQ formula does not include safety stock. Use safety stock separately when demand or lead time is uncertain.</p>
+          </details>
+        </section>
+      </div>
+
+      <aside class="eoq-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Economic Order Quantity page sections">
+          <a href="#inputs">Inputs</a>
+          <a href="#results">Results</a>
+          <a href="#cost-breakdown">Cost Breakdown</a>
+          <a href="#chart-section">Chart</a>
+          <a href="#about-eoq">About</a>
+          <a href="#how-to-use">How to Use</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#practical-guidance">Guidance</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <script src="Economic_Order_Quantity.js"></script>
+</body>
+</html>

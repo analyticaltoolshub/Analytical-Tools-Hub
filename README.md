@@ -11,6 +11,7 @@ Website: https://analyticaltoolshub.com/
 - Kraljic Matrix
 - Gantt Chart Planner
 - Break-Even Analysis
+- Economic Order Quantity
 
 ## Run Locally
 

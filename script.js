@@ -23,6 +23,11 @@ const problems = [
     href: 'ABC%20Analysis/ABC_Analysis.html'
   },
   {
+    title: 'How much stock should I order?',
+    detail: 'Recommended tool: Economic Order Quantity',
+    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+  },
+  {
     title: 'How can I forecast seasonal demand?',
     detail: 'Recommended tool: Exponential Smoothing',
     href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
@@ -45,7 +50,7 @@ const problems = [
 ];
 
 const categories = [
-  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '2 tools available', icon: 'boxes' },
+  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '3 tools available', icon: 'boxes' },
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
   { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Expanding soon', icon: 'settings' },
   { title: 'Statistics', benefit: 'Analyze relationships, distributions, samples, and uncertainty.', count: 'Expanding soon', icon: 'compare' },
@@ -67,12 +72,14 @@ const tools = [
     categories: ['Inventory and Supply Chain']
   },
   {
-    name: 'EOQ Calculator',
+    name: 'Economic Order Quantity',
     description: 'Estimate the order quantity that balances ordering and holding costs.',
     category: 'Inventory Management',
     input: 'Demand, order cost, holding cost',
-    output: 'Recommended order quantity',
-    status: 'Coming soon'
+    output: 'EOQ, cost curve, and reorder point',
+    cta: 'Open Economic Order Quantity',
+    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html',
+    categories: ['Inventory and Supply Chain']
   },
   {
     name: 'Safety Stock Calculator',
