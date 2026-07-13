@@ -889,8 +889,10 @@ body.abc-page #manual-entry .abc-manual-table th {
 }
 
 body.abc-page #faq.abc-faq h2,
+body.abc-page #decision-guide-heading,
 body.abc-page #about-abc.themed-card h2,
 body.abc-page #abc-guidance.themed-card h2,
+body.abc-page #abc-methodology.themed-card h2,
 body.abc-page #abc-guidance.themed-card h3,
 body.abc-page #about-abc.themed-card h3,
 body.abc-page #parameters-settings.themed-card h2,
@@ -900,6 +902,39 @@ body.abc-page #data-import.themed-card h2 {
   -webkit-text-fill-color: var(--navy-950) !important;
   background: none !important;
   opacity: 1 !important;
+}
+
+body.abc-page section[aria-labelledby="decision-guide-heading"].themed-card,
+body.abc-page #abc-methodology.themed-card {
+  background: #fff !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 12px 30px rgba(16, 24, 40, .05) !important;
+}
+
+body.abc-page section[aria-labelledby="decision-guide-heading"] .abc-content-card,
+body.abc-page #abc-methodology .abc-content-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  color: var(--text-primary) !important;
+}
+
+body.abc-page section[aria-labelledby="decision-guide-heading"] .abc-content-card span,
+body.abc-page #abc-methodology .abc-content-card span {
+  color: var(--blue-600) !important;
+  -webkit-text-fill-color: var(--blue-600) !important;
+  font-size: .82rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0 !important;
+}
+
+body.abc-page section[aria-labelledby="decision-guide-heading"] .abc-content-card p,
+body.abc-page #abc-methodology .abc-content-card p {
+  color: var(--text-secondary) !important;
+  -webkit-text-fill-color: var(--text-secondary) !important;
+  font-size: .95rem !important;
+  line-height: 1.65 !important;
 }
 
 body.abc-page #faq.abc-faq summary {

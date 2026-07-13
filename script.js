@@ -23,7 +23,7 @@ const problems = [
     href: 'ABC%20Analysis/ABC_Analysis.html'
   },
   {
-    title: 'How much stock should I order?',
+    title: 'How much stock should I order for a stable-demand item?',
     detail: 'Recommended tool: Economic Order Quantity',
     href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
   },
@@ -43,7 +43,7 @@ const problems = [
     href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
   },
   {
-    title: 'Which supplier presents the highest risk?',
+    title: 'Which purchasing categories need strategic supplier attention?',
     detail: 'Recommended tool: Kraljic Matrix',
     href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
   },
