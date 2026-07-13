@@ -43,7 +43,8 @@ body.forecast-page,
 body.kraljic-page,
 body.gantt-page,
 body.break-even-page,
-body.eoq-page {
+body.eoq-page,
+body.ssrop-page {
   min-height: 100vh;
   margin: 0;
   color: var(--text-primary) !important;
@@ -59,7 +60,8 @@ body.forecast-page::before,
 body.kraljic-page::before,
 body.gantt-page::before,
 body.break-even-page::before,
-body.eoq-page::before {
+body.eoq-page::before,
+body.ssrop-page::before {
   content: "ATH";
   position: fixed;
   right: -2rem;
@@ -80,7 +82,8 @@ body.forecast-page :focus-visible,
 body.kraljic-page :focus-visible,
 body.gantt-page :focus-visible,
 body.break-even-page :focus-visible,
-body.eoq-page :focus-visible {
+body.eoq-page :focus-visible,
+body.ssrop-page :focus-visible {
   outline: 3px solid rgba(45, 127, 249, .72) !important;
   outline-offset: 3px;
 }
@@ -242,7 +245,8 @@ body.abc-page main,
 body.forecast-page main.container,
 body.kraljic-page main.container,
 body.break-even-page main.container,
-body.eoq-page main.container {
+body.eoq-page main.container,
+body.ssrop-page main.container {
   width: min(100% - 40px, 1180px) !important;
   max-width: 1180px !important;
   margin: 0 auto !important;
@@ -807,7 +811,8 @@ tbody tr:hover td,
   body.forecast-page main.container,
   body.kraljic-page main.container,
   body.break-even-page main.container,
-  body.eoq-page main.container {
+  body.eoq-page main.container,
+  body.ssrop-page main.container {
     width: min(100% - 28px, 1180px) !important;
   }
 

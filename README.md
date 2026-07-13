@@ -12,6 +12,7 @@ Website: https://analyticaltoolshub.com/
 - Gantt Chart Planner
 - Break-Even Analysis
 - Economic Order Quantity
+- Safety Stock & Reorder Point
 
 ## Run Locally
 

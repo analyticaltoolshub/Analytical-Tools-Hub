@@ -35,4 +35,9 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://analyticaltoolshub.com/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

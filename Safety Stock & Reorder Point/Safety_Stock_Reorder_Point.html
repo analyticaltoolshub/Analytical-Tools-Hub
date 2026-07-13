@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safety Stock & Reorder Point | Analytical Tools Hub</title>
+  <meta name="description" content="Calculate safety stock, reorder point, lead time demand, and inventory action guidance with a browser-based inventory planning tool.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Safety Stock & Reorder Point Tool | Analytical Tools Hub">
+  <meta property="og:description" content="Estimate inventory buffer stock, reorder point, lead time demand, and replenishment status in your browser.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Safety Stock & Reorder Point Tool | Analytical Tools Hub">
+  <meta name="twitter:description" content="Estimate inventory buffer stock, reorder point, lead time demand, and replenishment status in your browser.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Safety_Stock_Reorder_Point.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html#software",
+          "name": "Safety Stock & Reorder Point Tool",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html",
+          "description": "A browser-based inventory planning tool for calculating safety stock, reorder point, lead time demand, and replenishment status.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "Safety stock",
+            "Reorder point",
+            "Lead time demand",
+            "Inventory position",
+            "Replenishment action guidance",
+            "CSV export"
+          ],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://analyticaltoolshub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Safety Stock & Reorder Point", "item": "https://analyticaltoolshub.com/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="ssrop-page">
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text">
+          <strong>Safety Stock & Reorder Point</strong>
+          <span>Inventory control workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="tool-hero" aria-labelledby="ssrop-page-title">
+      <span class="tool-badge">Inventory and Supply Chain</span>
+      <h1 id="ssrop-page-title">Safety Stock & Reorder Point</h1>
+      <p>Estimate the buffer stock needed for uncertainty, calculate when replenishment should be triggered, and review the current stock position.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based calculation</span>
+        <span>Service-level planning</span>
+        <span>CSV export support</span>
+      </div>
+    </section>
+
+    <div class="ssrop-layout">
+      <div class="ssrop-content">
+        <section class="panel" id="inputs">
+          <div class="section-header">
+            <div>
+              <h2>1. Demand, Lead Time, and Stock Inputs</h2>
+              <p>Enter average demand, variability, lead time, service level, and current stock position.</p>
+            </div>
+            <div class="editor-actions">
+              <button id="loadSampleButton" type="button">Load Sample</button>
+              <button class="reset" id="resetButton" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="privacy-note" role="note">
+            Data is processed locally in the browser and is not uploaded to a server.
+          </div>
+
+          <div class="input-grid">
+            <label>
+              <span>Average Daily Demand</span>
+              <input id="averageDemand" type="number" min="0" step="0.01" placeholder="48">
+            </label>
+            <label>
+              <span>Daily Demand Standard Deviation</span>
+              <input id="demandStdDev" type="number" min="0" step="0.01" placeholder="14">
+            </label>
+            <label>
+              <span>Average Lead Time in Days</span>
+              <input id="leadTime" type="number" min="0" step="0.01" placeholder="10">
+            </label>
+            <label>
+              <span>Lead Time Standard Deviation</span>
+              <input id="leadTimeStdDev" type="number" min="0" step="0.01" placeholder="2">
+            </label>
+            <label>
+              <span>Target Service Level</span>
+              <select id="serviceLevel">
+                <option value="1.28">90%</option>
+                <option value="1.65">95%</option>
+                <option value="1.88">97%</option>
+                <option value="2.05">98%</option>
+                <option value="2.33">99%</option>
+              </select>
+            </label>
+            <label>
+              <span>Current On-Hand Stock</span>
+              <input id="onHandStock" type="number" min="0" step="1" placeholder="620">
+            </label>
+            <label>
+              <span>On-Order Stock</span>
+              <input id="onOrderStock" type="number" min="0" step="1" placeholder="300">
+            </label>
+            <label>
+              <span>Allocated / Backordered Stock</span>
+              <input id="allocatedStock" type="number" min="0" step="1" placeholder="80">
+            </label>
+          </div>
+
+          <div class="input-guidance-grid" aria-label="Input guidance">
+            <article>
+              <h3>Demand Variability</h3>
+              <p>Use daily demand standard deviation when demand changes from day to day. Higher variability increases safety stock.</p>
+            </article>
+            <article>
+              <h3>Lead Time Variability</h3>
+              <p>Use lead time standard deviation when supplier or transit time is inconsistent. If lead time is stable, enter zero.</p>
+            </article>
+            <article>
+              <h3>Inventory Position</h3>
+              <p>Inventory position equals on-hand stock plus on-order stock minus allocated or backordered stock.</p>
+            </article>
+          </div>
+
+          <div class="error" id="errorMessage" role="alert"></div>
+
+          <div class="actions">
+            <button id="calculateButton" type="button">Calculate Safety Stock</button>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="results">
+          <div class="results-header">
+            <h2>2. Results Summary</h2>
+            <button id="exportCsvButton" type="button">Export CSV</button>
+          </div>
+          <div class="summary-grid">
+            <article>
+              <span>Safety Stock</span>
+              <strong id="safetyStock">0</strong>
+            </article>
+            <article>
+              <span>Reorder Point</span>
+              <strong id="reorderPoint">0</strong>
+            </article>
+            <article>
+              <span>Lead Time Demand</span>
+              <strong id="leadTimeDemand">0</strong>
+            </article>
+            <article>
+              <span>Inventory Position</span>
+              <strong id="inventoryPosition">0</strong>
+            </article>
+          </div>
+          <div class="interpretation" id="interpretation"></div>
+        </section>
+
+        <section class="panel hidden" id="action-summary">
+          <h2>3. Action Summary</h2>
+          <div class="breakdown-grid">
+            <article>
+              <span>Replenishment Status</span>
+              <strong id="replenishmentStatus">Not set</strong>
+            </article>
+            <article>
+              <span>Gap to Reorder Point</span>
+              <strong id="gapToRop">0</strong>
+            </article>
+            <article>
+              <span>Z-Score Used</span>
+              <strong id="zScoreUsed">0</strong>
+            </article>
+            <article>
+              <span>Protection Coverage</span>
+              <strong id="coverageDays">0 days</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="chart-section">
+          <div class="section-header">
+            <div>
+              <h2>4. Inventory Position View</h2>
+              <p>Turn on scenario planning to test different inventory positions against the reorder point.</p>
+            </div>
+            <button class="scenario-toggle" id="scenarioToggle" type="button" aria-pressed="false">
+              <span class="scenario-toggle-text">Scenario Planning</span>
+              <span class="scenario-switch" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-workspace">
+              <div class="chart-readout" id="chartReadout" hidden aria-live="polite">
+                <span id="readoutLabel">Current</span>
+                <dl>
+                  <div><dt>Inventory Position</dt><dd id="readoutInventoryPosition">0</dd></div>
+                  <div><dt>Gap to Reorder Point</dt><dd id="readoutGap">0</dd></div>
+                  <div><dt>Status</dt><dd id="readoutStatus">Not set</dd></div>
+                  <div><dt>Coverage</dt><dd id="readoutCoverage">0 days</dd></div>
+                </dl>
+              </div>
+              <div class="chart-stage">
+                <canvas id="stockChart" width="960" height="460" aria-label="Interactive safety stock and reorder point chart"></canvas>
+              </div>
+            </div>
+          </div>
+          <p class="chart-note" id="chartNote"></p>
+          <p class="sr-only" id="chartSummary"></p>
+        </section>
+
+        <section class="panel content-section" id="about-ssrop">
+          <h2>About Safety Stock and Reorder Point</h2>
+          <p>
+            Safety stock is a buffer that protects against demand and lead time uncertainty. Reorder point is the inventory position at which replenishment should be triggered.
+          </p>
+          <p>
+            Used together, these measures help planners reduce stockout risk while avoiding excessive inventory. The result depends heavily on demand quality, lead time reliability, and the service level target.
+          </p>
+        </section>
+
+        <section class="panel content-section" id="how-to-use">
+          <h2>How to Use This Tool</h2>
+          <ol class="method-list">
+            <li>Enter average daily demand for the item.</li>
+            <li>Enter daily demand variability and lead time variability.</li>
+            <li>Select the target service level.</li>
+            <li>Enter on-hand, on-order, and allocated stock to calculate inventory position.</li>
+            <li>Review whether the inventory position is above or below the reorder point.</li>
+          </ol>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Formula Logic</span>
+              <div class="formula-list" aria-label="Safety stock and reorder point formulas">
+                <p><strong>Notation</strong><br><var>d</var> = average daily demand, <var>sigma_d</var> = daily demand standard deviation, <var>L</var> = average lead time, <var>sigma_L</var> = lead time standard deviation, <var>z</var> = service level z-score</p>
+                <p><strong>Lead time demand</strong><br><var>LTD</var> = <var>d</var> &times; <var>L</var></p>
+                <p><strong>Safety stock</strong><br><var>SS</var> = <var>z</var> &times; sqrt((<var>L</var> &times; <var>sigma_d</var><sup>2</sup>) + (<var>d</var><sup>2</sup> &times; <var>sigma_L</var><sup>2</sup>))</p>
+                <p><strong>Reorder point</strong><br><var>ROP</var> = <var>LTD</var> + <var>SS</var></p>
+                <p><strong>Inventory position</strong><br><var>IP</var> = on-hand + on-order - allocated</p>
+              </div>
+            </div>
+            <div class="guidance-card">
+              <span>Required Inputs</span>
+              <p>The model needs average daily demand, average lead time, demand variability, lead time variability, and service level. Stock position inputs add action guidance.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Assumptions</span>
+              <p>The calculation assumes demand and lead time uncertainty can be approximated with standard deviation and a normal service-level z-score.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Limitations</span>
+              <p>Intermittent demand, supplier constraints, minimum order quantities, capacity limits, perishability, and correlated demand may require deeper inventory analysis.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="practical-guidance">
+          <h2>Practical Planning Guidance</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Use Real Variability</span>
+              <p>Safety stock is only as reliable as the variability inputs. Use recent demand and lead time data where possible.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Segment Service Levels</span>
+              <p>High-value or critical items may justify higher service levels. Low-priority items may not need the same protection.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Pair With EOQ</span>
+              <p>Safety stock and reorder point answer when to order. EOQ helps estimate how much to order.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Review Regularly</span>
+              <p>Update parameters when demand patterns, supplier reliability, lead times, or service expectations change.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details>
+            <summary>What is the difference between safety stock and reorder point?</summary>
+            <p>Safety stock is the buffer for uncertainty. Reorder point is the trigger level that includes expected lead time demand plus safety stock.</p>
+          </details>
+          <details>
+            <summary>Does a higher service level always make sense?</summary>
+            <p>Not always. Higher service levels increase safety stock and holding cost. Use higher targets where stockouts are more costly or operationally risky.</p>
+          </details>
+          <details>
+            <summary>What if lead time is stable?</summary>
+            <p>Enter zero for lead time standard deviation. The safety stock will then reflect demand variability during the average lead time.</p>
+          </details>
+          <details>
+            <summary>Is this the same as EOQ?</summary>
+            <p>No. Safety stock and reorder point help decide when to replenish. EOQ helps decide how much to order.</p>
+          </details>
+        </section>
+      </div>
+
+      <aside class="ssrop-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Safety Stock and Reorder Point page sections">
+          <a href="#inputs">Inputs</a>
+          <a href="#results">Results</a>
+          <a href="#action-summary">Action Summary</a>
+          <a href="#chart-section">Chart</a>
+          <a href="#about-ssrop">About</a>
+          <a href="#how-to-use">How to Use</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#practical-guidance">Guidance</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <script src="Safety_Stock_Reorder_Point.js"></script>
+</body>
+</html>

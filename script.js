@@ -28,6 +28,16 @@ const problems = [
     href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
   },
   {
+    title: 'How much buffer stock should I keep?',
+    detail: 'Recommended tool: Safety Stock & Reorder Point',
+    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+  },
+  {
+    title: 'When should I reorder inventory?',
+    detail: 'Recommended tool: Safety Stock & Reorder Point',
+    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+  },
+  {
     title: 'How can I forecast seasonal demand?',
     detail: 'Recommended tool: Exponential Smoothing',
     href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
@@ -50,7 +60,7 @@ const problems = [
 ];
 
 const categories = [
-  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '3 tools available', icon: 'boxes' },
+  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '4 tools available', icon: 'boxes' },
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
   { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Expanding soon', icon: 'settings' },
   { title: 'Statistics', benefit: 'Analyze relationships, distributions, samples, and uncertainty.', count: 'Expanding soon', icon: 'compare' },
@@ -82,20 +92,14 @@ const tools = [
     categories: ['Inventory and Supply Chain']
   },
   {
-    name: 'Safety Stock Calculator',
-    description: 'Estimate reserve stock needed to protect service levels under uncertainty.',
-    category: 'Supply Chain',
-    input: 'Demand variability, lead time, service level',
-    output: 'Safety stock recommendation',
-    status: 'Coming soon'
-  },
-  {
-    name: 'Reorder Point Calculator',
-    description: 'Calculate when replenishment should be triggered based on demand and lead time.',
+    name: 'Safety Stock & Reorder Point',
+    description: 'Estimate buffer stock and replenishment trigger levels under demand and lead time uncertainty.',
     category: 'Inventory Management',
-    input: 'Lead time demand and safety stock',
-    output: 'Reorder point threshold',
-    status: 'Coming soon'
+    input: 'Demand variability, lead time, service level',
+    output: 'Safety stock, reorder point, and stock action',
+    cta: 'Open Safety Stock & Reorder Point',
+    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html',
+    categories: ['Inventory and Supply Chain']
   },
   {
     name: 'Exponential Smoothing',
