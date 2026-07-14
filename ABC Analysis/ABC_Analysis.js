@@ -4,23 +4,38 @@ let finalAnalysisResults = [];
 let paretoChartInstance = null;
 const ALLOWED_FILE_EXTENSIONS = [".csv", ".xlsx", ".xls"];
 const MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024;
+const MONTHS = [
+  { key: "jan", label: "Jan" },
+  { key: "feb", label: "Feb" },
+  { key: "mar", label: "Mar" },
+  { key: "apr", label: "Apr" },
+  { key: "may", label: "May" },
+  { key: "jun", label: "Jun" },
+  { key: "jul", label: "Jul" },
+  { key: "aug", label: "Aug" },
+  { key: "sep", label: "Sep" },
+  { key: "oct", label: "Oct" },
+  { key: "nov", label: "Nov" },
+  { key: "dec", label: "Dec" },
+];
 const SAMPLE_INVENTORY_ITEMS = [
-  { name: "Laptop Docking Station", quantity: 120, unitPrice: 155 },
-  { name: "Industrial Safety Gloves", quantity: 950, unitPrice: 15 },
-  { name: "Barcode Scanner", quantity: 40, unitPrice: 320 },
-  { name: "Printer Toner Cartridge", quantity: 160, unitPrice: 60 },
-  { name: "Packing Tape Rolls", quantity: 740, unitPrice: 10 },
-  { name: "Wireless Keyboard", quantity: 150, unitPrice: 41 },
-  { name: "Shipping Labels", quantity: 1300, unitPrice: 4 },
-  { name: "USB-C Cable", quantity: 410, unitPrice: 10 },
-  { name: "Desk Organizer Tray", quantity: 175, unitPrice: 16 },
-  { name: "Replacement Mouse Pads", quantity: 270, unitPrice: 5 },
+  { name: "Laptop Docking Station", quantity: 120, unitPrice: 155, monthly: [10, 11, 9, 10, 10, 11, 9, 10, 10, 10, 10, 10] },
+  { name: "Industrial Safety Gloves", quantity: 950, unitPrice: 15, monthly: [70, 72, 78, 85, 88, 82, 80, 77, 76, 79, 82, 81] },
+  { name: "Barcode Scanner", quantity: 40, unitPrice: 320, monthly: [1, 4, 2, 8, 0, 5, 1, 7, 2, 6, 0, 4] },
+  { name: "Printer Toner Cartridge", quantity: 160, unitPrice: 60, monthly: [12, 13, 12, 14, 13, 14, 13, 12, 15, 14, 14, 14] },
+  { name: "Packing Tape Rolls", quantity: 740, unitPrice: 10, monthly: [52, 58, 62, 64, 70, 68, 65, 60, 58, 61, 60, 62] },
+  { name: "Wireless Keyboard", quantity: 150, unitPrice: 41, monthly: [8, 14, 9, 18, 7, 16, 10, 15, 8, 17, 9, 19] },
+  { name: "Shipping Labels", quantity: 1300, unitPrice: 4, monthly: [101, 105, 108, 110, 112, 109, 106, 108, 110, 111, 109, 111] },
+  { name: "USB-C Cable", quantity: 410, unitPrice: 10, monthly: [22, 28, 35, 46, 30, 42, 26, 50, 29, 45, 24, 33] },
+  { name: "Desk Organizer Tray", quantity: 175, unitPrice: 16, monthly: [14, 15, 13, 14, 14, 15, 15, 14, 15, 14, 16, 16] },
+  { name: "Replacement Mouse Pads", quantity: 270, unitPrice: 5, monthly: [3, 42, 4, 38, 6, 35, 5, 41, 4, 43, 5, 44] },
 ];
 
 // UI Element References
 const dropZone = document.getElementById("drop-zone");
 const fileInput = document.getElementById("file-input");
 const mappingSection = document.getElementById("mapping-section");
+const analysisModeSelect = document.getElementById("analysis-mode");
 const calcMethodSelect = document.getElementById("calc-method");
 const manualTbody = document.getElementById("manual-tbody");
 const manualSearchInput = document.getElementById("manual-search");
@@ -28,6 +43,8 @@ const resultsDashboard = document.getElementById("output-dashboard");
 
 // Initial setup hook
 window.addEventListener("DOMContentLoaded", () => {
+  buildMonthMappingSelectors([]);
+  updateAnalysisModeUI();
   initializeManualInputTable();
   setupDragAndDrop();
 });
@@ -43,6 +60,9 @@ function initializeManualInputTable() {
 function resetOutputState() {
   finalAnalysisResults = [];
   resultsDashboard.classList.add("hidden");
+  document.getElementById("xyz-output-panel").classList.add("hidden");
+  document.getElementById("abc-xyz-matrix").innerHTML = "";
+  document.getElementById("xyz-summary-note").textContent = "";
   document.getElementById("results-tbody").innerHTML = "";
   document.getElementById("stat-total-value").innerText = "$0.00";
   document.getElementById("stat-class-a").innerText = "0 (0%)";
@@ -62,6 +82,7 @@ function resetImportedFileState() {
   ["map-item", "map-val1", "map-val2"].forEach((selectId) => {
     document.getElementById(selectId).innerHTML = "";
   });
+  buildMonthMappingSelectors([]);
 }
 
 function clearAllData() {
@@ -69,10 +90,15 @@ function clearAllData() {
   resetOutputState();
   clearThresholdWarning();
   manualSearchInput.value = "";
+  analysisModeSelect.value = "abc";
   calcMethodSelect.value = "single";
+  analysisModeSelect.dispatchEvent(new Event("change"));
   calcMethodSelect.dispatchEvent(new Event("change"));
   document.getElementById("threshold-a").value = "80";
   document.getElementById("threshold-b").value = "95";
+  document.getElementById("threshold-x").value = "0.25";
+  document.getElementById("threshold-y").value = "0.50";
+  clearXyzThresholdWarning();
   initializeManualInputTable();
 }
 
@@ -80,10 +106,20 @@ function loadSampleData() {
   resetImportedFileState();
   resetOutputState();
   clearThresholdWarning();
+  clearXyzThresholdWarning();
   manualSearchInput.value = "";
+  if (analysisModeSelect.value === "abcxyz") {
+    calcMethodSelect.value = "multiply";
+  }
+  analysisModeSelect.dispatchEvent(new Event("change"));
   calcMethodSelect.dispatchEvent(new Event("change"));
   manualTbody.innerHTML = "";
   SAMPLE_INVENTORY_ITEMS.forEach((item) => {
+    if (analysisModeSelect.value === "abcxyz") {
+      addManualRow(item.name, "", item.unitPrice, item.monthly);
+      return;
+    }
+
     if (calcMethodSelect.value === "multiply") {
       addManualRow(item.name, item.quantity, item.unitPrice);
       return;
@@ -103,11 +139,27 @@ function applyManualSearchFilter() {
   });
 }
 
-function addManualRow(item = "", val1 = "", val2 = "") {
+function isXyzMode() {
+  return analysisModeSelect.value === "abcxyz";
+}
+
+function sumNumbers(values) {
+  return values.reduce((sum, value) => sum + (Number(value) || 0), 0);
+}
+
+function getStandardDeviation(values) {
+  if (values.length === 0) return 0;
+  const average = sumNumbers(values) / values.length;
+  const variance = values.reduce((sum, value) => sum + Math.pow(value - average, 2), 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+function addManualRow(item = "", val1 = "", val2 = "", monthlyValues = []) {
   const row = document.createElement("tr");
   row.className = "hover:bg-gray-50/50 transition-colors group";
 
   const isMultiply = calcMethodSelect.value === "multiply";
+  const useXyz = isXyzMode();
 
   const itemCell = document.createElement("td");
   itemCell.className = "p-2";
@@ -120,7 +172,7 @@ function addManualRow(item = "", val1 = "", val2 = "") {
   itemCell.appendChild(itemInput);
 
   const val1Cell = document.createElement("td");
-  val1Cell.className = "p-2";
+  val1Cell.className = `p-2 ${useXyz ? "hidden" : ""} manual-val1-cell`;
   const val1Input = document.createElement("input");
   val1Input.type = "number";
   val1Input.value = val1;
@@ -132,7 +184,7 @@ function addManualRow(item = "", val1 = "", val2 = "") {
   val1Cell.appendChild(val1Input);
 
   const val2Cell = document.createElement("td");
-  val2Cell.className = `p-2 ${isMultiply ? "" : "hidden"} manual-val2-cell`;
+  val2Cell.className = `p-2 ${isMultiply || useXyz ? "" : "hidden"} manual-val2-cell`;
   const val2Input = document.createElement("input");
   val2Input.type = "number";
   val2Input.value = val2;
@@ -142,6 +194,22 @@ function addManualRow(item = "", val1 = "", val2 = "") {
   val2Input.className =
     "w-full border border-gray-200 rounded px-2 py-1 text-sm manual-val2";
   val2Cell.appendChild(val2Input);
+
+  const monthCells = MONTHS.map((month, monthIndex) => {
+    const monthCell = document.createElement("td");
+    monthCell.className = `p-2 xyz-month-cell ${useXyz ? "" : "hidden"}`;
+    const monthInput = document.createElement("input");
+    monthInput.type = "number";
+    monthInput.value = monthlyValues[monthIndex] ?? "";
+    monthInput.min = "0";
+    monthInput.step = "any";
+    monthInput.placeholder = "0";
+    monthInput.setAttribute("aria-label", `${month.label} quantity for ${item || "item"}`);
+    monthInput.className =
+      "w-full border border-gray-200 rounded px-2 py-1 text-sm manual-month";
+    monthCell.appendChild(monthInput);
+    return monthCell;
+  });
 
   const actionCell = document.createElement("td");
   actionCell.className = "p-2 text-center";
@@ -153,7 +221,7 @@ function addManualRow(item = "", val1 = "", val2 = "") {
   removeButton.addEventListener("click", () => row.remove());
   actionCell.appendChild(removeButton);
 
-  row.append(itemCell, val1Cell, val2Cell, actionCell);
+  row.append(itemCell, val1Cell, val2Cell, ...monthCells, actionCell);
   manualTbody.appendChild(row);
   applyManualSearchFilter();
 }
@@ -167,28 +235,84 @@ document
 document.getElementById("btn-clear-all").addEventListener("click", clearAllData);
 manualSearchInput.addEventListener("input", applyManualSearchFilter);
 
+function updateAnalysisModeUI() {
+  const useXyz = isXyzMode();
+  const isMultiply = calcMethodSelect.value === "multiply";
+
+  document.getElementById("xyz-settings").classList.toggle("hidden", !useXyz);
+  document.getElementById("xyz-mapping-container").classList.toggle("hidden", !useXyz || !uploadedRawData);
+  document.querySelectorAll(".xyz-month-header").forEach((header) => header.classList.toggle("hidden", !useXyz));
+  document.querySelectorAll(".xyz-month-cell").forEach((cell) => cell.classList.toggle("hidden", !useXyz));
+  document.querySelectorAll(".manual-val1-cell").forEach((cell) => cell.classList.toggle("hidden", useXyz));
+
+  if (useXyz) {
+    calcMethodSelect.value = "multiply";
+    calcMethodSelect.disabled = true;
+    document.getElementById("manual-th-val1").innerText = "Quantity Used";
+    document.getElementById("manual-th-val1").classList.add("hidden");
+    document.getElementById("manual-th-val2").innerText = "Unit Cost";
+    document.getElementById("manual-th-val2").classList.remove("hidden");
+    document.getElementById("formula-label-1").innerText = "Unit Cost Column";
+    document.getElementById("mapping-val2-container").classList.add("hidden");
+    document.getElementById("calc-method-help").textContent = "ABC + XYZ sums the entered monthly quantities, then multiplies that quantity by unit cost.";
+    selectMappingOptionByPattern(document.getElementById("map-val1"), /unit.*(cost|price)|cost|price/i);
+  } else {
+    calcMethodSelect.disabled = false;
+    document.getElementById("manual-th-val1").classList.remove("hidden");
+    document.getElementById("manual-th-val2").innerText = "Unit Cost";
+    document.getElementById("manual-th-val1").innerText = isMultiply ? "Quantity Used" : "Consumption Value";
+    document.getElementById("formula-label-1").innerText = isMultiply ? "Quantity Used Column" : "Consumption Value Column";
+    document.getElementById("calc-method-help").textContent = isMultiply
+      ? "Quantity used is the total quantity used, sold, consumed, or demanded during the analysis period."
+      : "Consumption value is the total item value over the analysis period.";
+  }
+
+  document
+    .getElementById("mapping-val2-container")
+    .classList.toggle("hidden", useXyz || !isMultiply);
+  document
+    .querySelectorAll(".manual-val2-cell")
+    .forEach((cell) => cell.classList.toggle("hidden", !(useXyz || isMultiply)));
+}
+
+function selectMappingOptionByPattern(select, pattern) {
+  if (!select || select.options.length === 0) return;
+  const options = Array.from(select.options);
+  const matchedIndex = options.findIndex((option) => pattern.test(option.value));
+  if (matchedIndex >= 0) {
+    select.selectedIndex = matchedIndex;
+  }
+}
+
+analysisModeSelect.addEventListener("change", () => {
+  updateAnalysisModeUI();
+  resetOutputState();
+});
+
 // Respond to structural formulas changing
 calcMethodSelect.addEventListener("change", (e) => {
   const isMultiply = e.target.value === "multiply";
+  const useXyz = isXyzMode();
 
   // Adjust Manual Input Column visibility headers
   document
     .getElementById("manual-th-val2")
-    .classList.toggle("hidden", !isMultiply);
+    .classList.toggle("hidden", !(isMultiply || useXyz));
   document
     .querySelectorAll(".manual-val2-cell")
-    .forEach((cell) => cell.classList.toggle("hidden", !isMultiply));
+    .forEach((cell) => cell.classList.toggle("hidden", !(isMultiply || useXyz)));
   document.getElementById("manual-th-val1").innerText = isMultiply
-    ? "Quantity"
-    : "Value";
+    ? "Quantity Used"
+    : "Consumption Value";
 
   // Adjust Import Parser UI mappings
   document.getElementById("formula-label-1").innerText = isMultiply
-    ? "Quantity Column"
-    : "Value Column";
+    ? "Quantity Used Column"
+    : "Consumption Value Column";
   document
     .getElementById("mapping-val2-container")
-    .classList.toggle("hidden", !isMultiply);
+    .classList.toggle("hidden", useXyz || !isMultiply);
+  updateAnalysisModeUI();
 });
 
 // Drag & Drop event bindings
@@ -348,11 +472,52 @@ function populateColumnMappingSelectors(headers) {
     0,
   );
   selectVal2.selectedIndex = Math.max(
-    headers.findIndex((h) => /price|cost/i.test(h)),
+    headers.findIndex((h) => /unit.*(price|cost)|price|cost/i.test(h)),
     0,
   );
+  if (isXyzMode()) {
+    selectMappingOptionByPattern(selectVal1, /unit.*(cost|price)|cost|price/i);
+  }
 
+  buildMonthMappingSelectors(headers);
   mappingSection.classList.remove("hidden");
+  updateAnalysisModeUI();
+}
+
+function buildMonthMappingSelectors(headers) {
+  const monthGrid = document.getElementById("month-mapping-grid");
+  monthGrid.innerHTML = "";
+
+  MONTHS.forEach((month) => {
+    const wrapper = document.createElement("div");
+    const label = document.createElement("label");
+    label.className = "block text-xs font-medium mb-1";
+    label.setAttribute("for", `map-month-${month.key}`);
+    label.textContent = `${month.label} Qty`;
+
+    const select = document.createElement("select");
+    select.id = `map-month-${month.key}`;
+    select.className = "w-full themed-input px-2 py-1.5 text-sm";
+
+    const unusedOption = document.createElement("option");
+    unusedOption.value = "";
+    unusedOption.innerText = "Not used";
+    select.appendChild(unusedOption);
+
+    headers.forEach((header) => {
+      const opt = document.createElement("option");
+      opt.value = header;
+      opt.innerText = header;
+      select.appendChild(opt);
+    });
+
+    const monthPattern = new RegExp(`^${month.label}|${month.key}|${month.label.toLowerCase()}|${month.label}.*qty|${month.label}.*demand|${month.label}.*usage`, "i");
+    const matchIndex = headers.findIndex((header) => monthPattern.test(header));
+    select.selectedIndex = matchIndex >= 0 ? matchIndex + 1 : 0;
+
+    wrapper.append(label, select);
+    monthGrid.appendChild(wrapper);
+  });
 }
 
 // Processing trigger for explicit raw spreadsheets conversion
@@ -363,11 +528,30 @@ document.getElementById("btn-process-file").addEventListener("click", () => {
   const val1Key = document.getElementById("map-val1").value;
   const val2Key = document.getElementById("map-val2").value;
   const isMultiply = calcMethodSelect.value === "multiply";
+  const useXyz = isXyzMode();
+  const monthKeys = MONTHS.map((month) => document.getElementById(`map-month-${month.key}`)?.value);
 
   manualTbody.innerHTML = ""; // Wipe manual array context fields
 
   uploadedRawData.forEach((row) => {
     if (row[itemKey] !== undefined) {
+      if (useXyz) {
+        const monthlyValues = monthKeys.map((monthKey) => {
+          if (!monthKey) return "";
+          const rawValue = row[monthKey];
+          if (rawValue === undefined || rawValue === null || String(rawValue).trim() === "") return "";
+          const parsedValue = Number(rawValue);
+          return Number.isFinite(parsedValue) ? parsedValue : "";
+        });
+        addManualRow(
+          row[itemKey],
+          "",
+          row[val1Key] || 0,
+          monthlyValues,
+        );
+        return;
+      }
+
       addManualRow(
         row[itemKey],
         row[val1Key] || 0,
@@ -377,7 +561,7 @@ document.getElementById("btn-process-file").addEventListener("click", () => {
   });
 
   alert(
-    `Successfully integrated ${uploadedRawData.length} records! Review configs and hit 'Calculate ABC Analysis'.`,
+    `Successfully integrated ${uploadedRawData.length} records. Review the inputs and select Calculate Analysis.`,
   );
 });
 
@@ -389,6 +573,18 @@ function showThresholdWarning(message) {
 
 function clearThresholdWarning() {
   const thresholdWarning = document.getElementById("threshold-warning");
+  thresholdWarning.textContent = "";
+  thresholdWarning.classList.add("hidden");
+}
+
+function showXyzThresholdWarning(message) {
+  const thresholdWarning = document.getElementById("xyz-threshold-warning");
+  thresholdWarning.textContent = message;
+  thresholdWarning.classList.remove("hidden");
+}
+
+function clearXyzThresholdWarning() {
+  const thresholdWarning = document.getElementById("xyz-threshold-warning");
   thresholdWarning.textContent = "";
   thresholdWarning.classList.add("hidden");
 }
@@ -434,6 +630,38 @@ function getValidatedThresholds() {
   };
 }
 
+function getValidatedXyzThresholds() {
+  const thresholdXValue = parseFloat(document.getElementById("threshold-x").value);
+  const thresholdYValue = parseFloat(document.getElementById("threshold-y").value);
+
+  if (!Number.isFinite(thresholdXValue) || !Number.isFinite(thresholdYValue)) {
+    return {
+      isValid: false,
+      message: "Please enter valid numeric CV thresholds for X and Y.",
+    };
+  }
+
+  if (thresholdXValue < 0 || thresholdYValue < 0 || thresholdXValue > 10 || thresholdYValue > 10) {
+    return {
+      isValid: false,
+      message: "XYZ thresholds must be between 0 and 10.",
+    };
+  }
+
+  if (thresholdXValue >= thresholdYValue) {
+    return {
+      isValid: false,
+      message: "X threshold must be less than Y threshold.",
+    };
+  }
+
+  return {
+    isValid: true,
+    thresholdX: thresholdXValue,
+    thresholdY: thresholdYValue,
+  };
+}
+
 ["threshold-a", "threshold-b"].forEach((inputId) => {
   document.getElementById(inputId).addEventListener("input", () => {
     if (getValidatedThresholds().isValid) {
@@ -442,22 +670,39 @@ function getValidatedThresholds() {
   });
 });
 
+["threshold-x", "threshold-y"].forEach((inputId) => {
+  document.getElementById(inputId).addEventListener("input", () => {
+    if (getValidatedXyzThresholds().isValid) {
+      clearXyzThresholdWarning();
+    }
+  });
+});
+
 // Core Mathematical Processing Engine
 document.getElementById("btn-calculate").addEventListener("click", () => {
   const dataToProcess = [];
+  const xyzRowsWithTooFewMonths = [];
   const isMultiply = calcMethodSelect.value === "multiply";
+  const useXyz = isXyzMode();
 
   const items = document.querySelectorAll(".manual-item");
   const val1s = document.querySelectorAll(".manual-val1");
   const val2s = document.querySelectorAll(".manual-val2");
   const thresholdConfig = getValidatedThresholds();
+  const xyzThresholdConfig = getValidatedXyzThresholds();
 
   if (!thresholdConfig.isValid) {
     showThresholdWarning(thresholdConfig.message);
     return;
   }
 
+  if (useXyz && !xyzThresholdConfig.isValid) {
+    showXyzThresholdWarning(xyzThresholdConfig.message);
+    return;
+  }
+
   clearThresholdWarning();
+  clearXyzThresholdWarning();
 
   // 1. Gather raw context inputs
   items.forEach((elem, index) => {
@@ -466,10 +711,56 @@ document.getElementById("btn-calculate").addEventListener("click", () => {
     const v2 = isMultiply ? parseFloat(val2s[index].value) || 0 : 0;
 
     if (name !== "") {
+      if (useXyz) {
+        const row = elem.closest("tr");
+        const monthlyValues = Array.from(row.querySelectorAll(".manual-month"))
+          .map((input) => input.value.trim())
+          .filter((value) => value !== "")
+          .map(Number)
+          .filter(Number.isFinite);
+
+        if (monthlyValues.length < 3) {
+          xyzRowsWithTooFewMonths.push(name);
+          return;
+        }
+
+        const annualQuantity = sumNumbers(monthlyValues);
+        const unitCost = parseFloat(val2s[index].value) || 0;
+        const averageMonthlyQuantity = annualQuantity / monthlyValues.length;
+        const monthlyStdDev = getStandardDeviation(monthlyValues);
+        const coefficientOfVariation = averageMonthlyQuantity > 0 ? monthlyStdDev / averageMonthlyQuantity : 0;
+        const finalCalculatedValue = annualQuantity * unitCost;
+
+        dataToProcess.push({
+          name,
+          calculatedValue: finalCalculatedValue,
+          annualQuantity,
+          unitCost,
+          monthlyValues,
+          monthCount: monthlyValues.length,
+          averageMonthlyQuantity,
+          monthlyStdDev,
+          coefficientOfVariation,
+        });
+        return;
+      }
+
       const finalCalculatedValue = isMultiply ? v1 * v2 : v1;
-      dataToProcess.push({ name, calculatedValue: finalCalculatedValue });
+      dataToProcess.push({
+        name,
+        calculatedValue: finalCalculatedValue,
+        annualQuantity: isMultiply ? v1 : null,
+        unitCost: isMultiply ? v2 : null,
+      });
     }
   });
+
+  if (useXyz && xyzRowsWithTooFewMonths.length > 0) {
+    alert(
+      `ABC + XYZ needs at least 3 entered monthly quantity values per item. Check: ${xyzRowsWithTooFewMonths.slice(0, 5).join(", ")}${xyzRowsWithTooFewMonths.length > 5 ? "..." : ""}. Four or five months can be used for a directional view; 6-12 months is better.`,
+    );
+    return;
+  }
 
   if (dataToProcess.length === 0) {
     alert(
@@ -496,6 +787,7 @@ document.getElementById("btn-calculate").addEventListener("click", () => {
 
   // 4. Threshold parsing configurations variables maps
   const { thresholdA, thresholdB } = thresholdConfig;
+  const { thresholdX, thresholdY } = xyzThresholdConfig;
 
   let runningSum = 0;
   finalAnalysisResults = dataToProcess.map((item, index) => {
@@ -515,22 +807,45 @@ document.getElementById("btn-calculate").addEventListener("click", () => {
       abcClass = "B";
     }
 
+    let xyzClass = null;
+    let combinedClass = null;
+    if (useXyz) {
+      if (item.coefficientOfVariation <= thresholdX) {
+        xyzClass = "X";
+      } else if (item.coefficientOfVariation <= thresholdY) {
+        xyzClass = "Y";
+      } else {
+        xyzClass = "Z";
+      }
+      combinedClass = `${abcClass}${xyzClass}`;
+    }
+
     return {
       rank: index + 1,
       name: item.name,
       value: item.calculatedValue,
+      annualQuantity: item.annualQuantity,
+      unitCost: item.unitCost,
+      monthCount: item.monthCount,
+      coefficientOfVariation: item.coefficientOfVariation,
+      xyzClass,
+      combinedClass,
       percent: individualPercent,
       cumulative: cumulativePercent,
       class: abcClass,
     };
   });
 
-  renderDashboardOutputs(totalValue, finalAnalysisResults);
+  renderDashboardOutputs(totalValue, finalAnalysisResults, useXyz);
 });
 
 // Presentation Layout Handler Engine Functions
-function renderDashboardOutputs(totalSum, datasets) {
+function renderDashboardOutputs(totalSum, datasets, useXyz = false) {
   resultsDashboard.classList.remove("hidden");
+  document.getElementById("xyz-output-panel").classList.toggle("hidden", !useXyz);
+  ["result-th-annual-qty", "result-th-cv", "result-th-combined"].forEach((id) => {
+    document.getElementById(id).classList.toggle("hidden", !useXyz);
+  });
 
   // Compute structural widget summary sets
   const countA = datasets.filter((d) => d.class === "A").length;
@@ -584,6 +899,27 @@ function renderDashboardOutputs(totalSum, datasets) {
       maximumFractionDigits: 2,
     });
 
+    const annualQuantityCell = document.createElement("td");
+    annualQuantityCell.className = `p-4 text-right font-mono text-gray-600 ${useXyz ? "" : "hidden"}`;
+    annualQuantityCell.textContent = Number.isFinite(row.annualQuantity)
+      ? row.annualQuantity.toLocaleString(undefined, { maximumFractionDigits: 2 })
+      : "-";
+
+    const cvCell = document.createElement("td");
+    cvCell.className = `p-4 text-right font-mono text-gray-600 ${useXyz ? "" : "hidden"}`;
+    cvCell.textContent = Number.isFinite(row.coefficientOfVariation)
+      ? row.coefficientOfVariation.toFixed(2)
+      : "-";
+
+    const combinedCell = document.createElement("td");
+    combinedCell.className = `p-4 text-center ${useXyz ? "" : "hidden"}`;
+    if (useXyz) {
+      const combinedBadge = document.createElement("span");
+      combinedBadge.className = "px-3 py-1 rounded text-xs tracking-wider uppercase bg-blue-100 text-blue-800 font-bold";
+      combinedBadge.textContent = row.combinedClass;
+      combinedCell.appendChild(combinedBadge);
+    }
+
     const percentCell = document.createElement("td");
     percentCell.className = "p-4 text-right font-mono text-gray-600";
     percentCell.textContent = `${(row.percent * 100).toFixed(2)}%`;
@@ -603,6 +939,9 @@ function renderDashboardOutputs(totalSum, datasets) {
       rankCell,
       nameCell,
       valueCell,
+      annualQuantityCell,
+      cvCell,
+      combinedCell,
       percentCell,
       cumulativeCell,
       classCell,
@@ -613,8 +952,86 @@ function renderDashboardOutputs(totalSum, datasets) {
   // Rebuild interactive Pareto Multi-Axis Canvas Charts
   buildParetoChart(datasets);
 
+  if (useXyz) {
+    renderAbcXyzMatrix(datasets, totalSum);
+  }
+
   // Auto scroll down directly into view smoothly
   resultsDashboard.scrollIntoView({ behavior: "smooth" });
+}
+
+function getXyzBadgeStyle(xyzClass) {
+  if (xyzClass === "X") return "bg-blue-100 text-blue-800 font-bold";
+  if (xyzClass === "Y") return "bg-indigo-100 text-indigo-800 font-bold";
+  return "bg-purple-100 text-purple-800 font-bold";
+}
+
+function getSegmentRecommendation(segment) {
+  const recommendations = {
+    AX: "High value and predictable. Keep tight replenishment controls and reliable availability.",
+    AY: "High value with moderate variability. Review forecasts and safety stock frequently.",
+    AZ: "High value and volatile. Prioritize planning attention, supplier reliability, and buffer review.",
+    BX: "Moderate value and predictable. Use standard replenishment with periodic review.",
+    BY: "Moderate value and variable. Monitor demand changes and adjust reorder settings.",
+    BZ: "Moderate value and volatile. Review stocking logic before increasing inventory.",
+    CX: "Low value and predictable. Keep controls simple and automate where practical.",
+    CY: "Low value with moderate variability. Use simple min/max rules and review exceptions.",
+    CZ: "Low value and volatile. Consider lower service targets, make-to-order, or rationalization.",
+  };
+  return recommendations[segment] || "Review this segment before setting policy.";
+}
+
+function renderAbcXyzMatrix(datasets, totalSum) {
+  const matrix = document.getElementById("abc-xyz-matrix");
+  const summaryNote = document.getElementById("xyz-summary-note");
+  const abcClasses = ["A", "B", "C"];
+  const xyzClasses = ["X", "Y", "Z"];
+  const segmentCounts = {};
+
+  datasets.forEach((item) => {
+    segmentCounts[item.combinedClass] = segmentCounts[item.combinedClass] || { count: 0, value: 0 };
+    segmentCounts[item.combinedClass].count += 1;
+    segmentCounts[item.combinedClass].value += item.value;
+  });
+
+  const volatileHighValue = datasets.filter((item) => item.combinedClass === "AZ");
+  summaryNote.textContent = volatileHighValue.length > 0
+    ? `${volatileHighValue.length} A-class item${volatileHighValue.length === 1 ? "" : "s"} also have Z-level variability. Review these first.`
+    : "No A-class items are currently in the high-variability Z segment.";
+
+  matrix.innerHTML = "";
+  const corner = document.createElement("div");
+  corner.className = "abc-xyz-cell abc-xyz-axis";
+  corner.textContent = "ABC / XYZ";
+  matrix.appendChild(corner);
+
+  xyzClasses.forEach((xyzClass) => {
+    const header = document.createElement("div");
+    header.className = "abc-xyz-cell abc-xyz-axis";
+    header.innerHTML = `<strong>${xyzClass}</strong><span>${xyzClass === "X" ? "Predictable" : xyzClass === "Y" ? "Moderate" : "Variable"}</span>`;
+    matrix.appendChild(header);
+  });
+
+  abcClasses.forEach((abcClass) => {
+    const rowHeader = document.createElement("div");
+    rowHeader.className = "abc-xyz-cell abc-xyz-axis";
+    rowHeader.innerHTML = `<strong>${abcClass}</strong><span>${abcClass === "A" ? "High value" : abcClass === "B" ? "Medium value" : "Lower value"}</span>`;
+    matrix.appendChild(rowHeader);
+
+    xyzClasses.forEach((xyzClass) => {
+      const segment = `${abcClass}${xyzClass}`;
+      const metrics = segmentCounts[segment] || { count: 0, value: 0 };
+      const cell = document.createElement("div");
+      cell.className = `abc-xyz-cell abc-xyz-segment segment-${segment.toLowerCase()}`;
+      const valueShare = totalSum > 0 ? (metrics.value / totalSum) * 100 : 0;
+      cell.innerHTML = `
+        <strong>${segment}</strong>
+        <span>${metrics.count} item${metrics.count === 1 ? "" : "s"} • ${valueShare.toFixed(1)}% value</span>
+        <p>${getSegmentRecommendation(segment)}</p>
+      `;
+      matrix.appendChild(cell);
+    });
+  });
 }
 
 function buildParetoChart(datasets) {
@@ -727,16 +1144,32 @@ function buildParetoChart(datasets) {
 // Data Export Utility Modules
 window.exportData = function (format) {
   if (finalAnalysisResults.length === 0) return;
+  const useXyz = finalAnalysisResults.some((row) => row.xyzClass);
 
   // Structure data cleanly mapping programmatic attributes into human-readable export maps
-  const exportRows = finalAnalysisResults.map((r) => ({
-    Rank: r.rank,
-    "Item/SKU Code": r.name,
-    "Total Value ($)": r.value,
-    "Percentage Share (%)": +(r.percent * 100).toFixed(4),
-    "Cumulative Percentage (%)": +(r.cumulative * 100).toFixed(4),
-    "ABC Classification": r.class,
-  }));
+  const exportRows = finalAnalysisResults.map((r) => {
+    const baseRow = {
+      Rank: r.rank,
+      "Item/SKU Code": r.name,
+      "Consumption Value ($)": r.value,
+      "Percentage Share (%)": +(r.percent * 100).toFixed(4),
+      "Cumulative Percentage (%)": +(r.cumulative * 100).toFixed(4),
+      "ABC Classification": r.class,
+    };
+
+    if (useXyz) {
+      return {
+        ...baseRow,
+        "Quantity Used": r.annualQuantity,
+        "Months Used for XYZ": r.monthCount,
+        "Coefficient of Variation": Number.isFinite(r.coefficientOfVariation) ? +r.coefficientOfVariation.toFixed(4) : "",
+        "ABC-XYZ Segment": r.combinedClass,
+        "Recommended Policy": getSegmentRecommendation(r.combinedClass),
+      };
+    }
+
+    return baseRow;
+  });
 
   const worksheet = XLSX.utils.json_to_sheet(exportRows);
   const workbook = XLSX.utils.book_new();

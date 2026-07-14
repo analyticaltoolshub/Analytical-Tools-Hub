@@ -73,10 +73,10 @@ const categories = [
 const tools = [
   {
     name: 'ABC Analysis',
-    description: 'Classify inventory items according to their contribution to total consumption value.',
+    description: 'Classify inventory by annual consumption value, with optional XYZ demand variability segmentation.',
     category: 'Inventory Management',
-    input: 'Item demand, unit cost, annual usage',
-    output: 'Classification table and Pareto chart',
+    input: 'Annual value or monthly quantity plus unit cost',
+    output: 'ABC classes, optional ABC-XYZ matrix, and Pareto chart',
     cta: 'Open ABC Analysis',
     href: 'ABC%20Analysis/ABC_Analysis.html',
     categories: ['Inventory and Supply Chain']

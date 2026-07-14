@@ -193,7 +193,7 @@
                   <div class="preview-bottom">
                     <div class="input-panel">
                       <strong>Analysis Settings</strong>
-                      <label><span>Classification</span><select aria-label="Classification setting"><option>ABC by consumption value</option></select></label>
+                      <label><span>Classification</span><select aria-label="Classification setting"><option>ABC + XYZ segmentation</option></select></label>
                       <label><span>Review period</span><input value="12 months" aria-label="Review period"></label>
                       <p class="valid">Validation complete</p>
                     </div>
@@ -204,10 +204,10 @@
                     </div>
                   </div>
                   <div class="table-preview" role="table" aria-label="Inventory classification preview">
-                    <div role="row"><span role="columnheader">Item</span><span role="columnheader">Value</span><span role="columnheader">Class</span></div>
-                    <div role="row"><span role="cell">SKU-104</span><span role="cell">$82k</span><span role="cell">A</span></div>
-                    <div role="row"><span role="cell">SKU-221</span><span role="cell">$31k</span><span role="cell">B</span></div>
-                    <div role="row"><span role="cell">SKU-318</span><span role="cell">$8k</span><span role="cell">C</span></div>
+                    <div role="row"><span role="columnheader">Item</span><span role="columnheader">Value</span><span role="columnheader">Segment</span></div>
+                    <div role="row"><span role="cell">SKU-104</span><span role="cell">$82k</span><span role="cell">AX</span></div>
+                    <div role="row"><span role="cell">SKU-221</span><span role="cell">$31k</span><span role="cell">BY</span></div>
+                    <div role="row"><span role="cell">SKU-318</span><span role="cell">$8k</span><span role="cell">CZ</span></div>
                   </div>
                 </div>
               </div>
@@ -345,26 +345,26 @@
           <div>
             <span class="eyebrow">Inside an ATH Tool</span>
             <h2>ABC Analysis in Practice</h2>
-            <p>See how a working ATH tool moves from structured input to validation, visual analysis, classification, and a practical inventory decision.</p>
+            <p>See how a working ATH tool moves from structured input to validation, visual analysis, ABC-XYZ segmentation, and a practical inventory decision.</p>
             <ul class="benefit-list">
               <li>Import data or enter items manually</li>
-              <li>Set ABC thresholds and validate inputs</li>
-              <li>Review summary metrics and Pareto chart</li>
-              <li>Use the classification table to prioritise control</li>
+              <li>Choose ABC only or ABC + XYZ mode</li>
+              <li>Review summary metrics, Pareto chart, and segment matrix</li>
+              <li>Use classification output to prioritise inventory control</li>
               <li>Export the result for analysis records</li>
             </ul>
             <a class="button button-primary" href="ABC%20Analysis/ABC_Analysis.html">Try ABC Analysis</a>
           </div>
           <div class="tool-interface abc-workflow-preview" aria-label="ABC Analysis workflow preview">
             <div class="tool-interface-top">
-              <strong>ABC Analysis</strong>
+              <strong>ABC / XYZ Analysis</strong>
               <div><button>Export CSV</button><button>Export Excel</button></div>
             </div>
             <div class="abc-workflow-steps" aria-label="ABC Analysis workflow steps">
               <div><span>1</span><strong>Data Import</strong><p>CSV or spreadsheet</p></div>
               <div><span>2</span><strong>Manual Entry</strong><p>Add SKU rows</p></div>
-              <div><span>3</span><strong>Settings</strong><p>A 80% / B 95%</p></div>
-              <div><span>4</span><strong>Results</strong><p>Chart and table</p></div>
+              <div><span>3</span><strong>Settings</strong><p>ABC + XYZ thresholds</p></div>
+              <div><span>4</span><strong>Results</strong><p>Chart, matrix, table</p></div>
             </div>
             <div class="abc-mini-stats">
               <article><span>Total Evaluated Value</span><strong>$82,250.00</strong></article>
@@ -384,15 +384,15 @@
                 </div>
               </div>
               <div class="abc-preview-table" role="table" aria-label="ABC classification output preview">
-                <div role="row"><span role="columnheader">Rank</span><span role="columnheader">Item/SKU</span><span role="columnheader">Value</span><span role="columnheader">Class</span></div>
-                <div role="row"><span role="cell">1</span><span role="cell">Laptop Docking Station</span><span role="cell">$18,600</span><span role="cell"><em>A</em></span></div>
-                <div role="row"><span role="cell">2</span><span role="cell">Industrial Safety Gloves</span><span role="cell">$14,250</span><span role="cell"><em>A</em></span></div>
-                <div role="row"><span role="cell">3</span><span role="cell">Barcode Scanner</span><span role="cell">$12,800</span><span role="cell"><em>A</em></span></div>
+                <div role="row"><span role="columnheader">Rank</span><span role="columnheader">Item/SKU</span><span role="columnheader">Value</span><span role="columnheader">Segment</span></div>
+                <div role="row"><span role="cell">1</span><span role="cell">Laptop Docking Station</span><span role="cell">$18,600</span><span role="cell"><em>AX</em></span></div>
+                <div role="row"><span role="cell">2</span><span role="cell">Industrial Safety Gloves</span><span role="cell">$14,250</span><span role="cell"><em>AY</em></span></div>
+                <div role="row"><span role="cell">3</span><span role="cell">Barcode Scanner</span><span role="cell">$12,800</span><span role="cell"><em>AZ</em></span></div>
               </div>
             </div>
             <div class="recommendations">
               <strong>Summary recommendations</strong>
-              <p>A-class items represent the largest value concentration. Review order policies, cycle counts, and supplier continuity first.</p>
+              <p>AX items are high-value and predictable. AZ items need closer planning because they combine high value with volatile usage.</p>
             </div>
           </div>
         </div>

@@ -236,6 +236,106 @@ html {
   line-height: 1.45;
 }
 
+.abc-page .abc-field-help {
+  margin: 0.45rem 0 0;
+  color: var(--text-secondary) !important;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.abc-page .abc-subheading {
+  margin: 0 0 0.35rem;
+  color: var(--navy-950) !important;
+  -webkit-text-fill-color: var(--navy-950) !important;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.abc-page .abc-month-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.abc-page .abc-results-note {
+  max-width: 720px;
+  margin: 0;
+  color: var(--text-secondary) !important;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.abc-page .abc-results-callout {
+  min-width: min(100%, 280px);
+  padding: 0.85rem 1rem;
+  color: #047857 !important;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  border-radius: 0.5rem;
+  background: #ecfdf3;
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.abc-page .abc-xyz-matrix {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) repeat(3, minmax(170px, 1fr));
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+  overflow-x: auto;
+}
+
+.abc-page .abc-xyz-cell {
+  min-height: 7.5rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: #fff;
+  color: var(--text-primary) !important;
+}
+
+.abc-page .abc-xyz-axis {
+  min-height: auto;
+  background: var(--surface);
+  font-size: 0.85rem;
+}
+
+.abc-page .abc-xyz-cell strong {
+  display: block;
+  color: var(--navy-950) !important;
+  font-size: 1.05rem;
+  font-weight: 850;
+}
+
+.abc-page .abc-xyz-cell span {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--blue-600) !important;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.abc-page .abc-xyz-cell p {
+  margin: 0.55rem 0 0;
+  color: var(--text-secondary) !important;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.abc-page .segment-az,
+.abc-page .segment-bz {
+  border-color: rgba(180, 35, 24, 0.25);
+  background: #fff7f7;
+}
+
+.abc-page .segment-ax,
+.abc-page .segment-bx,
+.abc-page .segment-cx {
+  border-color: rgba(34, 197, 94, 0.22);
+  background: #f6fef9;
+}
+
 .abc-page .abc-calculation-note {
   padding: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -506,7 +606,11 @@ html {
 
 .abc-page .abc-manual-table {
   table-layout: fixed;
-  min-width: 0;
+  min-width: 720px;
+}
+
+.abc-page .abc-manual-table:has(.xyz-month-cell:not(.hidden)) {
+  min-width: 1680px;
 }
 
 .abc-page .abc-manual-table thead {
