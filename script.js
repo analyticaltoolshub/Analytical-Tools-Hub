@@ -23,7 +23,127 @@ const problems = [
     href: 'ABC%20Analysis/ABC_Analysis.html'
   },
   {
+    title: 'Which products contribute the most to inventory value or revenue?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which products have the most stable demand patterns?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which products have highly variable or unpredictable demand?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which SKUs require the highest management attention?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which items should carry the highest safety stock priority?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which items can operate with lower inventory buffers?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which products are at the highest risk of stockouts?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which products are overstocked relative to their importance and demand pattern?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which SKUs should have the highest service level targets?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which products require more accurate forecasting and planning?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which items should be reviewed more frequently for replenishment?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which SKUs should be candidates for make-to-order rather than make-to-stock?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which products require stronger supplier management or dual sourcing?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which SKUs should be prioritized during inventory shortages?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which low-value, highly volatile items should be rationalized or discontinued?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'How should inventory policies differ across product categories?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Where should working capital be invested to maximize inventory performance?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'Which inventory segments represent the greatest business and planning risk?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'How should warehouse space and resources be allocated across SKUs?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
+    title: 'What is the recommended inventory strategy for each ABC-XYZ segment?',
+    detail: 'Recommended tool: ABC Analysis',
+    href: 'ABC%20Analysis/ABC_Analysis.html'
+  },
+  {
     title: 'How much stock should I order for a stable-demand item?',
+    detail: 'Recommended tool: Economic Order Quantity',
+    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+  },
+  {
+    title: 'What order quantity balances ordering cost and holding cost?',
+    detail: 'Recommended tool: Economic Order Quantity',
+    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+  },
+  {
+    title: 'How often should I place replenishment orders for a stable item?',
+    detail: 'Recommended tool: Economic Order Quantity',
+    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+  },
+  {
+    title: 'Is my current order quantity costing more than the EOQ?',
+    detail: 'Recommended tool: Economic Order Quantity',
+    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+  },
+  {
+    title: 'How does changing ordering cost or holding cost affect order quantity?',
     detail: 'Recommended tool: Economic Order Quantity',
     href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
   },
@@ -38,7 +158,47 @@ const problems = [
     href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
   },
   {
+    title: 'What reorder point should I use when demand and lead time vary?',
+    detail: 'Recommended tool: Safety Stock & Reorder Point',
+    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+  },
+  {
+    title: 'How does service level change my safety stock requirement?',
+    detail: 'Recommended tool: Safety Stock & Reorder Point',
+    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+  },
+  {
+    title: 'Is my current inventory position below the reorder point?',
+    detail: 'Recommended tool: Safety Stock & Reorder Point',
+    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+  },
+  {
+    title: 'How many days of coverage do I have before I need to reorder?',
+    detail: 'Recommended tool: Safety Stock & Reorder Point',
+    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+  },
+  {
     title: 'How can I forecast seasonal demand?',
+    detail: 'Recommended tool: Exponential Smoothing',
+    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+  },
+  {
+    title: 'How can I forecast demand when there is a trend?',
+    detail: 'Recommended tool: Exponential Smoothing',
+    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+  },
+  {
+    title: 'What is the next-period forecast from recent demand history?',
+    detail: 'Recommended tool: Exponential Smoothing',
+    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+  },
+  {
+    title: 'Which smoothing method fits my demand pattern best?',
+    detail: 'Recommended tool: Exponential Smoothing',
+    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+  },
+  {
+    title: 'How accurate is my forecast using MAE?',
     detail: 'Recommended tool: Exponential Smoothing',
     href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
   },
@@ -48,7 +208,42 @@ const problems = [
     href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
   },
   {
+    title: 'Which spend categories are high impact and high supply risk?',
+    detail: 'Recommended tool: Kraljic Matrix',
+    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+  },
+  {
+    title: 'Which categories should use leverage, strategic, bottleneck, or routine sourcing strategies?',
+    detail: 'Recommended tool: Kraljic Matrix',
+    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+  },
+  {
+    title: 'Which suppliers or categories create the highest procurement risk?',
+    detail: 'Recommended tool: Kraljic Matrix',
+    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+  },
+  {
+    title: 'Where should procurement focus negotiation effort and supplier relationships?',
+    detail: 'Recommended tool: Kraljic Matrix',
+    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+  },
+  {
     title: 'How can I plan project tasks over time?',
+    detail: 'Recommended tool: Gantt Chart Planner',
+    href: 'Gantt%20Chart/Gantt_Chart.html'
+  },
+  {
+    title: 'How can I create a timeline for project tasks and milestones?',
+    detail: 'Recommended tool: Gantt Chart Planner',
+    href: 'Gantt%20Chart/Gantt_Chart.html'
+  },
+  {
+    title: 'How can I see project progress across weeks and months?',
+    detail: 'Recommended tool: Gantt Chart Planner',
+    href: 'Gantt%20Chart/Gantt_Chart.html'
+  },
+  {
+    title: 'How can I save and reload a project plan as JSON?',
     detail: 'Recommended tool: Gantt Chart Planner',
     href: 'Gantt%20Chart/Gantt_Chart.html'
   },
@@ -56,6 +251,56 @@ const problems = [
     title: 'How many units do I need to sell to break even?',
     detail: 'Recommended tool: Break-Even Analysis',
     href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+  },
+  {
+    title: 'What sales volume is needed to reach a target profit?',
+    detail: 'Recommended tool: Break-Even Analysis',
+    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+  },
+  {
+    title: 'How much margin of safety do I have at expected sales?',
+    detail: 'Recommended tool: Break-Even Analysis',
+    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+  },
+  {
+    title: 'How do price, fixed cost, and variable cost affect profitability?',
+    detail: 'Recommended tool: Break-Even Analysis',
+    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+  },
+  {
+    title: 'What revenue do I need to cover fixed and variable costs?',
+    detail: 'Recommended tool: Break-Even Analysis',
+    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+  },
+  {
+    title: 'Which option should I choose when several criteria matter?',
+    detail: 'Recommended tool: Analytic Hierarchy Process',
+    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+  },
+  {
+    title: 'Which supplier is the best fit across cost, quality, delivery, and risk?',
+    detail: 'Recommended tool: Analytic Hierarchy Process',
+    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+  },
+  {
+    title: 'Which 3PL partner should I select for service coverage and logistics performance?',
+    detail: 'Recommended tool: Analytic Hierarchy Process',
+    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+  },
+  {
+    title: 'Which warehouse location is strongest across cost, access, labour, and customer proximity?',
+    detail: 'Recommended tool: Analytic Hierarchy Process',
+    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+  },
+  {
+    title: 'Which transport mode should I choose when cost, speed, reliability, and emissions matter?',
+    detail: 'Recommended tool: Analytic Hierarchy Process',
+    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+  },
+  {
+    title: 'Which inventory policy is best when service level, working capital, and stockout risk conflict?',
+    detail: 'Recommended tool: Analytic Hierarchy Process',
+    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
   }
 ];
 
@@ -67,7 +312,7 @@ const categories = [
   { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: '1 tool available', icon: 'calculator' },
   { title: 'Quality and Engineering', benefit: 'Measure process capability, reliability, variation, and performance.', count: 'Expanding soon', icon: 'shield' },
   { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '1 tool available', icon: 'chart' }
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '2 tools available', icon: 'chart' }
 ];
 
 const tools = [
@@ -129,6 +374,16 @@ const tools = [
     cta: 'Open Break-Even Analysis',
     href: 'Break%20Even%20Analysis/Break_Even_Analysis.html',
     categories: ['Finance', 'Business Analysis']
+  },
+  {
+    name: 'Analytic Hierarchy Process',
+    description: 'Design pairwise questionnaires, collect expert judgements, and rank alternatives across multiple criteria.',
+    category: 'Business Analysis',
+    input: 'Criteria, alternatives, expert pairwise comparisons',
+    output: 'Criteria weights, consistency ratios, and ranked alternatives',
+    cta: 'Open Analytic Hierarchy Process',
+    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html',
+    categories: ['Business Analysis']
   },
   {
     name: 'Gantt Chart Planner',

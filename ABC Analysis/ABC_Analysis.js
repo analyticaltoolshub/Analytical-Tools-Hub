@@ -51,7 +51,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // Initialize Manual Input with empty template fields
 function initializeManualInputTable() {
-  manualTbody.innerHTML = "";
+  manualTbody.textContent = "";
   for (let i = 0; i < 5; i++) {
     addManualRow();
   }
@@ -61,10 +61,12 @@ function resetOutputState() {
   finalAnalysisResults = [];
   resultsDashboard.classList.add("hidden");
   document.getElementById("xyz-output-panel").classList.add("hidden");
-  document.getElementById("abc-xyz-matrix").innerHTML = "";
+  document.getElementById("abc-xyz-matrix").textContent = "";
   document.getElementById("xyz-summary-note").textContent = "";
-  document.getElementById("results-tbody").innerHTML = "";
-  document.getElementById("stat-total-value").innerText = "$0.00";
+  document.getElementById("abc-insight-panel").textContent = "";
+  document.getElementById("paretoChartSummary").textContent = "";
+  document.getElementById("results-tbody").textContent = "";
+  document.getElementById("stat-total-value").innerText = "\u00a30.00";
   document.getElementById("stat-class-a").innerText = "0 (0%)";
   document.getElementById("stat-class-b").innerText = "0 (0%)";
   document.getElementById("stat-class-c").innerText = "0 (0%)";
@@ -80,7 +82,7 @@ function resetImportedFileState() {
   fileInput.value = "";
   mappingSection.classList.add("hidden");
   ["map-item", "map-val1", "map-val2"].forEach((selectId) => {
-    document.getElementById(selectId).innerHTML = "";
+    document.getElementById(selectId).textContent = "";
   });
   buildMonthMappingSelectors([]);
 }
@@ -113,7 +115,7 @@ function loadSampleData() {
   }
   analysisModeSelect.dispatchEvent(new Event("change"));
   calcMethodSelect.dispatchEvent(new Event("change"));
-  manualTbody.innerHTML = "";
+  manualTbody.textContent = "";
   SAMPLE_INVENTORY_ITEMS.forEach((item) => {
     if (analysisModeSelect.value === "abcxyz") {
       addManualRow(item.name, "", item.unitPrice, item.monthly);
@@ -453,7 +455,7 @@ function populateColumnMappingSelectors(headers) {
   const selectVal2 = document.getElementById("map-val2");
 
   [selectItem, selectVal1, selectVal2].forEach((sel) => {
-    sel.innerHTML = "";
+    sel.textContent = "";
     headers.forEach((h) => {
       const opt = document.createElement("option");
       opt.value = h;
@@ -486,7 +488,7 @@ function populateColumnMappingSelectors(headers) {
 
 function buildMonthMappingSelectors(headers) {
   const monthGrid = document.getElementById("month-mapping-grid");
-  monthGrid.innerHTML = "";
+  monthGrid.textContent = "";
 
   MONTHS.forEach((month) => {
     const wrapper = document.createElement("div");
@@ -531,7 +533,7 @@ document.getElementById("btn-process-file").addEventListener("click", () => {
   const useXyz = isXyzMode();
   const monthKeys = MONTHS.map((month) => document.getElementById(`map-month-${month.key}`)?.value);
 
-  manualTbody.innerHTML = ""; // Wipe manual array context fields
+  manualTbody.textContent = ""; // Wipe manual array context fields
 
   uploadedRawData.forEach((row) => {
     if (row[itemKey] !== undefined) {
@@ -862,18 +864,31 @@ function renderDashboardOutputs(totalSum, datasets, useXyz = false) {
     .filter((d) => d.class === "C")
     .reduce((s, i) => s + i.value, 0);
 
-  document.getElementById("stat-total-value").innerText =
-    `$${totalSum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  document.getElementById("stat-total-value").innerText = formatCurrency(totalSum);
   document.getElementById("stat-class-a").innerText =
     `${countA} (${((sumValA / totalSum) * 100).toFixed(1)}%)`;
   document.getElementById("stat-class-b").innerText =
     `${countB} (${((sumValB / totalSum) * 100).toFixed(1)}%)`;
   document.getElementById("stat-class-c").innerText =
     `${countC} (${((sumValC / totalSum) * 100).toFixed(1)}%)`;
+  document.getElementById("paretoChartSummary").textContent =
+    `Pareto chart summary: ${datasets.length} items were analysed with total inventory value ${formatCurrency(totalSum)}. ` +
+    `A items represent ${((sumValA / totalSum) * 100).toFixed(1)}% of value, ` +
+    `B items represent ${((sumValB / totalSum) * 100).toFixed(1)}%, and ` +
+    `C items represent ${((sumValC / totalSum) * 100).toFixed(1)}%.`;
+
+  renderManagementInsightPanel(totalSum, datasets, useXyz, {
+    countA,
+    countB,
+    countC,
+    sumValA,
+    sumValB,
+    sumValC,
+  });
 
   // Display table compilation
   const tbody = document.getElementById("results-tbody");
-  tbody.innerHTML = "";
+  tbody.textContent = "";
 
   datasets.forEach((row) => {
     const tr = document.createElement("tr");
@@ -960,6 +975,114 @@ function renderDashboardOutputs(totalSum, datasets, useXyz = false) {
   resultsDashboard.scrollIntoView({ behavior: "smooth" });
 }
 
+function formatCurrency(value) {
+  return `\u00a3${Number(value || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function formatPercent(value) {
+  return `${(Number(value || 0) * 100).toFixed(1)}%`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function renderManagementInsightPanel(totalSum, datasets, useXyz, classSummary) {
+  const panel = document.getElementById("abc-insight-panel");
+  const totalItems = datasets.length;
+  const { countA, countB, countC, sumValA, sumValB, sumValC } = classSummary;
+  const countShareC = totalItems > 0 ? countC / totalItems : 0;
+  const valueShareA = totalSum > 0 ? sumValA / totalSum : 0;
+  const valueShareC = totalSum > 0 ? sumValC / totalSum : 0;
+  const azItems = useXyz ? datasets.filter((item) => item.combinedClass === "AZ") : [];
+  const highValueVolatileItems = useXyz
+    ? datasets.filter((item) => item.class === "A" && ["Y", "Z"].includes(item.xyzClass))
+    : [];
+  const priorityItems = useXyz ? highValueVolatileItems : datasets.filter((item) => item.class === "A");
+  const priorityPreview = priorityItems
+    .slice()
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+  const azValue = azItems.reduce((sum, item) => sum + item.value, 0);
+
+  const xyzRiskCopy = useXyz
+    ? azItems.length > 0
+      ? `${azItems.length} AZ item${azItems.length === 1 ? "" : "s"} account for ${formatCurrency(azValue)} of inventory value and should be prioritised for forecast review and safety stock assessment.`
+      : "No A-class items are currently classified as AZ. Continue reviewing AY and high-value A items for forecast and replenishment risk."
+    : `${countA.toLocaleString()} A-class item${countA === 1 ? "" : "s"} should be prioritised for management review because they hold the largest share of inventory value.`;
+
+  panel.innerHTML = `
+    <div class="abc-insight-header">
+      <div>
+        <p class="abc-insight-eyebrow">Management Interpretation</p>
+        <h2>What This Analysis Means</h2>
+      </div>
+      <span>${totalItems.toLocaleString()} SKU${totalItems === 1 ? "" : "s"} analysed</span>
+    </div>
+    <div class="abc-insight-grid">
+      <section class="abc-insight-section abc-insight-section-wide">
+        <h3>Executive Summary</h3>
+        <ul>
+          <li>Inventory analysis completed for ${totalItems.toLocaleString()} SKU${totalItems === 1 ? "" : "s"}.</li>
+          <li>${countA.toLocaleString()} A-class item${countA === 1 ? "" : "s"} represent ${formatPercent(valueShareA)} of inventory value.</li>
+          <li>${xyzRiskCopy}</li>
+          <li>${formatPercent(countShareC)} of SKUs are C-class items but represent only ${formatPercent(valueShareC)} of inventory value.</li>
+        </ul>
+      </section>
+      <section class="abc-insight-section">
+        <h3>Working Capital View</h3>
+        <dl>
+          <div><dt>Total inventory value</dt><dd>${formatCurrency(totalSum)}</dd></div>
+          <div><dt>Value in A items</dt><dd>${formatCurrency(sumValA)} (${formatPercent(valueShareA)})</dd></div>
+          <div><dt>Value in C items</dt><dd>${formatCurrency(sumValC)} (${formatPercent(valueShareC)})</dd></div>
+        </dl>
+      </section>
+      <section class="abc-insight-section">
+        <h3>${useXyz ? "Risk Identification" : "Priority Focus"}</h3>
+        <ul>
+          <li>${useXyz ? `${azItems.length.toLocaleString()} AZ item${azItems.length === 1 ? "" : "s"} detected.` : `Review ${countA.toLocaleString()} A-class item${countA === 1 ? "" : "s"} first because they represent ${formatPercent(valueShareA)} of inventory value.`}</li>
+          <li>${useXyz ? `${highValueVolatileItems.length.toLocaleString()} high-value volatile item${highValueVolatileItems.length === 1 ? "" : "s"} require review.` : `${countC.toLocaleString()} C-class item${countC === 1 ? "" : "s"} can usually be managed with simpler controls because they represent ${formatPercent(valueShareC)} of inventory value.`}</li>
+          <li>${useXyz ? "Lead-time and single-source risk are not included unless those fields are added to the dataset." : "Demand variability, lead-time risk, and single-source risk are not assessed in ABC-only mode."}</li>
+        </ul>
+      </section>
+      <section class="abc-insight-section">
+        <h3>Suggested Policies</h3>
+        <ul>
+          <li><strong>A items:</strong> weekly review, tight min/max controls, frequent exception checks.</li>
+          <li><strong>B items:</strong> monthly review with standard reorder controls.</li>
+          <li><strong>C items:</strong> simplified replenishment and exception-based review.</li>
+        </ul>
+      </section>
+      <section class="abc-insight-section">
+        <h3>Cycle Count Recommendations</h3>
+        <ul>
+          <li><strong>A items:</strong> count most frequently, such as monthly or by rolling weekly samples.</li>
+          <li><strong>B items:</strong> count quarterly or on a planned cycle.</li>
+          <li><strong>C items:</strong> count less often, using annual, sample-based, or exception-driven checks.</li>
+        </ul>
+      </section>
+    </div>
+    <div class="abc-priority-list">
+      <h3>${useXyz ? "Priority Review List" : "Highest-Value Review List"}</h3>
+      ${
+        priorityPreview.length > 0
+          ? `<ol>${priorityPreview
+              .map((item) => `<li><span>${escapeHtml(item.name)}</span><strong>${formatCurrency(item.value)}${useXyz ? ` - ${item.combinedClass}` : ` - ${item.class}`}</strong></li>`)
+              .join("")}</ol>`
+          : "<p>No priority items were identified from the current dataset.</p>"
+      }
+    </div>
+  `;
+}
+
 function getXyzBadgeStyle(xyzClass) {
   if (xyzClass === "X") return "bg-blue-100 text-blue-800 font-bold";
   if (xyzClass === "Y") return "bg-indigo-100 text-indigo-800 font-bold";
@@ -999,7 +1122,7 @@ function renderAbcXyzMatrix(datasets, totalSum) {
     ? `${volatileHighValue.length} A-class item${volatileHighValue.length === 1 ? "" : "s"} also have Z-level variability. Review these first.`
     : "No A-class items are currently in the high-variability Z segment.";
 
-  matrix.innerHTML = "";
+  matrix.textContent = "";
   const corner = document.createElement("div");
   corner.className = "abc-xyz-cell abc-xyz-axis";
   corner.textContent = "ABC / XYZ";
@@ -1026,7 +1149,7 @@ function renderAbcXyzMatrix(datasets, totalSum) {
       const valueShare = totalSum > 0 ? (metrics.value / totalSum) * 100 : 0;
       cell.innerHTML = `
         <strong>${segment}</strong>
-        <span>${metrics.count} item${metrics.count === 1 ? "" : "s"} • ${valueShare.toFixed(1)}% value</span>
+        <span>${metrics.count} item${metrics.count === 1 ? "" : "s"} - ${valueShare.toFixed(1)}% value</span>
         <p>${getSegmentRecommendation(segment)}</p>
       `;
       matrix.appendChild(cell);
@@ -1064,7 +1187,7 @@ function buildParetoChart(datasets) {
       labels: labels,
       datasets: [
         {
-          label: "Absolute Dollar Value ($)",
+          label: "Consumption Value",
           data: absoluteValues,
           backgroundColor: barColors,
           borderColor: barColors.map((c) =>
@@ -1115,7 +1238,7 @@ function buildParetoChart(datasets) {
           position: "left",
           title: {
             display: true,
-            text: "Individual Value ($)",
+            text: "Individual Value",
             font: { weight: "bold" },
             color: "#475467",
           },
@@ -1151,7 +1274,7 @@ window.exportData = function (format) {
     const baseRow = {
       Rank: r.rank,
       "Item/SKU Code": r.name,
-      "Consumption Value ($)": r.value,
+      "Consumption Value": r.value,
       "Percentage Share (%)": +(r.percent * 100).toFixed(4),
       "Cumulative Percentage (%)": +(r.cumulative * 100).toFixed(4),
       "ABC Classification": r.class,

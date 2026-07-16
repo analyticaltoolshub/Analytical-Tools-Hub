@@ -13,6 +13,7 @@ Website: https://analyticaltoolshub.com/
 - Break-Even Analysis
 - Economic Order Quantity
 - Safety Stock & Reorder Point
+- Analytic Hierarchy Process
 
 ## Run Locally
 

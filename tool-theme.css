@@ -32,6 +32,18 @@
   box-sizing: border-box;
 }
 
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -44,7 +56,8 @@ body.kraljic-page,
 body.gantt-page,
 body.break-even-page,
 body.eoq-page,
-body.ssrop-page {
+body.ssrop-page,
+body.ahp-page {
   min-height: 100vh;
   margin: 0;
   color: var(--text-primary) !important;
@@ -61,7 +74,8 @@ body.kraljic-page::before,
 body.gantt-page::before,
 body.break-even-page::before,
 body.eoq-page::before,
-body.ssrop-page::before {
+body.ssrop-page::before,
+body.ahp-page::before {
   content: "ATH";
   position: fixed;
   right: -2rem;
@@ -83,7 +97,8 @@ body.kraljic-page :focus-visible,
 body.gantt-page :focus-visible,
 body.break-even-page :focus-visible,
 body.eoq-page :focus-visible,
-body.ssrop-page :focus-visible {
+body.ssrop-page :focus-visible,
+body.ahp-page :focus-visible {
   outline: 3px solid rgba(45, 127, 249, .72) !important;
   outline-offset: 3px;
 }
@@ -244,9 +259,11 @@ button.reset:hover,
 body.abc-page main,
 body.forecast-page main.container,
 body.kraljic-page main.container,
+body.gantt-page main.container,
 body.break-even-page main.container,
 body.eoq-page main.container,
-body.ssrop-page main.container {
+body.ssrop-page main.container,
+body.ahp-page main.container {
   width: min(100% - 40px, 1180px) !important;
   max-width: 1180px !important;
   margin: 0 auto !important;
@@ -343,6 +360,11 @@ body.ssrop-page main.container {
 
 .forecast-layout,
 .kraljic-layout,
+.gantt-layout,
+.break-even-layout,
+.eoq-layout,
+.ssrop-layout,
+.ahp-layout,
 .abc-page main > .grid {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) 260px !important;
@@ -352,6 +374,11 @@ body.ssrop-page main.container {
 
 .forecast-content,
 .kraljic-content,
+.gantt-content,
+.break-even-content,
+.eoq-content,
+.ssrop-content,
+.ahp-content,
 #abc-tool {
   min-width: 0;
   grid-column: 1;
@@ -449,10 +476,28 @@ body.ssrop-page main.container {
 .abc-faq details p {
   color: var(--text-secondary) !important;
   -webkit-text-fill-color: currentColor !important;
+  font-size: 1rem !important;
+  line-height: 1.65 !important;
+}
+
+.guidance-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+}
+
+.guidance-card {
+  min-height: 8rem !important;
+  padding: 1rem !important;
 }
 
 .forecast-side-nav,
 .kraljic-side-nav,
+.gantt-side-nav,
+.break-even-side-nav,
+.eoq-side-nav,
+.ssrop-side-nav,
+.ahp-side-nav,
 .abc-side-nav {
   position: sticky !important;
   top: 6rem !important;
@@ -464,6 +509,11 @@ body.ssrop-page main.container {
 
 .forecast-side-nav nav,
 .kraljic-side-nav nav,
+.gantt-side-nav nav,
+.break-even-side-nav nav,
+.eoq-side-nav nav,
+.ssrop-side-nav nav,
+.ahp-side-nav nav,
 .abc-side-nav nav {
   display: grid;
   gap: .45rem;
@@ -471,6 +521,11 @@ body.ssrop-page main.container {
 
 .forecast-side-nav a,
 .kraljic-side-nav a,
+.gantt-side-nav a,
+.break-even-side-nav a,
+.eoq-side-nav a,
+.ssrop-side-nav a,
+.ahp-side-nav a,
 .abc-side-nav a {
   min-height: 2.35rem !important;
   display: flex !important;
@@ -487,9 +542,19 @@ body.ssrop-page main.container {
 
 .forecast-side-nav a:hover,
 .kraljic-side-nav a:hover,
+.gantt-side-nav a:hover,
+.break-even-side-nav a:hover,
+.eoq-side-nav a:hover,
+.ssrop-side-nav a:hover,
+.ahp-side-nav a:hover,
 .abc-side-nav a:hover,
 .forecast-side-nav a:focus,
 .kraljic-side-nav a:focus,
+.gantt-side-nav a:focus,
+.break-even-side-nav a:focus,
+.eoq-side-nav a:focus,
+.ssrop-side-nav a:focus,
+.ahp-side-nav a:focus,
 .abc-side-nav a:focus {
   color: var(--blue-600) !important;
   border-color: rgba(31, 111, 235, .28) !important;
@@ -567,12 +632,29 @@ body.ssrop-page main.container {
   border-color: #d0d5dd !important;
 }
 
+.faq-section {
+  display: grid !important;
+  gap: .75rem !important;
+}
+
+.faq-section h2 {
+  margin-bottom: .25rem !important;
+}
+
 .faq-section summary,
 .abc-faq summary {
+  cursor: pointer !important;
+  padding: .9rem 1rem !important;
   color: var(--navy-950) !important;
   -webkit-text-fill-color: currentColor !important;
   background: #fff !important;
   font-weight: 800 !important;
+}
+
+.faq-section details p,
+.abc-faq details p {
+  margin: 0 !important;
+  padding: 0 1rem 1rem !important;
 }
 
 .faq-section summary::marker,
@@ -776,12 +858,22 @@ tbody tr:hover td,
 @media (max-width: 1080px) {
   .forecast-layout,
   .kraljic-layout,
+  .gantt-layout,
+  .break-even-layout,
+  .eoq-layout,
+  .ssrop-layout,
+  .ahp-layout,
   .abc-page main > .grid {
     grid-template-columns: 1fr !important;
   }
 
   .forecast-side-nav,
   .kraljic-side-nav,
+  .gantt-side-nav,
+  .break-even-side-nav,
+  .eoq-side-nav,
+  .ssrop-side-nav,
+  .ahp-side-nav,
   .abc-side-nav {
     display: none !important;
   }
@@ -810,9 +902,11 @@ tbody tr:hover td,
   body.abc-page main,
   body.forecast-page main.container,
   body.kraljic-page main.container,
+  body.gantt-page main.container,
   body.break-even-page main.container,
   body.eoq-page main.container,
-  body.ssrop-page main.container {
+  body.ssrop-page main.container,
+  body.ahp-page main.container {
     width: min(100% - 28px, 1180px) !important;
   }
 

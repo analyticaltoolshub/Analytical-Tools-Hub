@@ -181,7 +181,7 @@ function createInput(type, value, index, field) {
 }
 
 function renderTable() {
-  taskTableBody.innerHTML = "";
+  taskTableBody.textContent = "";
 
   tasks.forEach((task, index) => {
     const row = document.createElement("tr");
@@ -202,10 +202,16 @@ function renderTable() {
     const select = document.createElement("select");
     select.dataset.index = index;
     select.dataset.field = "milestone";
-    select.innerHTML = `
-      <option value="false"${!task.milestone ? " selected" : ""}>No</option>
-      <option value="true"${task.milestone ? " selected" : ""}>Yes</option>
-    `;
+    [
+      { value: "false", label: "No", selected: !task.milestone },
+      { value: "true", label: "Yes", selected: task.milestone },
+    ].forEach((optionConfig) => {
+      const option = document.createElement("option");
+      option.value = optionConfig.value;
+      option.textContent = optionConfig.label;
+      option.selected = optionConfig.selected;
+      select.appendChild(option);
+    });
     milestoneCell.appendChild(select);
 
     const deleteCell = document.createElement("td");
@@ -274,7 +280,7 @@ function setTimelineFullscreen(isFullscreen) {
 }
 
 function renderTaskList(validTasks) {
-  taskList.innerHTML = "";
+  taskList.textContent = "";
 
   if (!validTasks.length) {
     const empty = document.createElement("div");
@@ -301,7 +307,7 @@ function renderTaskList(validTasks) {
 }
 
 function renderTimeline(validTasks) {
-  gantt.innerHTML = "";
+  gantt.textContent = "";
 
   const allDates = validTasks.flatMap((task) => [new Date(task.start), new Date(task.end)]);
   const minDate = getWeekStart(new Date(Math.min(...allDates)));
@@ -419,14 +425,17 @@ function render() {
   if (!validTasks.length) {
     clearError();
     renderTaskList([]);
-    gantt.innerHTML = `
-      <div class="timeline-empty">
-        <div>
-          <strong>No timeline data loaded</strong>
-          <span>Add a task, load a sample scenario, or import a JSON project file to build the Gantt timeline.</span>
-        </div>
-      </div>
-    `;
+    gantt.textContent = "";
+    const emptyState = document.createElement("div");
+    emptyState.className = "timeline-empty";
+    const emptyContent = document.createElement("div");
+    const emptyTitle = document.createElement("strong");
+    emptyTitle.textContent = "No timeline data loaded";
+    const emptyText = document.createElement("span");
+    emptyText.textContent = "Add a task, load a sample scenario, or import a JSON project file to build the Gantt timeline.";
+    emptyContent.append(emptyTitle, emptyText);
+    emptyState.appendChild(emptyContent);
+    gantt.appendChild(emptyState);
     timelinePanel.scrollLeft = 0;
     updateGanttHeight([]);
     return;

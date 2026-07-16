@@ -307,7 +307,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="themed-card p-5 rounded-xl border border-gray-700 shadow-2xs">
                     <p class="text-xs font-semibold text-muted uppercase tracking-wider">Total Evaluated Value</p>
-                    <p id="stat-total-value" class="text-2xl font-bold text-light mt-1">$0.00</p>
+                    <p id="stat-total-value" class="text-2xl font-bold text-light mt-1">&pound;0.00</p>
                 </div>
                 <div class="themed-card p-5 rounded-xl border border-emerald-100 shadow-2xs">
                     <p class="text-xs font-semibold text-emerald-200 uppercase tracking-wider">Class A Count / Value %
@@ -324,11 +324,14 @@
                 </div>
             </div>
 
+            <div id="abc-insight-panel" class="abc-insight-panel themed-card p-6 rounded-xl shadow-xs border border-gray-700" aria-live="polite"></div>
+
             <div class="themed-card p-6 rounded-xl shadow-xs border border-gray-700">
                 <h2 class="text-lg font-semibold mb-4">Pareto Principle Visualization (ABC Curve)</h2>
                 <div class="relative w-full h-80 sm:h-96 md:h-[450px]">
                     <canvas id="paretoChart"></canvas>
                 </div>
+                <p id="paretoChartSummary" class="sr-only"></p>
             </div>
 
             <div id="xyz-output-panel" class="themed-card p-6 rounded-xl shadow-xs border border-gray-700 hidden">
@@ -357,7 +360,7 @@
                             <tr>
                                 <th class="p-4 font-semibold text-muted tracking-wider">Rank</th>
                                 <th class="p-4 font-semibold text-muted tracking-wider">Item/SKU Identifier</th>
-                                <th class="p-4 font-semibold text-muted tracking-wider text-right">Consumption Value ($)
+                                <th class="p-4 font-semibold text-muted tracking-wider text-right">Consumption Value
                                 </th>
                                 <th id="result-th-annual-qty" class="p-4 font-semibold text-muted tracking-wider text-right hidden">Qty Used</th>
                                 <th id="result-th-cv" class="p-4 font-semibold text-muted tracking-wider text-right hidden">CV</th>
@@ -413,54 +416,51 @@
         </section>
 
         <section id="abc-guidance" class="themed-card p-6 rounded-xl shadow-xs border border-gray-700 space-y-4">
-            <h2 class="text-lg font-semibold">Practical Guidance</h2>
+            <h2 class="text-lg font-semibold">Guidance</h2>
             <div class="abc-class-actions">
-                <h3>What to Do With Each ABC Class</h3>
+                <h3>Before You Apply Policies</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="abc-action-card">
-                        <span>A Items: High Priority</span>
+                        <span>Validate the Inputs</span>
                         <p>
-                            Review these items often, keep stock control tight, and watch stockout risk closely.
-                            Use detailed forecasting, focus supplier conversations on reliability, and tune reorder
-                            points so important items stay available without tying up excess inventory.
+                            Check that item names, quantities, unit costs, and monthly values represent the same
+                            analysis period. Poor source data can make the classification look more precise than it is.
                         </p>
                     </div>
                     <div class="abc-action-card">
-                        <span>B Items: Medium Priority</span>
+                        <span>Review Operational Exceptions</span>
                         <p>
-                            Manage these with standard reorder points, planned replenishment, and periodic review.
-                            They need steady attention, but usually do not require the same level of control as
-                            high-priority A items.
+                            Use the result alongside lead time, supplier constraints, shelf life, substitution risk,
+                            minimum order quantities, and service-level expectations before changing replenishment rules.
                         </p>
                     </div>
                     <div class="abc-action-card">
-                        <span>C Items: Low Priority</span>
+                        <span>Refresh Regularly</span>
                         <p>
-                            Keep controls simple with min/max rules, less frequent counts, and bulk ordering where it
-                            is practical. The goal is to reduce handling effort while still keeping enough stock for
-                            normal demand.
+                            Re-run the analysis when price, demand, sourcing, or lifecycle conditions change. Items can
+                            move between classes as business conditions shift.
                         </p>
                     </div>
                 </div>
             </div>
             <div class="abc-class-actions">
-                <h3>How to Use ABC-XYZ Segments</h3>
+                <h3>How to Read ABC-XYZ</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     <div class="abc-action-card">
-                        <span>AX: high value, predictable</span>
-                        <p>Use tight replenishment rules, frequent review, and reliable supplier follow-up. These are often good candidates for disciplined reorder points and close service-level monitoring.</p>
+                        <span>ABC = Value Concentration</span>
+                        <p>A, B, and C show where inventory value is concentrated. This helps prioritise management attention and working-capital review.</p>
                     </div>
                     <div class="abc-action-card">
-                        <span>AY / AZ: high value, variable</span>
-                        <p>Review first. Check seasonality, promotion effects, lead-time risk, and safety stock assumptions before increasing inventory or changing supplier arrangements.</p>
+                        <span>XYZ = Demand Variability</span>
+                        <p>X, Y, and Z show whether monthly usage is predictable, moderately variable, or volatile based on coefficient of variation.</p>
                     </div>
                     <div class="abc-action-card">
-                        <span>BX / BY / BZ: controlled attention</span>
-                        <p>Use standard policies, then tighten controls where variability is high or availability risk matters. These items usually need balanced effort rather than intensive daily review.</p>
+                        <span>Combined Segment = Priority</span>
+                        <p>Segments such as AX, AY, and AZ combine value and variability so the result can be translated into review priorities.</p>
                     </div>
                     <div class="abc-action-card">
-                        <span>CX / CY / CZ: simplify where possible</span>
-                        <p>Keep administration light. For low-value and volatile items, consider simpler min/max rules, rationalisation, lower review frequency, or make-to-order handling where practical.</p>
+                        <span>Policy Needs Context</span>
+                        <p>The generated suggestions are a starting point. Confirm criticality, lead time, and supplier risk before making stock policy changes.</p>
                     </div>
                 </div>
             </div>

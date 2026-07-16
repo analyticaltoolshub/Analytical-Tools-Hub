@@ -69,6 +69,7 @@ const imgBtn = document.getElementById("imgBtn");
 const tableBody = document.getElementById("table");
 const matrix = document.getElementById("matrix");
 const summary = document.getElementById("summary");
+const matrixSummary = document.getElementById("matrixSummary");
 const searchInput = document.getElementById("searchInput");
 
 function updateSliderLabels() {
@@ -80,12 +81,6 @@ updateSliderLabels();
 
 function save() {
   localStorage.setItem("kraljic", JSON.stringify(items));
-}
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 function classifyItem(item) {
@@ -171,7 +166,7 @@ function calculateImpactScores(aggregatedItems) {
 
 function populateColumnSelectors(headers) {
   [categoryColumn, supplierColumn, spendColumn].forEach(select => {
-    select.innerHTML = "";
+    select.textContent = "";
     headers.forEach(header => {
       const option = document.createElement("option");
       option.value = header;
@@ -348,7 +343,7 @@ function aggregateRows(categoryKey, supplierKey, spendKey) {
 }
 
 function populateCategoryRiskSelector() {
-  categorySelect.innerHTML = "";
+  categorySelect.textContent = "";
 
   items.forEach(item => {
     const option = document.createElement("option");
@@ -612,10 +607,11 @@ function render() {
 function clearMatrix() {
   matrix.querySelectorAll(".point").forEach(p => p.remove());
   summary.textContent = "Set supply risk, then click Update Matrix.";
+  matrixSummary.textContent = "Kraljic matrix summary: supply risk has not been set yet.";
 }
 
 function renderTable() {
-  tableBody.innerHTML = "";
+  tableBody.textContent = "";
 
   items.forEach((item, index) => {
     tableBody.appendChild(createTableRow(item, index));
@@ -660,11 +656,15 @@ function renderMatrix() {
     p.style.left = x + "px";
     p.style.top = y + "px";
 
-    p.innerHTML = `
-      <strong>${escapeHtml(item.name)}</strong><br>
-      R: ${scaleLabels[item.risk]}<br>
-      I: ${scaleLabels[item.impact]}
-    `;
+    const pointName = document.createElement("strong");
+    pointName.textContent = item.name;
+    p.append(
+      pointName,
+      document.createElement("br"),
+      `R: ${scaleLabels[item.risk]}`,
+      document.createElement("br"),
+      `I: ${scaleLabels[item.impact]}`
+    );
     p.setAttribute("title", `${item.name}: ${scaleLabels[item.risk]} supply risk, ${scaleLabels[item.impact]} profit impact from ${formatCurrency(item.annualSpend)} annual spend`);
     p.setAttribute("aria-label", `${item.name}: ${scaleLabels[item.risk]} supply risk, ${scaleLabels[item.impact]} profit impact from annual spend`);
 
@@ -673,6 +673,9 @@ function renderMatrix() {
 
   summary.textContent =
     `Non-critical: ${counts["non-critical"]} | Leverage: ${counts["leverage"]} | Bottleneck: ${counts["bottleneck"]} | Strategic: ${counts["strategic"]}`;
+  matrixSummary.textContent =
+    `Kraljic matrix summary: ${counts.strategic} strategic categories, ${counts.leverage} leverage categories, ` +
+    `${counts.bottleneck} bottleneck categories, and ${counts["non-critical"]} non-critical categories are currently plotted.`;
 }
 
 function updateMatrix() {

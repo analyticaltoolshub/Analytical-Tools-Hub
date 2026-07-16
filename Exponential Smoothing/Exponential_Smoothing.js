@@ -13,6 +13,7 @@ const errorDiv = document.getElementById("error");
 const resultsTable = document.getElementById("resultsTable");
 const finalForecast = document.getElementById("finalForecast");
 const errorMetric = document.getElementById("errorMetric");
+const chartSummary = document.getElementById("chartSummary");
 const dropZone = document.getElementById("drop-zone");
 const fileInput = document.getElementById("file-input");
 const mappingSection = document.getElementById("mapping-section");
@@ -70,7 +71,7 @@ function getForecastData() {
 }
 
 function initializeManualRows() {
-    manualTbody.innerHTML = "";
+    manualTbody.textContent = "";
     for (let index = 0; index < 5; index++) {
         addManualRow();
     }
@@ -198,7 +199,7 @@ function sheetToRows(worksheet) {
 }
 
 function populateDemandColumnSelector(headers) {
-    demandColumn.innerHTML = "";
+    demandColumn.textContent = "";
 
     headers.forEach((header) => {
         const option = document.createElement("option");
@@ -224,7 +225,7 @@ function processUploadedData() {
         return;
     }
 
-    manualTbody.innerHTML = "";
+    manualTbody.textContent = "";
     values.forEach((value) => addManualRow(value));
     hideResults();
     errorDiv.innerText = "";
@@ -365,19 +366,31 @@ function calculateMae(actual, forecast) {
 }
 
 function displayResults(actual, forecast, nextForecast, mae) {
-    let table = "<tr><th>Period</th><th>Actual</th><th>Forecast</th></tr>";
+    resultsTable.textContent = "";
+
+    const headerRow = document.createElement("tr");
+    ["Period", "Actual", "Forecast"].forEach((label) => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        headerRow.appendChild(th);
+    });
+    resultsTable.appendChild(headerRow);
 
     for (let i = 0; i < actual.length; i++) {
-        table += `<tr>
-            <td>${i + 1}</td>
-            <td>${actual[i].toFixed(2)}</td>
-            <td>${forecast[i].toFixed(2)}</td>
-        </tr>`;
+        const row = document.createElement("tr");
+        [i + 1, actual[i].toFixed(2), forecast[i].toFixed(2)].forEach((value) => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+        resultsTable.appendChild(row);
     }
 
-    resultsTable.innerHTML = table;
-    finalForecast.innerText = `Next Period Forecast: ${nextForecast.toFixed(2)}`;
-    errorMetric.innerText = `MAE: ${mae.toFixed(3)}`;
+    finalForecast.textContent = `Next Period Forecast: ${nextForecast.toFixed(2)}`;
+    errorMetric.textContent = `MAE: ${mae.toFixed(3)}`;
+    chartSummary.textContent =
+        `Forecast chart summary: ${actual.length} demand periods analysed. ` +
+        `The next period forecast is ${nextForecast.toFixed(2)} and the mean absolute error is ${mae.toFixed(3)}.`;
 }
 
 function drawChart(actual, forecast) {
@@ -449,9 +462,10 @@ function showResults() {
 function hideResults() {
     resultsSection.classList.add("hidden");
     chartSection.classList.add("hidden");
-    resultsTable.innerHTML = "";
-    finalForecast.innerText = "";
-    errorMetric.innerText = "";
+    resultsTable.textContent = "";
+    finalForecast.textContent = "";
+    errorMetric.textContent = "";
+    chartSummary.textContent = "";
 
     if (chart) {
         chart.destroy();
@@ -463,7 +477,7 @@ function clearData() {
     fileInput.value = "";
     uploadedRawData = [];
     mappingSection.classList.add("hidden");
-    demandColumn.innerHTML = "";
+    demandColumn.textContent = "";
     initializeManualRows();
     errorDiv.innerText = "";
     hideResults();
@@ -472,8 +486,8 @@ function clearData() {
 function loadSampleData() {
     uploadedRawData = [];
     mappingSection.classList.add("hidden");
-    demandColumn.innerHTML = "";
-    manualTbody.innerHTML = "";
+    demandColumn.textContent = "";
+    manualTbody.textContent = "";
     const sampleMonthlyDemand = [
         820, 790, 860, 910, 980, 1060, 1120, 1090, 1010, 970, 1180, 1420,
         880, 850, 920, 990, 1050, 1140, 1210, 1170, 1080, 1040, 1270, 1530,

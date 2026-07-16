@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytic Hierarchy Process | Analytical Tools Hub</title>
+  <meta name="description" content="Design AHP questionnaires, collect expert pairwise comparisons, and rank alternatives using Analytic Hierarchy Process calculations in your browser.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Analytic Hierarchy Process Tool | Analytical Tools Hub">
+  <meta property="og:description" content="Create AHP questionnaires, collect expert Saaty-scale judgements, and rank alternatives with browser-based AHP analysis.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Analytic Hierarchy Process Tool | Analytical Tools Hub">
+  <meta name="twitter:description" content="Create AHP questionnaires, collect expert Saaty-scale judgements, and rank alternatives with browser-based AHP analysis.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Analytic_Hierarchy_Process.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html#software",
+          "name": "Analytic Hierarchy Process Tool",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html",
+          "description": "A browser-based tool for designing AHP questionnaires, collecting pairwise comparison responses, checking consistency, and ranking alternatives.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "AHP questionnaire design",
+            "Saaty scale survey response",
+            "JSON questionnaire export",
+            "JSON expert response export",
+            "Criteria weights",
+            "Alternative ranking",
+            "Consistency ratio"
+          ],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://analyticaltoolshub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Analytic Hierarchy Process", "item": "https://analyticaltoolshub.com/Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="ahp-page">
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text">
+          <strong>Analytic Hierarchy Process</strong>
+          <span>Multi-criteria decision workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="tool-hero" aria-labelledby="ahp-page-title">
+      <span class="tool-badge">Business Analysis</span>
+      <h1 id="ahp-page-title">Analytic Hierarchy Process</h1>
+      <p>Design a pairwise-comparison questionnaire, collect expert judgements on the Saaty scale, and rank alternatives using transparent AHP calculations.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based calculation</span>
+        <span>Questionnaire JSON workflow</span>
+        <span>Consistency ratio check</span>
+      </div>
+    </section>
+
+    <section class="panel content-section" aria-labelledby="decision-guide-heading">
+      <h2 id="decision-guide-heading">Why use this tool?</h2>
+      <div class="guidance-grid">
+        <div class="guidance-card">
+          <span>Decision Supported</span>
+          <p>Use this tool when a decision has several criteria and several alternatives that need structured expert judgement.</p>
+        </div>
+        <div class="guidance-card">
+          <span>What It Tells You</span>
+          <p>It estimates criterion weights, alternative scores under each criterion, overall ranking, and consistency ratios for the expert judgements.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Example Input</span>
+          <p>Define criteria such as cost, quality, risk, and implementation time, then compare alternatives pairwise under each criterion.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Sample Output Interpretation</span>
+          <p>The top-ranked alternative has the highest weighted score. High consistency ratios suggest the comparisons should be reviewed before acting.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="ahp-layout">
+      <div class="ahp-content">
+        <section class="panel" id="questionnaire-design">
+          <div class="section-header">
+            <div>
+              <h2>1. Questionnaire Design</h2>
+              <p>Create the AHP decision structure before sending it to experts.</p>
+            </div>
+            <div class="editor-actions">
+              <label class="template-select">
+                <span>Sample template</span>
+                <select id="sampleTemplateSelect">
+                  <option value="supplier-selection">Supplier Selection Decision</option>
+                  <option value="third-party-logistics">3PL Partner Selection</option>
+                  <option value="warehouse-location">Warehouse Location Decision</option>
+                  <option value="transport-mode">Transport Mode Selection</option>
+                  <option value="inventory-policy">Inventory Policy Selection</option>
+                </select>
+              </label>
+              <button id="loadSampleDesignButton" type="button">Load Sample Template</button>
+              <button class="reset" id="resetDesignButton" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="privacy-note">Questionnaire design is created locally in your browser. Export the JSON file before sharing it with experts.</div>
+          <div id="designError" class="error" role="alert"></div>
+
+          <div class="input-grid">
+            <label>
+              Project title
+              <input id="projectTitle" type="text">
+            </label>
+            <label>
+              Number of criteria
+              <input id="criteriaCount" type="number" min="2" max="10">
+            </label>
+            <label>
+              Number of alternatives
+              <input id="alternativeCount" type="number" min="2" max="10">
+            </label>
+            <button id="buildStructureButton" type="button">Build Fields</button>
+          </div>
+
+          <div id="structureFields" class="structure-fields"></div>
+
+          <div class="action-row">
+            <button id="previewQuestionnaireButton" type="button">Preview Questionnaire</button>
+            <button id="exportQuestionnaireButton" type="button" disabled>Export Questionnaire JSON</button>
+          </div>
+
+          <div id="questionnairePreview" class="question-preview hidden" aria-live="polite"></div>
+        </section>
+
+        <section class="panel" id="survey">
+          <div class="section-header">
+            <div>
+              <h2>2. Expert Survey</h2>
+              <p>Import a questionnaire JSON, complete the pairwise comparisons, and export the expert response.</p>
+            </div>
+          </div>
+
+          <div class="privacy-note">Survey answers are held in this browser session only. Export the completed response JSON before closing or refreshing the page.</div>
+          <div id="surveyError" class="error" role="alert"></div>
+
+          <div class="file-row">
+            <label>
+              Import questionnaire JSON
+              <input id="questionnaireFile" type="file" accept=".json,application/json">
+            </label>
+            <button id="loadQuestionnaireButton" type="button">Load Questionnaire</button>
+          </div>
+
+          <div id="surveyWorkspace" class="survey-workspace hidden">
+            <div class="survey-summary">
+              <div>
+                <span>Questionnaire</span>
+                <strong id="surveyTitle">Not loaded</strong>
+              </div>
+              <div>
+                <span>Progress</span>
+                <strong id="surveyCompleteness">0 / 0 answered</strong>
+              </div>
+            </div>
+
+            <label class="expert-label">
+              Expert name or role
+              <input id="expertName" type="text" placeholder="e.g. Procurement Manager">
+            </label>
+
+            <div id="surveyQuestions" class="survey-questions"></div>
+
+            <div class="action-row">
+              <button id="exportSurveyButton" type="button">Export Completed Survey JSON</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="analysis">
+          <div class="section-header">
+            <div>
+              <h2>3. AHP Analysis</h2>
+              <p>Load one or more completed expert response JSON files to calculate weights, consistency, and alternative ranking.</p>
+            </div>
+          </div>
+
+          <div id="analysisError" class="error" role="alert"></div>
+          <div class="file-row">
+            <label>
+              Import completed expert response JSON
+              <input id="responseFiles" type="file" accept=".json,application/json" multiple>
+            </label>
+            <button id="loadResponsesButton" type="button">Load Responses</button>
+            <button id="loadSampleResponseButton" type="button">Load Sample Response</button>
+          </div>
+
+          <div id="responseList" class="response-list"></div>
+
+          <div class="action-row">
+            <button id="calculateAnalysisButton" type="button" disabled>Calculate AHP Ranking</button>
+            <button id="exportAnalysisButton" type="button" disabled>Export Ranking CSV</button>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="results">
+          <div class="section-header">
+            <div>
+              <h2>4. Results and Interpretation</h2>
+              <p>Review the calculated priority weights, consistency checks, and final ranking.</p>
+            </div>
+          </div>
+
+          <div id="analysisSummary" class="interpretation" aria-live="polite"></div>
+          <p id="analysisChartSummary" class="sr-only"></p>
+
+          <div class="results-grid">
+            <div class="result-card">
+              <h3>Criteria Weights</h3>
+              <div id="criteriaWeights" class="bar-list"></div>
+            </div>
+            <div class="result-card">
+              <h3>Alternative Ranking</h3>
+              <div id="alternativeRanking" class="ranking-list"></div>
+            </div>
+            <div class="result-card result-card-wide">
+              <h3>Consistency Review</h3>
+              <div id="consistencyPanel" class="consistency-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="about-ahp">
+          <h2>About Analytic Hierarchy Process</h2>
+          <p>Analytic Hierarchy Process is a structured method for multi-criteria decision-making. It asks experts to compare criteria and alternatives in pairs, converts those judgements into priority weights, and combines the weights into an overall ranking.</p>
+        </section>
+
+        <section class="panel content-section" id="how-to-use">
+          <h2>Guidance</h2>
+          <ol class="method-list">
+            <li>Define the decision goal, criteria, and alternatives in the questionnaire design section.</li>
+            <li>Export the blank questionnaire JSON and send it to the expert or decision-maker.</li>
+            <li>The expert imports the questionnaire, answers each pairwise question, and exports the completed response JSON.</li>
+            <li>Load one or more completed response files into the analysis section and calculate the ranking.</li>
+            <li>Review consistency ratios before using the ranking to support a decision.</li>
+          </ol>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Formula</span>
+              <p>The tool builds reciprocal pairwise matrices, estimates priorities using the geometric mean method, and combines alternative weights using the weighted sum of criterion priorities.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Consistency Ratio</span>
+              <p>CR = CI / RI, where CI = (&lambda;<sub>max</sub> - n) / (n - 1). A ratio around 0.10 or lower is often treated as acceptable guidance.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Saaty Scale</span>
+              <p>Ratings use 1 equal, 2 equal to moderate, 3 moderate, 4 moderate to strong, 5 strong, 6 strong to very strong, 7 very strong, 8 very strong to extreme, and 9 extreme preference.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Assumptions</span>
+              <p>Experts can make meaningful pairwise judgements, criteria are relevant to the decision, and alternatives are comparable under each criterion.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Limitations</span>
+              <p>AHP supports structured judgement but does not remove bias. Poorly defined criteria or inconsistent responses can produce misleading rankings.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details>
+            <summary>What is the Saaty scale?</summary>
+            <p>It is a 1 to 9 judgement scale used for pairwise comparison. A value of 1 means equal importance or preference, while 9 means extreme importance or preference.</p>
+          </details>
+          <details>
+            <summary>Can several experts answer the same questionnaire?</summary>
+            <p>Yes. Send the same questionnaire JSON to each expert, then load multiple completed response files in the analysis section. The tool aggregates judgements using a geometric mean.</p>
+          </details>
+          <details>
+            <summary>What does consistency ratio mean?</summary>
+            <p>It checks whether the pairwise comparisons are reasonably coherent. A high consistency ratio means the expert should review the answers before the ranking is used.</p>
+          </details>
+          <details>
+            <summary>Is my survey data uploaded?</summary>
+            <p>No. This tool reads, calculates, and exports JSON files in the browser. No server upload is used by this static page.</p>
+          </details>
+        </section>
+      </div>
+
+      <aside class="ahp-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Analytic Hierarchy Process page sections">
+          <a href="#questionnaire-design">Questionnaire Design</a>
+          <a href="#survey">Expert Survey</a>
+          <a href="#analysis">AHP Analysis</a>
+          <a href="#results">Results</a>
+          <a href="#about-ahp">About</a>
+          <a href="#how-to-use">Guidance</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <script src="Analytic_Hierarchy_Process.js"></script>
+</body>
+</html>

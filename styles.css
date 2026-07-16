@@ -943,6 +943,25 @@ h3 {
   display: grid;
   gap: 8px;
   margin-top: 18px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(31, 111, 235, .45) var(--surface-alt);
+}
+
+.problem-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.problem-list::-webkit-scrollbar-track {
+  background: var(--surface-alt);
+  border-radius: 999px;
+}
+
+.problem-list::-webkit-scrollbar-thumb {
+  background: rgba(31, 111, 235, .45);
+  border-radius: 999px;
 }
 
 .problem-list button {
