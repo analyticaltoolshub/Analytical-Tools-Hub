@@ -519,6 +519,7 @@ const legalDocuments = {
 function renderCards(selector, items, template) {
   const target = document.querySelector(selector);
   if (!target) return;
+  if (target.children.length > 0) return;
   target.innerHTML = items.map(template).join('');
 }
 

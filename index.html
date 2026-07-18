@@ -135,18 +135,18 @@
       <section class="hero section">
         <div class="container hero-grid">
           <div class="hero-copy">
-            <span class="badge">Practical analysis, accessible to everyone</span>
-            <h1>Turn Data Into Better Decisions</h1>
-            <p class="hero-lede">Access practical analytical tools for supply chain, forecasting, inventory, operations, statistics, finance, engineering, and business—all in one professional workspace.</p>
+            <span class="badge">Decision intelligence for practical analysis</span>
+            <h1><span class="headline-line">Analyze Evidence.</span><span class="headline-line">Structure Judgement.</span><span class="headline-line">Decide Clearly.</span></h1>
+            <p class="hero-lede">Analytical Tools Hub helps supply chain, procurement, operations, business, and research users apply data-driven analytics, structured expert judgement, and transparent decision methods in one browser-based workspace.</p>
             <div class="hero-actions">
-              <a class="button button-primary button-large" href="#tools">Calculate. Analyze. Decide</a>
+              <a class="button button-primary button-large" href="#tools">Find the Right Tool</a>
               <a class="button button-secondary button-large" href="#how-it-works">See How ATH Works</a>
             </div>
-            <p class="reassurance">Free to use • No installation • Works in your browser</p>
+            <p class="reassurance">Free to use • No installation • Works in your browser • Transparent methods</p>
             <ul class="hero-checks" aria-label="ATH benefits">
-              <li>No software installation</li>
-              <li>Clear results and visualisations</li>
-              <li>Designed for practical decisions</li>
+              <li>Data-driven and judgement-based methods</li>
+              <li>Clear calculations, outputs, and interpretation</li>
+              <li>Built for practical business and academic decisions</li>
             </ul>
           </div>
           <div class="workspace-preview" aria-label="ATH analytical workspace preview">
@@ -193,7 +193,7 @@
                   <div class="preview-bottom">
                     <div class="input-panel">
                       <strong>Analysis Settings</strong>
-                      <label><span>Classification</span><select aria-label="Classification setting"><option>ABC + XYZ segmentation</option></select></label>
+                      <label><span>Classification</span><select aria-label="Classification setting"><option>ABC + XYZ</option></select></label>
                       <label><span>Review period</span><input value="12 months" aria-label="Review period"></label>
                       <p class="valid">Validation complete</p>
                     </div>
@@ -216,11 +216,32 @@
         </div>
       </section>
 
-      <section class="promise-strip" aria-label="Disciplines supported by ATH">
-        <div class="container promise-inner">
-          <h2>One platform. Multiple disciplines. Better decisions.</h2>
-          <div class="discipline-list">
-            <span>Supply Chain</span><span>Forecasting</span><span>Inventory</span><span>Operations</span><span>Statistics</span><span>Finance</span><span>Engineering</span><span>Business</span>
+      <section class="section surface-section" aria-labelledby="decision-methods-heading">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">Decision Support</span>
+            <h2 id="decision-methods-heading">The Right Method for the Right Decision</h2>
+            <p>Some business decisions rely entirely on measurable historical data. Others depend on structured expert judgement. Many important decisions require a combination of both. Analytical Tools Hub brings together quantitative analysis, structured expert judgement, Multi-Criteria Decision Making (MCDM), practical business analytics, and transparent analytical methods so users can choose an approach that fits the decision in front of them.</p>
+          </div>
+          <div class="learning-grid">
+            <article class="learning-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-7"/></svg>
+              <h3>Data-Driven Decisions</h3>
+              <p>Use measurable demand, cost, sales, inventory, or performance data to calculate results and compare options.</p>
+              <p><strong>Examples:</strong> ABC Analysis, EOQ, Safety Stock, Forecasting.</p>
+            </article>
+            <article class="learning-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5Z"/></svg>
+              <h3>Expert Judgement Decisions</h3>
+              <p>Structure subjective expertise when decisions involve criteria, trade-offs, preferences, or professional judgement.</p>
+              <p><strong>Example:</strong> Analytic Hierarchy Process (AHP).</p>
+            </article>
+            <article class="learning-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 3v18M16 3v18"/><path d="M3 8h10M11 16h10"/></svg>
+              <h3>Hybrid Decision Support</h3>
+              <p>Combine data, risk assessment, categorisation, and judgement to support decisions that are not solved by one metric alone.</p>
+              <p><strong>Example:</strong> Kraljic Matrix.</p>
+            </article>
           </div>
         </div>
       </section>
@@ -306,7 +327,65 @@
             <article class="problem-card">
               <h3>Start With a Problem</h3>
               <p>Use plain-language questions when you know the challenge but not the method.</p>
-              <div class="problem-list" data-render="problems"></div>
+              <div class="problem-list" data-render="problems">
+                <button type="button" data-problem="Which inventory items need the most control?">Which inventory items need the most control?</button>
+                <button type="button" data-problem="Which products contribute the most to inventory value or revenue?">Which products contribute the most to inventory value or revenue?</button>
+                <button type="button" data-problem="Which products have the most stable demand patterns?">Which products have the most stable demand patterns?</button>
+                <button type="button" data-problem="Which products have highly variable or unpredictable demand?">Which products have highly variable or unpredictable demand?</button>
+                <button type="button" data-problem="Which SKUs require the highest management attention?">Which SKUs require the highest management attention?</button>
+                <button type="button" data-problem="Which items should carry the highest safety stock priority?">Which items should carry the highest safety stock priority?</button>
+                <button type="button" data-problem="Which items can operate with lower inventory buffers?">Which items can operate with lower inventory buffers?</button>
+                <button type="button" data-problem="Which products are at the highest risk of stockouts?">Which products are at the highest risk of stockouts?</button>
+                <button type="button" data-problem="Which products are overstocked relative to their importance and demand pattern?">Which products are overstocked relative to their importance and demand pattern?</button>
+                <button type="button" data-problem="Which SKUs should have the highest service level targets?">Which SKUs should have the highest service level targets?</button>
+                <button type="button" data-problem="Which products require more accurate forecasting and planning?">Which products require more accurate forecasting and planning?</button>
+                <button type="button" data-problem="Which items should be reviewed more frequently for replenishment?">Which items should be reviewed more frequently for replenishment?</button>
+                <button type="button" data-problem="Which SKUs should be candidates for make-to-order rather than make-to-stock?">Which SKUs should be candidates for make-to-order rather than make-to-stock?</button>
+                <button type="button" data-problem="Which products require stronger supplier management or dual sourcing?">Which products require stronger supplier management or dual sourcing?</button>
+                <button type="button" data-problem="Which SKUs should be prioritized during inventory shortages?">Which SKUs should be prioritized during inventory shortages?</button>
+                <button type="button" data-problem="Which low-value, highly volatile items should be rationalized or discontinued?">Which low-value, highly volatile items should be rationalized or discontinued?</button>
+                <button type="button" data-problem="How should inventory policies differ across product categories?">How should inventory policies differ across product categories?</button>
+                <button type="button" data-problem="Where should working capital be invested to maximize inventory performance?">Where should working capital be invested to maximize inventory performance?</button>
+                <button type="button" data-problem="Which inventory segments represent the greatest business and planning risk?">Which inventory segments represent the greatest business and planning risk?</button>
+                <button type="button" data-problem="How should warehouse space and resources be allocated across SKUs?">How should warehouse space and resources be allocated across SKUs?</button>
+                <button type="button" data-problem="What is the recommended inventory strategy for each ABC-XYZ segment?">What is the recommended inventory strategy for each ABC-XYZ segment?</button>
+                <button type="button" data-problem="How much stock should I order for a stable-demand item?">How much stock should I order for a stable-demand item?</button>
+                <button type="button" data-problem="What order quantity balances ordering cost and holding cost?">What order quantity balances ordering cost and holding cost?</button>
+                <button type="button" data-problem="How often should I place replenishment orders for a stable item?">How often should I place replenishment orders for a stable item?</button>
+                <button type="button" data-problem="Is my current order quantity costing more than the EOQ?">Is my current order quantity costing more than the EOQ?</button>
+                <button type="button" data-problem="How does changing ordering cost or holding cost affect order quantity?">How does changing ordering cost or holding cost affect order quantity?</button>
+                <button type="button" data-problem="How much buffer stock should I keep?">How much buffer stock should I keep?</button>
+                <button type="button" data-problem="When should I reorder inventory?">When should I reorder inventory?</button>
+                <button type="button" data-problem="What reorder point should I use when demand and lead time vary?">What reorder point should I use when demand and lead time vary?</button>
+                <button type="button" data-problem="How does service level change my safety stock requirement?">How does service level change my safety stock requirement?</button>
+                <button type="button" data-problem="Is my current inventory position below the reorder point?">Is my current inventory position below the reorder point?</button>
+                <button type="button" data-problem="How many days of coverage do I have before I need to reorder?">How many days of coverage do I have before I need to reorder?</button>
+                <button type="button" data-problem="How can I forecast seasonal demand?">How can I forecast seasonal demand?</button>
+                <button type="button" data-problem="How can I forecast demand when there is a trend?">How can I forecast demand when there is a trend?</button>
+                <button type="button" data-problem="What is the next-period forecast from recent demand history?">What is the next-period forecast from recent demand history?</button>
+                <button type="button" data-problem="Which smoothing method fits my demand pattern best?">Which smoothing method fits my demand pattern best?</button>
+                <button type="button" data-problem="How accurate is my forecast using MAE?">How accurate is my forecast using MAE?</button>
+                <button type="button" data-problem="Which purchasing categories need strategic supplier attention?">Which purchasing categories need strategic supplier attention?</button>
+                <button type="button" data-problem="Which spend categories are high impact and high supply risk?">Which spend categories are high impact and high supply risk?</button>
+                <button type="button" data-problem="Which categories should use leverage, strategic, bottleneck, or routine sourcing strategies?">Which categories should use leverage, strategic, bottleneck, or routine sourcing strategies?</button>
+                <button type="button" data-problem="Which suppliers or categories create the highest procurement risk?">Which suppliers or categories create the highest procurement risk?</button>
+                <button type="button" data-problem="Where should procurement focus negotiation effort and supplier relationships?">Where should procurement focus negotiation effort and supplier relationships?</button>
+                <button type="button" data-problem="How can I plan project tasks over time?">How can I plan project tasks over time?</button>
+                <button type="button" data-problem="How can I create a timeline for project tasks and milestones?">How can I create a timeline for project tasks and milestones?</button>
+                <button type="button" data-problem="How can I see project progress across weeks and months?">How can I see project progress across weeks and months?</button>
+                <button type="button" data-problem="How can I save and reload a project plan as JSON?">How can I save and reload a project plan as JSON?</button>
+                <button type="button" data-problem="How many units do I need to sell to break even?">How many units do I need to sell to break even?</button>
+                <button type="button" data-problem="What sales volume is needed to reach a target profit?">What sales volume is needed to reach a target profit?</button>
+                <button type="button" data-problem="How much margin of safety do I have at expected sales?">How much margin of safety do I have at expected sales?</button>
+                <button type="button" data-problem="How do price, fixed cost, and variable cost affect profitability?">How do price, fixed cost, and variable cost affect profitability?</button>
+                <button type="button" data-problem="What revenue do I need to cover fixed and variable costs?">What revenue do I need to cover fixed and variable costs?</button>
+                <button type="button" data-problem="Which option should I choose when several criteria matter?">Which option should I choose when several criteria matter?</button>
+                <button type="button" data-problem="Which supplier is the best fit across cost, quality, delivery, and risk?">Which supplier is the best fit across cost, quality, delivery, and risk?</button>
+                <button type="button" data-problem="Which 3PL partner should I select for service coverage and logistics performance?">Which 3PL partner should I select for service coverage and logistics performance?</button>
+                <button type="button" data-problem="Which warehouse location is strongest across cost, access, labour, and customer proximity?">Which warehouse location is strongest across cost, access, labour, and customer proximity?</button>
+                <button type="button" data-problem="Which transport mode should I choose when cost, speed, reliability, and emissions matter?">Which transport mode should I choose when cost, speed, reliability, and emissions matter?</button>
+                <button type="button" data-problem="Which inventory policy is best when service level, working capital, and stockout risk conflict?">Which inventory policy is best when service level, working capital, and stockout risk conflict?</button>
+              </div>
             </article>
           </div>
         </div>
@@ -320,7 +399,64 @@
               <h2>Featured Analytical Disciplines</h2>
             </div>
           </div>
-          <div class="category-grid" data-render="categories"></div>
+          <div class="category-grid" data-render="categories">
+            <article class="category-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+              <h3>Inventory and Supply Chain</h3>
+              <span class="card-meta">4 tools available</span>
+              <p>Optimize stock, service levels, purchasing, and supplier decisions.</p>
+              <button class="card-link card-link-button" type="button" data-category-search="Inventory and Supply Chain" aria-label="Explore Inventory and Supply Chain category">Explore category</button>
+            </article>
+            <article class="category-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-7"/></svg>
+              <h3>Forecasting</h3>
+              <span class="card-meta">1 tool available</span>
+              <p>Identify trends, seasonality, and future demand.</p>
+              <button class="card-link card-link-button" type="button" data-category-search="Forecasting" aria-label="Explore Forecasting category">Explore category</button>
+            </article>
+            <article class="category-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.2.4.5.75.9 1 .32.2.7.3 1.1.3h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-2 1Z"/></svg>
+              <h3>Operations</h3>
+              <span class="card-meta">Expanding soon</span>
+              <p>Evaluate capacity, productivity, queues, and process performance.</p>
+              <button class="card-link card-link-button" type="button" data-category-search="Operations" aria-label="Explore Operations category">Explore category</button>
+            </article>
+            <article class="category-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 3v18M16 3v18"/><path d="M3 8h10M11 16h10"/></svg>
+              <h3>Statistics</h3>
+              <span class="card-meta">Expanding soon</span>
+              <p>Analyze relationships, distributions, samples, and uncertainty.</p>
+              <button class="card-link card-link-button" type="button" data-category-search="Statistics" aria-label="Explore Statistics category">Explore category</button>
+            </article>
+            <article class="category-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+              <h3>Finance</h3>
+              <span class="card-meta">1 tool available</span>
+              <p>Assess investments, costs, returns, and business viability.</p>
+              <button class="card-link card-link-button" type="button" data-category-search="Finance" aria-label="Explore Finance category">Explore category</button>
+            </article>
+            <article class="category-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/></svg>
+              <h3>Quality and Engineering</h3>
+              <span class="card-meta">Expanding soon</span>
+              <p>Measure process capability, reliability, variation, and performance.</p>
+              <button class="card-link card-link-button" type="button" data-category-search="Quality and Engineering" aria-label="Explore Quality and Engineering category">Explore category</button>
+            </article>
+            <article class="category-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.2.4.5.75.9 1 .32.2.7.3 1.1.3h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-2 1Z"/></svg>
+              <h3>Project Management</h3>
+              <span class="card-meta">1 tool available</span>
+              <p>Plan schedules, resources, risk, and project economics.</p>
+              <button class="card-link card-link-button" type="button" data-category-search="Project Management" aria-label="Explore Project Management category">Explore category</button>
+            </article>
+            <article class="category-card">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-7"/></svg>
+              <h3>Business Analysis</h3>
+              <span class="card-meta">2 tools available</span>
+              <p>Compare scenarios and support strategic decisions.</p>
+              <button class="card-link card-link-button" type="button" data-category-search="Business Analysis" aria-label="Explore Business Analysis category">Explore category</button>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -333,7 +469,67 @@
             </div>
             <p>A focused set of practical tools before ATH grows into a broader analytical workspace.</p>
           </div>
-          <div class="tools-grid" data-render="tools"></div>
+          <div class="tools-grid" data-render="tools">
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>ABC Analysis</h3></div><button class="bookmark-button" type="button" aria-label="Save ABC Analysis placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Classify inventory by annual consumption value, with optional XYZ demand variability segmentation.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Annual value or monthly quantity plus unit cost</span><span><strong>Output:</strong> ABC classes, optional ABC-XYZ matrix, and Pareto chart</span></div>
+              <a class="card-link" href="ABC%20Analysis/ABC_Analysis.html" aria-label="Open ABC Analysis">Open ABC Analysis</a>
+            </article>
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>Economic Order Quantity</h3></div><button class="bookmark-button" type="button" aria-label="Save Economic Order Quantity placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Estimate the order quantity that balances ordering and holding costs.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Demand, order cost, holding cost</span><span><strong>Output:</strong> EOQ, cost curve, and reorder point</span></div>
+              <a class="card-link" href="Economic%20Order%20Quantity/Economic_Order_Quantity.html" aria-label="Open Economic Order Quantity">Open Economic Order Quantity</a>
+            </article>
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>Safety Stock &amp; Reorder Point</h3></div><button class="bookmark-button" type="button" aria-label="Save Safety Stock and Reorder Point placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Estimate buffer stock and replenishment trigger levels under demand and lead time uncertainty.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Demand variability, lead time, service level</span><span><strong>Output:</strong> Safety stock, reorder point, and stock action</span></div>
+              <a class="card-link" href="Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html" aria-label="Open Safety Stock and Reorder Point">Open Safety Stock &amp; Reorder Point</a>
+            </article>
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Forecasting</span><h3>Exponential Smoothing</h3></div><button class="bookmark-button" type="button" aria-label="Save Exponential Smoothing placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Forecast demand using simple smoothing, Holt's trend method, or Holt-Winters seasonality.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Historical demand series</span><span><strong>Output:</strong> Forecast table, error metric, and chart</span></div>
+              <a class="card-link" href="Exponential%20Smoothing/Exponential_Smoothing.html" aria-label="Open Exponential Smoothing">Open Exponential Smoothing</a>
+            </article>
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Procurement</span><h3>Kraljic Matrix</h3></div><button class="bookmark-button" type="button" aria-label="Save Kraljic Matrix placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Segment suppliers and purchases by supply risk and profit impact.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Risk and impact ratings</span><span><strong>Output:</strong> Portfolio quadrant and strategy</span></div>
+              <a class="card-link" href="Kraljic%20Matrix/Kraljic_Matrix.html" aria-label="Open Kraljic Matrix">Open Kraljic Matrix</a>
+            </article>
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Finance</span><h3>Break-Even Analysis</h3></div><button class="bookmark-button" type="button" aria-label="Save Break-Even Analysis placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Find the volume or revenue needed to cover fixed and variable costs.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Price, fixed cost, variable cost</span><span><strong>Output:</strong> Break-even quantity and margin</span></div>
+              <a class="card-link" href="Break%20Even%20Analysis/Break_Even_Analysis.html" aria-label="Open Break-Even Analysis">Open Break-Even Analysis</a>
+            </article>
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Business Analysis</span><h3>Analytic Hierarchy Process</h3></div><button class="bookmark-button" type="button" aria-label="Save Analytic Hierarchy Process placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Design pairwise questionnaires, collect expert judgements, and rank alternatives across multiple criteria.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Criteria, alternatives, expert pairwise comparisons</span><span><strong>Output:</strong> Criteria weights, consistency ratios, and ranked alternatives</span></div>
+              <a class="card-link" href="Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html" aria-label="Open Analytic Hierarchy Process">Open Analytic Hierarchy Process</a>
+            </article>
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Project Management</span><h3>Gantt Chart Planner</h3></div><button class="bookmark-button" type="button" aria-label="Save Gantt Chart Planner placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Plan task dates, progress, and milestones on a project timeline.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Tasks, dates, progress, milestones</span><span><strong>Output:</strong> Gantt timeline and JSON plan export</span></div>
+              <a class="card-link" href="Gantt%20Chart/Gantt_Chart.html" aria-label="Open Gantt Chart Planner">Open Gantt Chart Planner</a>
+            </article>
+          </div>
+          <div class="all-tools-links" aria-label="All tools">
+            <span>All tools:</span>
+            <a href="ABC%20Analysis/ABC_Analysis.html">ABC Analysis</a>
+            <a href="Economic%20Order%20Quantity/Economic_Order_Quantity.html">EOQ</a>
+            <a href="Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html">Safety Stock &amp; Reorder Point</a>
+            <a href="Exponential%20Smoothing/Exponential_Smoothing.html">Exponential Smoothing</a>
+            <a href="Kraljic%20Matrix/Kraljic_Matrix.html">Kraljic Matrix</a>
+            <a href="Break%20Even%20Analysis/Break_Even_Analysis.html">Break-Even</a>
+            <a href="Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html">AHP</a>
+            <a href="Gantt%20Chart/Gantt_Chart.html">Gantt Planner</a>
+          </div>
         </div>
       </section>
 
@@ -341,55 +537,60 @@
         <div class="container flagship-grid">
           <div>
             <span class="eyebrow">Inside an ATH Tool</span>
-            <h2>ABC Analysis in Practice</h2>
-            <p>See how a working ATH tool moves from structured input to validation, visual analysis, ABC-XYZ segmentation, and a practical inventory decision.</p>
+            <h2>AHP in Practice</h2>
+            <p>See how a working ATH tool supports structured expert judgement by turning pairwise comparisons into criteria weights, consistency checks, and a ranked decision output.</p>
             <ul class="benefit-list">
-              <li>Import data or enter items manually</li>
-              <li>Choose ABC only or ABC + XYZ mode</li>
-              <li>Review summary metrics, Pareto chart, and segment matrix</li>
-              <li>Use classification output to prioritise inventory control</li>
-              <li>Export the result for analysis records</li>
+              <li>Design a pairwise-comparison questionnaire</li>
+              <li>Collect expert judgements using the Saaty scale</li>
+              <li>Check consistency before interpreting the result</li>
+              <li>Rank alternatives across weighted criteria</li>
+              <li>Export questionnaires and responses as JSON</li>
             </ul>
-            <a class="button button-primary" href="ABC%20Analysis/ABC_Analysis.html">Try ABC Analysis</a>
+            <a class="button button-primary" href="Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html">Try AHP</a>
           </div>
-          <div class="tool-interface abc-workflow-preview" aria-label="ABC Analysis workflow preview">
+          <div class="tool-interface abc-workflow-preview" aria-label="Analytic Hierarchy Process workflow preview">
             <div class="tool-interface-top">
-              <strong>ABC / XYZ Analysis</strong>
-              <div><button>Export CSV</button><button>Export Excel</button></div>
+              <strong>Analytic Hierarchy Process</strong>
+              <div><button>Export JSON</button><button>Import Responses</button></div>
             </div>
-            <div class="abc-workflow-steps" aria-label="ABC Analysis workflow steps">
-              <div><span>1</span><strong>Data Import</strong><p>CSV or spreadsheet</p></div>
-              <div><span>2</span><strong>Manual Entry</strong><p>Add SKU rows</p></div>
-              <div><span>3</span><strong>Settings</strong><p>ABC + XYZ thresholds</p></div>
-              <div><span>4</span><strong>Results</strong><p>Chart, matrix, table</p></div>
+            <div class="abc-workflow-steps" aria-label="Analytic Hierarchy Process workflow steps">
+              <div><span>1</span><strong>Decision Setup</strong><p>Goal, criteria, alternatives</p></div>
+              <div><span>2</span><strong>Expert Survey</strong><p>Pairwise comparisons</p></div>
+              <div><span>3</span><strong>Consistency Check</strong><p>Review judgement quality</p></div>
+              <div><span>4</span><strong>Ranking</strong><p>Weighted decision output</p></div>
             </div>
             <div class="abc-mini-stats">
-              <article><span>Total Evaluated Value</span><strong>$82,250.00</strong></article>
-              <article><span>Class A Count / Value %</span><strong>5 (76.2%)</strong></article>
-              <article><span>Class B Count / Value %</span><strong>4 (22.2%)</strong></article>
-              <article><span>Class C Count / Value %</span><strong>1 (1.6%)</strong></article>
+              <article><span>Decision Goal</span><strong>3PL selection</strong></article>
+              <article><span>Criteria Compared</span><strong>4</strong></article>
+              <article><span>Consistency Ratio</span><strong>0.07</strong></article>
+              <article><span>Top Alternative</span><strong>Provider B</strong></article>
             </div>
             <div class="abc-preview-main">
               <div class="abc-preview-chart">
                 <div class="chart-title-row">
-                  <strong>Pareto Principle Visualization</strong>
-                  <span>ABC Curve</span>
+                  <strong>Criteria Weight Preview</strong>
+                  <span>Expert judgement output</span>
                 </div>
-                <div class="pareto-preview">
-                  <div class="bar a"></div><div class="bar a"></div><div class="bar a"></div><div class="bar b"></div><div class="bar b"></div><div class="bar c"></div>
-                  <svg viewBox="0 0 360 110" aria-hidden="true"><path d="M8 96C58 72 94 52 134 38S214 22 270 15 320 11 352 9"/></svg>
+                <div class="ahp-weight-preview" aria-label="Criteria weight distribution preview">
+                  <div class="ahp-donut" aria-hidden="true"></div>
+                  <div class="ahp-weight-legend">
+                    <span><i></i> Service coverage 34%</span>
+                    <span><i></i> Delivery performance 27%</span>
+                    <span><i></i> Technology capability 22%</span>
+                    <span><i></i> Logistics cost 17%</span>
+                  </div>
                 </div>
               </div>
-              <div class="abc-preview-table" role="table" aria-label="ABC classification output preview">
-                <div role="row"><span role="columnheader">Rank</span><span role="columnheader">Item/SKU</span><span role="columnheader">Value</span><span role="columnheader">Segment</span></div>
-                <div role="row"><span role="cell">1</span><span role="cell">Laptop Docking Station</span><span role="cell">$18,600</span><span role="cell"><em>AX</em></span></div>
-                <div role="row"><span role="cell">2</span><span role="cell">Industrial Safety Gloves</span><span role="cell">$14,250</span><span role="cell"><em>AY</em></span></div>
-                <div role="row"><span role="cell">3</span><span role="cell">Barcode Scanner</span><span role="cell">$12,800</span><span role="cell"><em>AZ</em></span></div>
+              <div class="abc-preview-table ahp-ranking-preview-table" role="table" aria-label="AHP ranked alternatives preview">
+                <div role="row"><span role="columnheader">Rank</span><span role="columnheader">Alternative</span><span role="columnheader">Score</span><span role="columnheader">Result</span></div>
+                <div role="row"><span role="cell">1</span><span role="cell">3PL Provider B</span><span role="cell">0.42</span><span role="cell"><em>Preferred</em></span></div>
+                <div role="row"><span role="cell">2</span><span role="cell">3PL Provider A</span><span role="cell">0.34</span><span role="cell"><em>Close</em></span></div>
+                <div role="row"><span role="cell">3</span><span role="cell">3PL Provider C</span><span role="cell">0.24</span><span role="cell"><em>Review</em></span></div>
               </div>
             </div>
             <div class="recommendations">
-              <strong>Summary recommendations</strong>
-              <p>AX items are high-value and predictable. AZ items need closer planning because they combine high value with volatile usage.</p>
+              <strong>Decision interpretation</strong>
+              <p>Provider B ranks highest based on the current expert judgements. The consistency ratio is within acceptable guidance, so the ranking is suitable for review and discussion.</p>
             </div>
           </div>
         </div>

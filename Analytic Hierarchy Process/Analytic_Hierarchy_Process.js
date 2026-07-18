@@ -30,7 +30,8 @@ const elements = {
   results: document.getElementById("results"),
   analysisSummary: document.getElementById("analysisSummary"),
   analysisChartSummary: document.getElementById("analysisChartSummary"),
-  criteriaWeights: document.getElementById("criteriaWeights"),
+  criteriaWeightChart: document.getElementById("criteriaWeightChart"),
+  criteriaWeightLegend: document.getElementById("criteriaWeightLegend"),
   alternativeRanking: document.getElementById("alternativeRanking"),
   consistencyPanel: document.getElementById("consistencyPanel"),
 };
@@ -598,32 +599,39 @@ function formatPercent(value) {
   return `${(value * 100).toFixed(1)}%`;
 }
 
-function renderBarList(target, labels, weights) {
-  target.textContent = "";
+function renderWeightDistribution(labels, weights) {
+  if (!elements.criteriaWeightChart || !elements.criteriaWeightLegend) return;
+
+  const colors = ["#1f6feb", "#22c55e", "#f8b84e", "#f97066", "#7c3aed", "#0ea5e9", "#14b8a6", "#64748b", "#db2777", "#84cc16"];
+  let cursor = 0;
+  const segments = weights.map((weight, index) => {
+    const start = cursor;
+    cursor += weight * 100;
+    return `${colors[index % colors.length]} ${start.toFixed(2)}% ${cursor.toFixed(2)}%`;
+  });
+
+  elements.criteriaWeightChart.style.background =
+    `radial-gradient(circle at center, #fff 0 47%, transparent 48%), conic-gradient(${segments.join(", ")})`;
+  elements.criteriaWeightLegend.textContent = "";
+
   labels.forEach((label, index) => {
     const row = document.createElement("div");
-    row.className = "bar-row";
-    const labelRow = document.createElement("div");
-    labelRow.className = "bar-label";
+    row.className = "weight-legend-item";
+    const marker = document.createElement("span");
+    marker.className = "weight-legend-marker";
+    marker.style.background = colors[index % colors.length];
     const name = document.createElement("span");
     name.textContent = label;
     const value = document.createElement("strong");
     value.textContent = formatPercent(weights[index]);
-    labelRow.append(name, value);
-    const track = document.createElement("div");
-    track.className = "bar-track";
-    const fill = document.createElement("div");
-    fill.className = "bar-fill";
-    fill.style.width = `${Math.max(2, weights[index] * 100)}%`;
-    track.appendChild(fill);
-    row.append(labelRow, track);
-    target.appendChild(row);
+    row.append(marker, name, value);
+    elements.criteriaWeightLegend.appendChild(row);
   });
 }
 
 function renderAnalysis(analysis) {
   elements.results.classList.remove("hidden");
-  renderBarList(elements.criteriaWeights, analysis.questionnaire.criteria, analysis.criteriaResult.weights);
+  renderWeightDistribution(analysis.questionnaire.criteria, analysis.criteriaResult.weights);
   elements.alternativeRanking.textContent = "";
   elements.consistencyPanel.textContent = "";
 
@@ -666,7 +674,9 @@ function renderAnalysis(analysis) {
     `${winner.alternative} ranks first with an overall priority of ${formatPercent(winner.score)}. ` +
     `The most influential criterion is ${analysis.questionnaire.criteria[topCriterionIndex]} at ${formatPercent(analysis.criteriaResult.weights[topCriterionIndex])}. ` +
     `${consistencyWarnings ? `${consistencyWarnings} consistency check${consistencyWarnings === 1 ? "" : "s"} should be reviewed before using the ranking.` : "All displayed consistency ratios are within the common 0.10 review threshold."}`;
-  elements.analysisChartSummary.textContent = `AHP ranking summary: ${winner.alternative} is ranked first. ${analysis.questionnaire.criteria[topCriterionIndex]} is the highest-weighted criterion.`;
+  elements.analysisChartSummary.textContent =
+    `Criteria weight distribution: ${analysis.questionnaire.criteria.map((criterion, index) => `${criterion} ${formatPercent(analysis.criteriaResult.weights[index])}`).join(", ")}. ` +
+    `AHP ranking summary: ${winner.alternative} is ranked first. ${analysis.questionnaire.criteria[topCriterionIndex]} is the highest-weighted criterion.`;
   elements.exportAnalysisButton.disabled = false;
   elements.results.scrollIntoView({ behavior: "smooth" });
 }
