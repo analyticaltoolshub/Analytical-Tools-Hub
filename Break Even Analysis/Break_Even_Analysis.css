@@ -289,11 +289,12 @@
   width: 100%;
   height: auto;
   cursor: default;
-  touch-action: none;
+  touch-action: pan-x pan-y;
 }
 
 .break-even-page.scenario-planning #breakEvenChart {
   cursor: crosshair;
+  touch-action: none;
 }
 
 .chart-readout {
@@ -508,8 +509,13 @@
   }
 
   .chart-workspace {
-    min-width: 760px;
+    min-width: 620px;
     grid-template-columns: 1fr;
+  }
+
+  .chart-stage,
+  #breakEvenChart {
+    min-width: 620px;
   }
 
   .chart-readout dl {

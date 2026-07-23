@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monte Carlo Risk Simulation Tool | Analytical Tools Hub</title>
+  <meta name="description" content="Run Monte Carlo simulations in your browser to model uncertainty, estimate target probabilities, calculate percentiles, and identify key risk drivers.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Monte Carlo Risk Simulation Tool | Analytical Tools Hub">
+  <meta property="og:description" content="Model uncertainty, estimate target probabilities, calculate percentiles, and identify key risk drivers with a browser-based Monte Carlo simulation tool.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Monte Carlo Risk Simulation Tool | Analytical Tools Hub">
+  <meta name="twitter:description" content="Run Monte Carlo simulations in your browser to model uncertainty, estimate target probabilities, calculate percentiles, and identify key risk drivers.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="monte-carlo.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html#software",
+          "name": "Monte Carlo Risk Simulation Tool",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html",
+          "description": "A browser-based Monte Carlo simulation tool for modelling uncertain inputs, estimating target probabilities, calculating percentiles, and identifying key risk drivers.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "Seeded Monte Carlo simulation",
+            "Fixed, uniform, triangular, normal, lognormal, and discrete distributions",
+            "Safe arithmetic formula builder",
+            "Histogram and cumulative probability charts",
+            "Percentile results",
+            "Correlation-based outcome driver analysis",
+            "CSV and chart image export"
+          ],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://analyticaltoolshub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Statistics", "item": "https://analyticaltoolshub.com/#categories" },
+            { "@type": "ListItem", "position": 3, "name": "Monte Carlo Risk Simulation", "item": "https://analyticaltoolshub.com/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="monte-carlo-page">
+  <a class="sr-only" href="#main">Skip to main content</a>
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text">
+          <strong>Monte Carlo Risk Simulation</strong>
+          <span>Statistical simulation workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" id="main">
+    <section class="tool-hero" aria-labelledby="monte-carlo-title">
+      <span class="tool-badge">Statistics</span>
+      <h1 id="monte-carlo-title">Monte Carlo Risk Simulation</h1>
+      <p><strong>Model uncertainty, explore possible outcomes, and quantify decision risk.</strong></p>
+      <p>Use probability distributions to represent uncertain inputs, simulate thousands of scenarios, and estimate the likelihood of achieving a target.</p>
+      <div class="tool-reassurance" aria-label="Tool capabilities">
+        <span>Risk analysis</span>
+        <span>Probability modelling</span>
+        <span>Expert estimates</span>
+        <span>Outcome driver analysis</span>
+        <span>Browser-based</span>
+        <span>No data upload required</span>
+      </div>
+      <div class="privacy-note hero-privacy" role="note">All calculations are performed locally in your browser.</div>
+    </section>
+
+    <section class="panel content-section" aria-labelledby="why-use-heading">
+      <h2 id="why-use-heading">Why use this tool?</h2>
+      <div class="guidance-grid">
+        <div class="guidance-card">
+          <span>Decision Supported</span>
+          <p>Use this tool when a decision depends on uncertain values such as demand, cost, duration, lead time, or expert estimates.</p>
+        </div>
+        <div class="guidance-card">
+          <span>What It Tells You</span>
+          <p>It estimates the distribution of possible outcomes, probability of meeting a target, percentile ranges, and the variables most related to the result.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Example Input</span>
+          <p>The default profit-risk example uses triangular price and cost estimates, normal demand uncertainty, and a fixed-cost range.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Sample Output Interpretation</span>
+          <p>The result explains target probability, median outcome, plausible range, main uncertainty driver, and whether target risk appears lower, moderate, or higher.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="monte-carlo-layout">
+      <div class="monte-carlo-content">
+        <nav class="panel workflow-strip" aria-label="Simulation workflow">
+          <ol class="workflow-steps" aria-label="Monte Carlo workflow">
+            <li class="active" data-workflow-step="1" aria-current="step"><span>1</span>Choose Model</li>
+            <li data-workflow-step="2"><span>2</span>Define Inputs</li>
+            <li data-workflow-step="3"><span>3</span>Set Target</li>
+            <li data-workflow-step="4"><span>4</span>Run Analysis</li>
+            <li data-workflow-step="5"><span>5</span>Interpret Results</li>
+          </ol>
+        </nav>
+
+        <section class="panel" id="choose-model">
+          <div class="section-header">
+            <div>
+              <h2>1. Choose Model</h2>
+              <p>Selecting a model loads a practical sample that you can adapt to your decision.</p>
+            </div>
+            <div class="editor-actions">
+              <button class="reset" id="resetToolButton" type="button">Reset</button>
+            </div>
+          </div>
+          <fieldset class="model-grid">
+            <legend class="sr-only">Simulation model template</legend>
+            <label><input type="radio" name="modelTemplate" value="profit" checked> <span><strong>Profit and Break-Even Risk</strong><small>Test whether uncertain demand, price, and cost can achieve a profit target.</small></span></label>
+            <label><input type="radio" name="modelTemplate" value="cost"> <span><strong>Project Cost Risk</strong><small>Estimate the probability of completing a project within budget.</small></span></label>
+            <label><input type="radio" name="modelTemplate" value="inventory"> <span><strong>Demand and Inventory Risk</strong><small>Assess stockout exposure when demand and inventory inputs vary.</small></span></label>
+            <label><input type="radio" name="modelTemplate" value="duration"> <span><strong>Project Completion Risk</strong><small>Estimate the likelihood of completing project activities on time.</small></span></label>
+            <label><input type="radio" name="modelTemplate" value="custom"> <span><strong>Custom Model</strong><small>Add variables and combine them with a controlled arithmetic formula.</small></span></label>
+          </fieldset>
+          <div class="privacy-note" role="note">Your model inputs and simulation results remain in your browser and are not uploaded to a server.</div>
+        </section>
+
+        <section class="panel" id="define-inputs">
+          <div class="section-header">
+            <div>
+              <h2>2. Define Inputs</h2>
+              <p>Choose distributions for uncertain inputs. Triangular distributions can be useful when experts can provide minimum, most likely, and maximum estimates.</p>
+            </div>
+            <button id="addVariableButton" type="button">Add Variable</button>
+          </div>
+          <details class="distribution-reference">
+            <summary>How to choose a distribution</summary>
+            <div class="distribution-guide-grid">
+              <article><strong>Fixed</strong><span>Known value</span><p>Use for a confirmed contract price, committed quantity, or other certain input.</p></article>
+              <article><strong>Uniform</strong><span>Minimum and maximum</span><p>Use when values inside a credible range are considered equally plausible.</p></article>
+              <article><strong>Triangular</strong><span>Minimum, most likely and maximum</span><p>Useful for structured expert estimates when limited observations are available.</p></article>
+              <article><strong>Normal</strong><span>Mean and standard deviation</span><p>Use for approximately symmetric variation around an average; add bounds when negative values are impossible.</p></article>
+              <article><strong>Lognormal</strong><span>Underlying normal parameters</span><p>Use for positive, right-skewed values such as some costs, durations, and lead times.</p></article>
+              <article><strong>Discrete</strong><span>Outcomes and probabilities</span><p>Use when only specific events or scenarios can occur.</p></article>
+            </div>
+          </details>
+          <div class="error" id="errorSummary" role="alert" aria-live="assertive" hidden></div>
+          <div id="variableEditor" class="variable-editor" aria-live="polite"></div>
+        </section>
+
+        <section class="panel" id="configure-simulation">
+          <div class="section-header">
+            <div>
+              <h2>3. Set Decision Target</h2>
+              <p>Define the result you need to achieve and how many scenarios to test.</p>
+            </div>
+          </div>
+          <div class="input-grid essential-config-grid">
+            <label>
+              <span>Target condition</span>
+              <select id="targetCondition">
+                <option value="gt">Greater than</option>
+                <option value="gte" selected>Greater than or equal to</option>
+                <option value="lt">Less than</option>
+                <option value="lte">Less than or equal to</option>
+              </select>
+            </label>
+            <label>
+              <span>Target value</span>
+              <input id="targetValue" type="number" step="0.01" value="100000">
+            </label>
+            <label>
+              <span>Iterations</span>
+              <select id="iterations">
+                <option value="1000">1,000</option>
+                <option value="5000">5,000</option>
+                <option value="10000" selected>10,000</option>
+                <option value="25000">25,000</option>
+                <option value="50000">50,000</option>
+              </select>
+            </label>
+          </div>
+          <details class="advanced-settings" id="advanced-settings">
+            <summary>Advanced settings</summary>
+            <p>Use these controls when you need to change output formatting, reproducibility, percentile range, or calculation logic.</p>
+            <div class="input-grid config-grid">
+              <label>
+                <span>Output name</span>
+                <input id="outputName" type="text" value="Annual Profit">
+              </label>
+              <label>
+                <span>Output unit</span>
+                <select id="outputUnitType">
+                  <option value="currency">Currency</option>
+                  <option value="units">Units</option>
+                  <option value="days">Days</option>
+                  <option value="weeks">Weeks</option>
+                  <option value="percentage">Percentage</option>
+                  <option value="custom">Custom unit</option>
+                </select>
+              </label>
+              <label>
+                <span>Currency or custom unit</span>
+                <input id="unitSymbol" type="text" value="£" maxlength="16">
+              </label>
+              <label>
+                <span>Random seed</span>
+                <input id="seed" type="number" step="1" value="12345">
+              </label>
+              <label>
+                <span>Central outcome range</span>
+                <select id="confidenceLevel">
+                  <option value="80">80%</option>
+                  <option value="90" selected>90%</option>
+                  <option value="95">95%</option>
+                  <option value="99">99%</option>
+                </select>
+              </label>
+            </div>
+            <div class="formula-builder">
+              <label>
+                <span>Formula</span>
+                <textarea id="formula" rows="3">(Selling_Price - Variable_Cost) * Demand - Fixed_Cost</textarea>
+              </label>
+              <div>
+                <strong>Insert variable</strong>
+                <div id="formulaVariableButtons" class="formula-buttons"></div>
+                <p>Supported content: registered variables, numbers, +, -, *, /, and parentheses. JavaScript execution is not allowed.</p>
+              </div>
+            </div>
+            <div class="editor-actions advanced-actions">
+              <button id="generateSeedButton" type="button">Generate New Seed</button>
+              <button id="clearResultsButton" class="reset" type="button">Clear Results</button>
+            </div>
+          </details>
+        </section>
+
+        <section class="panel" id="run-analysis">
+          <div class="section-header">
+            <div>
+              <h2>4. Run Analysis</h2>
+              <p>Simulation runs locally in your browser and uses background processing where supported.</p>
+            </div>
+            <div class="editor-actions">
+              <button id="runSimulationButton" type="button">Run Simulation</button>
+              <button id="cancelSimulationButton" class="reset" type="button" disabled>Cancel</button>
+            </div>
+          </div>
+          <div class="error run-error" id="runErrorSummary" role="alert" aria-live="assertive" hidden></div>
+          <div class="simulation-status" aria-live="polite">
+            <div class="progress-row">
+              <progress id="simulationProgress" value="0" max="100"></progress>
+              <strong id="simulationProgressText">0%</strong>
+            </div>
+            <span id="simulationStatus">Ready to run the selected sample model.</span>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="results" aria-labelledby="results-heading">
+          <div class="results-header">
+            <div>
+              <h2 id="results-heading" tabindex="-1">5. Results and Interpretation</h2>
+              <p id="resultSubtitle">Review the decision outlook before exploring the supporting distribution and percentile detail.</p>
+            </div>
+            <div class="editor-actions">
+              <button id="exportCsvButton" type="button">Export CSV</button>
+            </div>
+          </div>
+          <p class="sr-only" id="resultsAnnouncement" aria-live="assertive"></p>
+          <article class="result-block interpretation-block decision-summary">
+            <div class="decision-summary-heading">
+              <div>
+                <span>Decision Summary</span>
+                <h3>What the simulation means</h3>
+              </div>
+              <strong id="decisionRiskBadge">Awaiting result</strong>
+            </div>
+            <div id="interpretationText"></div>
+          </article>
+          <div id="metricCards" class="metric-grid"></div>
+          <div class="chart-grid">
+            <article class="result-block">
+              <div class="result-block-header">
+                <h3>Outcome Histogram</h3>
+                <button class="chart-download-button" id="saveHistogramButton" type="button">Save PNG</button>
+              </div>
+              <div id="histogramChart" class="svg-chart" role="img" aria-label="Histogram of simulated outcomes"></div>
+              <p id="histogramSummary" class="chart-note"></p>
+            </article>
+            <article class="result-block">
+              <div class="result-block-header">
+                <h3>Cumulative Probability</h3>
+                <button class="chart-download-button" id="saveCumulativeButton" type="button">Save PNG</button>
+              </div>
+              <div id="cumulativeChart" class="svg-chart" role="img" aria-label="Cumulative probability chart"></div>
+              <p id="cumulativeSummary" class="chart-note"></p>
+            </article>
+          </div>
+          <article class="result-block">
+            <h3>Key Outcome Drivers</h3>
+            <p>This ranks linear input-output relationships using Pearson correlation. It does not prove causation and may not fully represent nonlinear effects.</p>
+            <div id="sensitivityBars" class="sensitivity-bars"></div>
+            <div class="table-wrap"><table id="sensitivityTable"></table></div>
+          </article>
+          <article class="result-block">
+            <h3>Percentile Detail</h3>
+            <p>P90 means that 90% of simulated outcomes were at or below this value. Whether a higher percentile is conservative depends on the model.</p>
+            <div class="table-wrap"><table id="percentileTable"></table></div>
+          </article>
+          <article class="result-block" id="scenarioComparison" hidden>
+            <div class="scenario-header">
+              <div>
+                <h3>Scenario Comparison</h3>
+                <p>Scenarios are retained only for this browser session. The first saved scenario is the baseline.</p>
+              </div>
+              <button class="reset" id="clearScenariosButton" type="button">Clear Comparisons</button>
+            </div>
+            <div class="table-wrap"><table id="scenarioTable"></table></div>
+          </article>
+          <div class="scenario-save">
+            <label>
+              <span>Scenario name</span>
+              <input id="scenarioName" type="text" maxlength="60" placeholder="For example, Conservative demand">
+            </label>
+            <button id="saveScenarioButton" type="button">Save Current Scenario</button>
+            <span id="scenarioStatus" aria-live="polite">Save up to three scenarios for comparison.</span>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="about-monte-carlo">
+          <h2>About Monte Carlo Simulation</h2>
+          <p>Monte Carlo simulation represents uncertain inputs with probability distributions and repeatedly calculates the model to create a range of possible outcomes. It helps decision-makers examine target probability, downside exposure, planning percentiles, and the assumptions most closely related to the result.</p>
+          <p>The method is useful when one deterministic estimate would hide meaningful uncertainty in demand, cost, duration, inventory, price, or other decision inputs.</p>
+        </section>
+
+        <section class="panel content-section" id="guidance">
+          <h2>Guidance</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Start With Evidence</span>
+              <p>Use historical observations, supplier information, published evidence, or validated business assumptions wherever they are available.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Use Expert Estimates Carefully</span>
+              <p>When data is limited, document who supplied the estimate and why the minimum, most likely, and maximum values are credible.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Review Planning Percentiles</span>
+              <p>For cost and duration, higher percentiles can support conservative planning. For profit or remaining inventory, lower percentiles may better represent downside exposure.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Test the Main Driver</span>
+              <p>Review the strongest input-output relationship, challenge that assumption, and compare scenarios before making the final decision.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>Calculation Logic</span>
+              <p>Each iteration samples one value from every input distribution, evaluates the defined formula, and records the resulting outcome.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Percentile Logic</span>
+              <p>P50 is the median. P80, P90, and P95 are values at or below which 80%, 90%, and 95% of simulated outcomes fall.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Assumptions</span>
+              <p>The selected distributions, parameters, formula, target, and independence between variables are assumed to represent the decision adequately.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Limitations</span>
+              <p>Results depend on input quality. Correlated variables, distribution fitting, Latin hypercube sampling, and nonlinear sensitivity measures are not currently supported.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details><summary>How many iterations should I use?</summary><p>Start with 10,000 iterations for practical analysis. Increase the count when the output remains unstable or when tail percentiles are important, while recognising that more iterations do not correct weak input assumptions.</p></details>
+          <details><summary>Which distribution should I choose?</summary><p>Choose a distribution that matches the available evidence and the shape of the uncertainty. Use the distribution helper above the inputs and document the reason for each choice.</p></details>
+          <details><summary>What does P90 mean?</summary><p>P90 is the value at or below which 90% of simulated outcomes fall. For cost or duration it can be a conservative planning value; for profit, a lower percentile such as P10 may better describe downside exposure.</p></details>
+          <details><summary>Is the driver analysis a sensitivity analysis?</summary><p>The tool currently uses Pearson correlation to rank linear relationships between sampled inputs and the simulated outcome. It is a useful driver screen, but it is not a complete global sensitivity analysis.</p></details>
+          <details><summary>Are my inputs uploaded?</summary><p>No. The current simulation, scenario comparison, and exports are processed locally in your browser.</p></details>
+        </section>
+      </div>
+
+      <aside class="monte-carlo-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Monte Carlo Risk Simulation page sections">
+          <a href="#choose-model">Choose Model</a>
+          <a href="#define-inputs">Define Inputs</a>
+          <a href="#configure-simulation">Set Target</a>
+          <a href="#run-analysis">Run Analysis</a>
+          <a href="#results">Results</a>
+          <a href="#about-monte-carlo">About</a>
+          <a href="#guidance">Guidance</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <div class="confirm-modal" id="confirmModal" hidden role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmDescription">
+    <div class="confirm-card">
+      <h2 id="confirmTitle">Reset tool?</h2>
+      <p id="confirmDescription">You have modified the model. Resetting will replace the current inputs with the default sample for the selected model.</p>
+      <div class="editor-actions">
+        <button id="confirmResetButton" type="button">Reset</button>
+        <button id="cancelResetButton" class="reset" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="monte-carlo-worker.js"></script>
+  <script src="monte-carlo.js"></script>
+</body>
+</html>

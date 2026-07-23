@@ -20,6 +20,15 @@
   --border-radius-md: 8px;
   --transition-fast: .16s ease;
   --transition-slow: .22s ease;
+  --tool-content-width: 1180px;
+  --tool-page-gap: 1.25rem;
+  --tool-panel-padding: 1.25rem;
+  --tool-heading-1: 3.25rem;
+  --tool-heading-2: 1.25rem;
+  --tool-heading-3: 1rem;
+  --tool-body-size: 1rem;
+  --tool-supporting-size: .95rem;
+  --tool-label-size: .82rem;
   --bg-dark: var(--surface);
   --bg-darker: var(--navy-950);
   --text-light: var(--text-primary);
@@ -57,9 +66,11 @@ body.gantt-page,
 body.break-even-page,
 body.eoq-page,
 body.ssrop-page,
-body.ahp-page {
+body.ahp-page,
+body.monte-carlo-page {
   min-height: 100vh;
   margin: 0;
+  font-size: var(--tool-body-size);
   color: var(--text-primary) !important;
   background:
     radial-gradient(circle at 88% 4%, rgba(45, 127, 249, .12), transparent 30rem),
@@ -75,7 +86,8 @@ body.gantt-page::before,
 body.break-even-page::before,
 body.eoq-page::before,
 body.ssrop-page::before,
-body.ahp-page::before {
+body.ahp-page::before,
+body.monte-carlo-page::before {
   content: "ATH";
   position: fixed;
   right: -2rem;
@@ -98,7 +110,8 @@ body.gantt-page :focus-visible,
 body.break-even-page :focus-visible,
 body.eoq-page :focus-visible,
 body.ssrop-page :focus-visible,
-body.ahp-page :focus-visible {
+body.ahp-page :focus-visible,
+body.monte-carlo-page :focus-visible {
   outline: 3px solid rgba(45, 127, 249, .72) !important;
   outline-offset: 3px;
 }
@@ -263,17 +276,20 @@ body.gantt-page main.container,
 body.break-even-page main.container,
 body.eoq-page main.container,
 body.ssrop-page main.container,
-body.ahp-page main.container {
-  width: min(100% - 40px, 1180px) !important;
-  max-width: 1180px !important;
+body.ahp-page main.container,
+body.monte-carlo-page main.container {
+  width: min(100% - 40px, var(--tool-content-width)) !important;
+  max-width: var(--tool-content-width) !important;
   margin: 0 auto !important;
   padding: 2rem 0 4rem !important;
+  display: grid !important;
+  gap: var(--tool-page-gap) !important;
 }
 
 .tool-hero {
   position: relative;
   overflow: hidden;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0;
   padding: clamp(1.4rem, 3vw, 2rem);
   border: 1px solid rgba(16, 42, 71, .1);
   border-radius: 12px;
@@ -316,7 +332,7 @@ body.ahp-page main.container {
   background: none !important;
   -webkit-text-fill-color: currentColor !important;
   font-family: inherit !important;
-  font-size: clamp(2rem, 4.5vw, 3.5rem) !important;
+  font-size: var(--tool-heading-1) !important;
   font-weight: 850 !important;
   line-height: 1.05 !important;
   letter-spacing: 0;
@@ -365,6 +381,7 @@ body.ahp-page main.container {
 .eoq-layout,
 .ssrop-layout,
 .ahp-layout,
+.monte-carlo-layout,
 .abc-page main > .grid {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) 260px !important;
@@ -379,9 +396,24 @@ body.ahp-page main.container {
 .eoq-content,
 .ssrop-content,
 .ahp-content,
+.monte-carlo-content,
 #abc-tool {
   min-width: 0;
   grid-column: 1;
+  display: grid !important;
+  gap: var(--tool-page-gap) !important;
+}
+
+.forecast-content > .panel,
+.kraljic-content > .panel,
+.gantt-content > .panel,
+.break-even-content > .panel,
+.eoq-content > .panel,
+.ssrop-content > .panel,
+.ahp-content > .panel,
+.monte-carlo-content > .panel,
+#abc-tool > .themed-card {
+  margin: 0 !important;
 }
 
 .panel,
@@ -402,7 +434,19 @@ body.ahp-page main.container {
 
 .panel,
 .themed-card {
-  padding: 1.25rem !important;
+  padding: var(--tool-panel-padding) !important;
+}
+
+body.abc-page main > .themed-card,
+body.forecast-page main.container > .panel,
+body.kraljic-page main.container > .panel,
+body.gantt-page main.container > .panel,
+body.break-even-page main.container > .panel,
+body.eoq-page main.container > .panel,
+body.ssrop-page main.container > .panel,
+body.ahp-page main.container > .panel,
+body.monte-carlo-page main.container > .panel {
+  margin: 0 !important;
 }
 
 .panel h2,
@@ -431,15 +475,49 @@ body.ahp-page main.container {
 .panel h2,
 .themed-card h2,
 .abc-page h2 {
-  font-size: 1.25rem !important;
+  font-size: var(--tool-heading-2) !important;
   font-weight: 820 !important;
+  line-height: 1.3 !important;
 }
 
 .panel h3,
 .themed-card h3,
 .abc-page h3 {
-  font-size: 1rem !important;
+  font-size: var(--tool-heading-3) !important;
   font-weight: 800 !important;
+  line-height: 1.4 !important;
+}
+
+.panel > h2,
+.themed-card > h2,
+.content-section > h2,
+.abc-faq > h2 {
+  margin: 0 0 1rem !important;
+}
+
+.section-header,
+.results-header,
+.manual-entry-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.section-header h2,
+.results-header h2,
+.manual-entry-header h2 {
+  margin: 0 0 .25rem !important;
+}
+
+.section-header p,
+.results-header p,
+.manual-entry-header p {
+  margin: 0 !important;
+  color: var(--text-secondary) !important;
+  font-size: var(--tool-supporting-size) !important;
+  line-height: 1.6 !important;
 }
 
 .content-section p,
@@ -484,11 +562,38 @@ body.ahp-page main.container {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 1rem !important;
+  margin-top: 0 !important;
 }
 
-.guidance-card {
+.guidance-card,
+.abc-content-card {
   min-height: 8rem !important;
   padding: 1rem !important;
+}
+
+.guidance-card span,
+.abc-content-card span {
+  display: block !important;
+  margin: 0 0 .55rem !important;
+  font-size: var(--tool-label-size) !important;
+  font-weight: 850 !important;
+  line-height: 1.35 !important;
+}
+
+.guidance-card p,
+.abc-content-card p {
+  margin: 0 !important;
+  font-size: var(--tool-supporting-size) !important;
+  line-height: 1.65 !important;
+}
+
+body.abc-page section[aria-labelledby="decision-guide-heading"] > .grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+}
+
+body.abc-page main > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0 !important;
 }
 
 .forecast-side-nav,
@@ -498,6 +603,7 @@ body.ahp-page main.container {
 .eoq-side-nav,
 .ssrop-side-nav,
 .ahp-side-nav,
+.monte-carlo-side-nav,
 .abc-side-nav {
   position: sticky !important;
   top: 6rem !important;
@@ -514,6 +620,7 @@ body.ahp-page main.container {
 .eoq-side-nav nav,
 .ssrop-side-nav nav,
 .ahp-side-nav nav,
+.monte-carlo-side-nav nav,
 .abc-side-nav nav {
   display: grid;
   gap: .45rem;
@@ -526,6 +633,7 @@ body.ahp-page main.container {
 .eoq-side-nav a,
 .ssrop-side-nav a,
 .ahp-side-nav a,
+.monte-carlo-side-nav a,
 .abc-side-nav a {
   min-height: 2.35rem !important;
   display: flex !important;
@@ -547,6 +655,7 @@ body.ahp-page main.container {
 .eoq-side-nav a:hover,
 .ssrop-side-nav a:hover,
 .ahp-side-nav a:hover,
+.monte-carlo-side-nav a:hover,
 .abc-side-nav a:hover,
 .forecast-side-nav a:focus,
 .kraljic-side-nav a:focus,
@@ -555,6 +664,7 @@ body.ahp-page main.container {
 .eoq-side-nav a:focus,
 .ssrop-side-nav a:focus,
 .ahp-side-nav a:focus,
+.monte-carlo-side-nav a:focus,
 .abc-side-nav a:focus {
   color: var(--blue-600) !important;
   border-color: rgba(31, 111, 235, .28) !important;
@@ -638,7 +748,7 @@ body.ahp-page main.container {
 }
 
 .faq-section h2 {
-  margin-bottom: .25rem !important;
+  margin-bottom: 1rem !important;
 }
 
 .faq-section summary,
@@ -648,7 +758,9 @@ body.ahp-page main.container {
   color: var(--navy-950) !important;
   -webkit-text-fill-color: currentColor !important;
   background: #fff !important;
+  font-size: var(--tool-supporting-size) !important;
   font-weight: 800 !important;
+  line-height: 1.45 !important;
 }
 
 .faq-section details p,
@@ -680,7 +792,9 @@ label,
 .mapping-grid label,
 .risk-entry-grid label {
   color: var(--text-primary) !important;
+  font-size: .9rem !important;
   font-weight: 760 !important;
+  line-height: 1.45 !important;
 }
 
 textarea,
@@ -762,11 +876,13 @@ th,
 .manual-table thead {
   color: var(--text-secondary) !important;
   background: var(--surface) !important;
+  font-size: .8rem !important;
   font-weight: 820 !important;
 }
 
 td {
   color: var(--text-primary) !important;
+  font-size: .9rem !important;
 }
 
 tbody tr:hover td,
@@ -863,6 +979,7 @@ tbody tr:hover td,
   .eoq-layout,
   .ssrop-layout,
   .ahp-layout,
+  .monte-carlo-layout,
   .abc-page main > .grid {
     grid-template-columns: 1fr !important;
   }
@@ -874,8 +991,40 @@ tbody tr:hover td,
   .eoq-side-nav,
   .ssrop-side-nav,
   .ahp-side-nav,
+  .monte-carlo-side-nav,
   .abc-side-nav {
     display: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .chart-wrap,
+  .matrix-wrapper,
+  .abc-xyz-matrix,
+  .gantt-wrapper,
+  .svg-chart,
+  .table-wrap,
+  .manual-table-wrap,
+  .max-h-60 {
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+  }
+
+  .chart-wrap::before {
+    content: "Swipe horizontally to inspect the full chart";
+    position: sticky;
+    left: .75rem;
+    z-index: 2;
+    display: inline-flex;
+    margin: .75rem .75rem 0;
+    padding: .28rem .5rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    background: var(--surface);
+    font-size: .75rem;
+    font-weight: 800;
   }
 }
 
@@ -906,8 +1055,9 @@ tbody tr:hover td,
   body.break-even-page main.container,
   body.eoq-page main.container,
   body.ssrop-page main.container,
-  body.ahp-page main.container {
-    width: min(100% - 28px, 1180px) !important;
+  body.ahp-page main.container,
+  body.monte-carlo-page main.container {
+    width: min(100% - 28px, var(--tool-content-width)) !important;
   }
 
   .tool-topnav-inner,
@@ -936,6 +1086,29 @@ tbody tr:hover td,
 
   .tool-hero {
     margin-top: .5rem;
+    padding: 1.25rem;
+  }
+
+  .tool-hero h1,
+  .tool-hero h2 {
+    font-size: 2.25rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .tool-hero p {
+    font-size: 1rem !important;
+  }
+
+  .section-header,
+  .results-header,
+  .manual-entry-header {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  .panel,
+  .themed-card {
+    padding: 1rem !important;
   }
 
   .tool-hero::after {
@@ -950,6 +1123,10 @@ tbody tr:hover td,
   .abc-page .grid.grid-cols-1.md\:grid-cols-2,
   .abc-page .grid.grid-cols-1.md\:grid-cols-2.xl\:grid-cols-4,
   .abc-page .grid.grid-cols-1.md\:grid-cols-2.xl\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.abc-page section[aria-labelledby="decision-guide-heading"] > .grid {
     grid-template-columns: 1fr !important;
   }
 }

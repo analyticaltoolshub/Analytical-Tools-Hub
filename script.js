@@ -301,6 +301,36 @@ const problems = [
     title: 'Which inventory policy is best when service level, working capital, and stockout risk conflict?',
     detail: 'Recommended tool: Analytic Hierarchy Process',
     href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+  },
+  {
+    title: 'What is the probability of achieving a target profit when demand and costs are uncertain?',
+    detail: 'Recommended tool: Monte Carlo Risk Simulation',
+    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+  },
+  {
+    title: 'What project budget gives me an 80% or 90% confidence level?',
+    detail: 'Recommended tool: Monte Carlo Risk Simulation',
+    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+  },
+  {
+    title: 'Which uncertain input has the strongest relationship with my result?',
+    detail: 'Recommended tool: Monte Carlo Risk Simulation',
+    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+  },
+  {
+    title: 'How likely is my project to finish before the deadline?',
+    detail: 'Recommended tool: Monte Carlo Risk Simulation',
+    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+  },
+  {
+    title: 'What is the risk of stockout when demand and replenishment are uncertain?',
+    detail: 'Recommended tool: Monte Carlo Risk Simulation',
+    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+  },
+  {
+    title: 'How can I model best case, likely case, and worst case expert estimates?',
+    detail: 'Recommended tool: Monte Carlo Risk Simulation',
+    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
   }
 ];
 
@@ -308,11 +338,11 @@ const categories = [
   { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '4 tools available', icon: 'boxes' },
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
   { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Expanding soon', icon: 'settings' },
-  { title: 'Statistics', benefit: 'Analyze relationships, distributions, samples, and uncertainty.', count: 'Expanding soon', icon: 'compare' },
+  { title: 'Statistics', benefit: 'Analyze distributions, uncertainty, samples, and probability-driven outcomes.', count: '1 tool available', icon: 'compare' },
   { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: '1 tool available', icon: 'calculator' },
   { title: 'Quality and Engineering', benefit: 'Measure process capability, reliability, variation, and performance.', count: 'Expanding soon', icon: 'shield' },
   { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '2 tools available', icon: 'chart' }
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '3 tools available', icon: 'chart' }
 ];
 
 const tools = [
@@ -393,6 +423,16 @@ const tools = [
     output: 'Gantt timeline and JSON plan export',
     href: 'Gantt%20Chart/Gantt_Chart.html',
     categories: ['Project Management']
+  },
+  {
+    name: 'Monte Carlo Risk Simulation',
+    description: 'Simulate uncertain inputs, estimate outcome probabilities, and identify the variables that drive risk.',
+    category: 'Statistics',
+    input: 'Distributions, formula, target, seed',
+    output: 'Outcome distribution, target probability, percentiles, and sensitivity',
+    cta: 'Open Monte Carlo Simulation',
+    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html',
+    categories: ['Statistics', 'Business Analysis']
   }
 ];
 
@@ -516,6 +556,139 @@ const legalDocuments = {
   }
 };
 
+const decisionPreviewMethods = {
+  ahp: {
+    label: 'AHP',
+    badge: 'Expert Judgement',
+    question: 'Which 3PL provider should we select?',
+    questionLabel: 'Multi-criteria supplier selection',
+    method: 'Analytic Hierarchy Process',
+    explanation: 'Recommended because the decision involves several criteria, expert judgement, and trade-offs between alternatives.',
+    metrics: [
+      ['Experts', '5'],
+      ['Criteria', '4'],
+      ['Alternatives', '3']
+    ],
+    lists: [
+      { title: 'Criteria', items: ['Service coverage', 'Delivery performance', 'Technology capability', 'Logistics cost'] },
+      { title: 'Alternatives', items: ['3PL Provider A', '3PL Provider B', '3PL Provider C'] }
+    ],
+    analysisTitle: 'Criteria weights',
+    analysis: {
+      kind: 'bars',
+      aria: 'Criteria weights: service coverage 34%, delivery performance 27%, technology capability 22%, logistics cost 17%',
+      items: [
+        ['Service coverage', '34%'],
+        ['Delivery performance', '27%'],
+        ['Technology capability', '22%'],
+        ['Logistics cost', '17%']
+      ],
+      meta: [
+        ['Consistency ratio', '0.07'],
+        ['Consistency status', 'Acceptable']
+      ]
+    },
+    resultTitle: 'Recommended option: 3PL Provider B',
+    scores: [
+      ['Provider B', '0.42'],
+      ['Provider A', '0.34'],
+      ['Provider C', '0.24']
+    ],
+    interpretation: 'Provider B ranks highest under the current expert judgements. The consistency ratio is within acceptable guidance, so the result is suitable for decision review.',
+    status: 'Decision confidence: High',
+    summary: 'Illustrative AHP decision workflow for selecting a 3PL provider using criteria weights, consistency review, and ranked alternatives.'
+  },
+  abc: {
+    label: 'ABC Analysis',
+    badge: 'Data-Driven',
+    question: 'Which inventory items require the highest management attention?',
+    questionLabel: 'Inventory prioritisation',
+    method: 'ABC Analysis with optional XYZ segmentation',
+    explanation: 'Recommended because the decision is based on inventory value concentration and can be extended with demand variability.',
+    metrics: [
+      ['SKUs', '120'],
+      ['Annual inventory value', '\u00a3486k'],
+      ['Analysis period', '12 months']
+    ],
+    lists: [
+      { title: 'Classes', items: ['A items: 18', 'B items: 31', 'C items: 71'] },
+      { title: 'XYZ summary', items: ['AX: 9', 'BY: 16', 'CZ: 42'] }
+    ],
+    analysisTitle: 'Classification pattern',
+    analysis: {
+      kind: 'pareto',
+      aria: 'Pareto-style classification preview showing A items as the smallest count but highest management priority.',
+      items: ['92%', '76%', '58%', '42%', '30%', '18%'],
+      meta: [
+        ['A items', '18'],
+        ['B items', '31'],
+        ['C items', '71']
+      ]
+    },
+    resultTitle: 'Prioritise frequent control and accurate forecasting for A-class items.',
+    interpretation: 'A-class items represent the highest management priority because they concentrate value and require tighter review routines.',
+    status: 'Recommended action: Review AX items weekly',
+    summary: 'Illustrative ABC Analysis workflow for identifying high-priority inventory items and reviewing AX items weekly.'
+  },
+  forecasting: {
+    label: 'Forecasting',
+    badge: 'Data-Driven',
+    question: 'What is the expected demand for the next period?',
+    questionLabel: 'Demand planning forecast',
+    method: 'Holt-Winters Exponential Smoothing',
+    explanation: 'Recommended because the demand history shows trend and seasonality over multiple periods.',
+    metrics: [
+      ['Historical periods', '24'],
+      ['Pattern', 'Trend with seasonality'],
+      ['Forecast horizon', '6 months']
+    ],
+    lists: [
+      { title: 'Inputs', items: ['Historical demand series', 'Seasonality pattern', 'Forecast horizon'] }
+    ],
+    analysisTitle: 'Forecast output',
+    analysis: {
+      kind: 'forecast',
+      aria: 'Historical and forecast line chart with a marked forecast region.',
+      meta: [
+        ['Next-period forecast', '1,245 units'],
+        ['MAE', '68 units'],
+        ['Forecast pattern', 'Stable seasonal growth']
+      ]
+    },
+    resultTitle: 'Use the forecast as the baseline for replenishment and capacity planning.',
+    interpretation: 'The forecast provides a planning baseline. Users should review assumptions and compare the output with known demand changes before acting.',
+    summary: 'Illustrative forecasting workflow for estimating next-period demand and planning replenishment.'
+  },
+  kraljic: {
+    label: 'Kraljic Matrix',
+    badge: 'Hybrid',
+    question: 'Which purchasing categories need strategic supplier attention?',
+    questionLabel: 'Procurement portfolio decision',
+    method: 'Kraljic Portfolio Matrix',
+    explanation: 'Recommended because the decision combines category data with procurement risk assessment and strategic judgement.',
+    metrics: [
+      ['Categories assessed', '12'],
+      ['Dimensions', 'Profit impact and supply risk'],
+      ['Judgement input', 'Procurement risk assessment']
+    ],
+    lists: [
+      { title: 'Sample category', items: ['Electronic components', 'Placed in: Strategic'] }
+    ],
+    analysisTitle: 'Portfolio position',
+    analysis: {
+      kind: 'matrix',
+      aria: 'Kraljic matrix preview highlighting electronic components in the strategic quadrant.',
+      meta: [
+        ['Highlighted category', 'Electronic components'],
+        ['Quadrant', 'Strategic']
+      ]
+    },
+    resultTitle: 'Build a long-term supplier relationship and develop a supply-risk mitigation plan.',
+    interpretation: 'The category sits in the strategic quadrant, so supplier relationship management and risk mitigation should receive senior attention.',
+    summary: 'Illustrative Kraljic Matrix workflow for identifying strategic supplier categories.'
+  }
+};
+
 function renderCards(selector, items, template) {
   const target = document.querySelector(selector);
   if (!target) return;
@@ -553,7 +726,7 @@ function initRenderedContent() {
           <span class="card-meta">${tool.category}</span>
           <h3>${tool.name}</h3>
         </div>
-        <button class="bookmark-button" type="button" aria-label="Save ${tool.name} placeholder">${icons.bookmark}</button>
+        <button class="bookmark-button" type="button" aria-label="Save ${tool.name}">${icons.bookmark}</button>
       </div>
       <p>${tool.description}</p>
       <div class="tool-meta">
@@ -588,6 +761,290 @@ function initRenderedContent() {
       <p>${item.body}</p>
     </article>
   `);
+}
+
+const savedToolsStorageKey = 'ath:saved-tools:v1';
+
+function initSavedTools() {
+  const toolsGrid = document.querySelector('[data-render="tools"]');
+  const filterButton = document.querySelector('[data-saved-tools-filter]');
+  const savedCount = document.querySelector('[data-saved-tools-count]');
+  const emptyState = document.querySelector('[data-saved-tools-empty]');
+  const message = document.querySelector('[data-saved-tools-message]');
+  if (!toolsGrid || !filterButton || !savedCount || !emptyState || !message) return;
+
+  let filterActive = false;
+  let messageTimer;
+  let savedTools = new Set();
+
+  try {
+    const storedTools = JSON.parse(localStorage.getItem(savedToolsStorageKey) || '[]');
+    if (Array.isArray(storedTools)) {
+      savedTools = new Set(storedTools.filter((item) => typeof item === 'string'));
+    }
+  } catch {
+    savedTools = new Set();
+  }
+
+  const toolCards = Array.from(toolsGrid.querySelectorAll('.tool-card')).map((card) => {
+    const link = card.querySelector('.card-link[href]');
+    const button = card.querySelector('.bookmark-button');
+    const name = card.querySelector('h3')?.textContent.trim() || 'Tool';
+    const id = link?.getAttribute('href') || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return { card, button, id, name };
+  }).filter((tool) => tool.button);
+  const availableToolIds = new Set(toolCards.map((tool) => tool.id));
+  savedTools = new Set(Array.from(savedTools).filter((id) => availableToolIds.has(id)));
+
+  const showMessage = (text) => {
+    window.clearTimeout(messageTimer);
+    message.textContent = text;
+    message.hidden = false;
+    messageTimer = window.setTimeout(() => {
+      message.hidden = true;
+    }, 2400);
+  };
+
+  const persistSavedTools = () => {
+    try {
+      localStorage.setItem(savedToolsStorageKey, JSON.stringify(Array.from(savedTools)));
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateBookmark = (tool) => {
+    const isSaved = savedTools.has(tool.id);
+    tool.card.classList.toggle('has-saved-tool', isSaved);
+    tool.button.classList.toggle('is-saved', isSaved);
+    tool.button.setAttribute('aria-pressed', String(isSaved));
+    tool.button.setAttribute('aria-label', isSaved
+      ? `Remove ${tool.name} from saved tools`
+      : `Save ${tool.name}`);
+    tool.button.title = isSaved
+      ? `Remove ${tool.name} from saved tools`
+      : `Save ${tool.name}`;
+  };
+
+  const updateSavedToolsView = () => {
+    toolCards.forEach((tool) => {
+      tool.card.hidden = filterActive && !savedTools.has(tool.id);
+    });
+
+    savedCount.textContent = String(savedTools.size);
+    filterButton.setAttribute('aria-pressed', String(filterActive));
+    filterButton.setAttribute('aria-label', filterActive
+      ? 'Show all featured tools'
+      : `Show saved tools (${savedTools.size})`);
+    emptyState.hidden = !(filterActive && savedTools.size === 0);
+  };
+
+  toolCards.forEach((tool) => {
+    updateBookmark(tool);
+    tool.button.addEventListener('click', () => {
+      const wasSaved = savedTools.has(tool.id);
+      if (wasSaved) {
+        savedTools.delete(tool.id);
+      } else {
+        savedTools.add(tool.id);
+      }
+
+      const persisted = persistSavedTools();
+      toolCards.forEach(updateBookmark);
+
+      if (filterActive && wasSaved) {
+        filterButton.focus();
+      }
+      updateSavedToolsView();
+
+      const action = wasSaved ? 'removed from' : 'saved to';
+      showMessage(persisted
+        ? `${tool.name} ${action} your saved tools.`
+        : `${tool.name} ${action} this session. Browser storage is unavailable.`);
+    });
+  });
+
+  filterButton.addEventListener('click', () => {
+    filterActive = !filterActive;
+    updateSavedToolsView();
+    showMessage(filterActive ? 'Showing saved tools.' : 'Showing all featured tools.');
+  });
+
+  updateSavedToolsView();
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
+
+function renderPreviewMetrics(metrics) {
+  return `
+    <div class="preview-metric-grid">
+      ${metrics.map(([label, value]) => `
+        <div class="${String(value).length > 9 ? 'has-text-value' : ''}">
+          <strong>${escapeHtml(value)}</strong>
+          <span>${escapeHtml(label)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderPreviewLists(lists) {
+  return `
+    <div class="preview-list-pair">
+      ${lists.map((group) => `
+        <div>
+          <strong>${escapeHtml(group.title)}</strong>
+          <ul>${group.items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderPreviewAnalysis(analysis) {
+  if (analysis.kind === 'pareto') {
+    return `
+      <div class="preview-pareto" role="img" aria-label="${escapeHtml(analysis.aria)}">
+        ${analysis.items.map((height) => `<i style="--height: ${escapeHtml(height)};"></i>`).join('')}
+      </div>
+    `;
+  }
+
+  if (analysis.kind === 'forecast') {
+    return `
+      <svg class="preview-forecast-chart" viewBox="0 0 420 190" role="img" aria-label="${escapeHtml(analysis.aria)}">
+        <path class="chart-grid" d="M28 36H390M28 82H390M28 128H390M28 174H390"/>
+        <rect class="forecast-region" x="280" y="24" width="110" height="150" rx="8"/>
+        <path class="chart-band" d="M32 142C82 124 110 111 152 118S224 78 267 86 326 58 388 38v76C330 136 298 142 262 128S194 154 154 146 82 162 32 178Z"/>
+        <path class="chart-line" d="M32 154C78 132 111 118 150 124S218 80 264 91"/>
+        <path class="chart-forecast-line" d="M264 91C310 58 338 62 388 45"/>
+      </svg>
+    `;
+  }
+
+  if (analysis.kind === 'matrix') {
+    return `
+      <div class="preview-matrix" role="img" aria-label="${escapeHtml(analysis.aria)}">
+        <div class="is-highlighted">Strategic<span class="matrix-point">Electronic components</span></div>
+        <div>Leverage</div>
+        <div>Bottleneck</div>
+        <div>Routine</div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="preview-bars" aria-label="${escapeHtml(analysis.aria)}">
+      ${analysis.items.map(([label, value]) => `
+        <div>
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+          <i style="--value: ${escapeHtml(value)};"></i>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderPreviewMeta(meta = []) {
+  if (!meta.length) return '';
+  return `
+    <div class="preview-status-row">
+      ${meta.map(([label, value]) => `
+        <span class="${/status/i.test(label) ? 'is-status' : ''}">${escapeHtml(label)}: <strong>${escapeHtml(value)}</strong></span>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderDecisionPreview(methodKey) {
+  const preview = document.querySelector('[data-decision-preview]');
+  const target = document.querySelector('[data-preview-content]');
+  const data = decisionPreviewMethods[methodKey] || decisionPreviewMethods.ahp;
+  if (!preview || !target) return;
+
+  const tabs = preview.querySelectorAll('[data-preview-method]');
+  tabs.forEach((tab) => {
+    const selected = tab.dataset.previewMethod === methodKey;
+    tab.setAttribute('aria-selected', String(selected));
+    if (selected) target.setAttribute('aria-labelledby', tab.id);
+  });
+
+  target.classList.add('is-switching');
+  window.setTimeout(() => {
+    target.innerHTML = `
+      <span class="preview-example-label">Example decision workflow</span>
+      <article class="preview-question-card">
+        <span>Decision question</span>
+        <h2>${escapeHtml(data.question)}</h2>
+        <p>${escapeHtml(data.questionLabel)}</p>
+      </article>
+      <article class="preview-method-card">
+        <div>
+          <span>Recommended method</span>
+          <h3>${escapeHtml(data.method)}</h3>
+          <p>${escapeHtml(data.explanation)}</p>
+        </div>
+        <strong>${escapeHtml(data.badge)}</strong>
+      </article>
+      <div class="preview-evidence-grid">
+        <article class="preview-card">
+          <span>Input summary</span>
+          ${renderPreviewMetrics(data.metrics)}
+          ${renderPreviewLists(data.lists)}
+        </article>
+        <article class="preview-card">
+          <span>Analysis</span>
+          <h3>${escapeHtml(data.analysisTitle)}</h3>
+          ${renderPreviewAnalysis(data.analysis)}
+          ${renderPreviewMeta(data.analysis.meta)}
+        </article>
+      </div>
+      <article class="preview-result-card">
+        <span>Decision result</span>
+        <h3>${escapeHtml(data.resultTitle)}</h3>
+        ${data.scores ? `<div class="preview-score-list" aria-label="Alternative scores">${data.scores.map(([label, value]) => `<span><strong>${escapeHtml(label)}</strong>${escapeHtml(value)}</span>`).join('')}</div>` : ''}
+        <p>${escapeHtml(data.interpretation)}</p>
+        ${data.status ? `<strong class="preview-confidence">${escapeHtml(data.status)}</strong>` : ''}
+      </article>
+      <p class="sr-only">${escapeHtml(data.summary)}</p>
+    `;
+    target.classList.remove('is-switching');
+  }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 90);
+}
+
+function initDecisionPreview() {
+  const preview = document.querySelector('[data-decision-preview]');
+  if (!preview) return;
+  const tabs = Array.from(preview.querySelectorAll('[data-preview-method]'));
+  if (!tabs.length) return;
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => renderDecisionPreview(tab.dataset.previewMethod));
+    tab.addEventListener('keydown', (event) => {
+      const lastIndex = tabs.length - 1;
+      let nextIndex = index;
+      if (event.key === 'ArrowRight') nextIndex = index === lastIndex ? 0 : index + 1;
+      if (event.key === 'ArrowLeft') nextIndex = index === 0 ? lastIndex : index - 1;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = lastIndex;
+      if (nextIndex === index && !['Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      tabs[nextIndex].focus();
+      renderDecisionPreview(tabs[nextIndex].dataset.previewMethod);
+    });
+  });
+
+  renderDecisionPreview('ahp');
 }
 
 function initHeader() {
@@ -713,44 +1170,6 @@ function initSearch() {
   });
 }
 
-function initCounters() {
-  const counters = document.querySelectorAll('[data-count]');
-  if (!counters.length) return;
-
-  const animate = (element) => {
-    const target = Number(element.dataset.count || 0);
-    const prefix = element.dataset.prefix || '';
-    const duration = 900;
-    const start = performance.now();
-
-    const tick = (time) => {
-      const progress = Math.min((time - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      element.textContent = `${prefix}${Math.round(target * eased)}`;
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-
-    requestAnimationFrame(tick);
-  };
-
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    counters.forEach((counter) => {
-      counter.textContent = `${counter.dataset.prefix || ''}${counter.dataset.count}`;
-    });
-    return;
-  }
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      animate(entry.target);
-      observer.unobserve(entry.target);
-    });
-  }, { threshold: 0.55 });
-
-  counters.forEach((counter) => observer.observe(counter));
-}
-
 function initNewsletter() {
   const form = document.querySelector('[data-newsletter]');
   const message = document.querySelector('[data-form-message]');
@@ -823,9 +1242,10 @@ function initLegalModal() {
 }
 
 initRenderedContent();
+initSavedTools();
+initDecisionPreview();
 initHeader();
 initMobileMenu();
 initSearch();
-initCounters();
 initNewsletter();
 initLegalModal();

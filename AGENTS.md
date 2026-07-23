@@ -11,6 +11,10 @@ Analytical Tools Hub is a static, browser-based analytical tools website publish
 The product positioning is:
 
 - A trusted online workspace for practical analysis and better decision-making.
+- A decision-intelligence platform, not a generic calculator directory or integrated
+  ERP dashboard.
+- A mixture of data-driven, structured expert-judgement, and hybrid decision-support
+  methods. Different problems require different analytical approaches.
 - Free, practical, browser-based tools for professionals, students, and decision-makers.
 - Privacy-first where practical: current calculations should run in the browser unless a tool explicitly says otherwise.
 
@@ -52,6 +56,10 @@ The same folder/file pattern is used for:
 - `Break Even Analysis`
 - `Economic Order Quantity`
 - `Safety Stock & Reorder Point`
+- `Analytic Hierarchy Process`
+
+`Monte Carlo Risk Simulation` follows the same static tool-page pattern but also uses
+`monte-carlo-worker.js` for background simulation.
 
 ## Page Architecture Pattern
 
@@ -86,17 +94,28 @@ Tool pages should generally include:
 10. Guidance, methodology, assumptions, limitations, and FAQ sections.
 11. Side navigation where the specific tool uses it.
 
-The homepage is content-driven from arrays in `script.js`. When adding tools, update:
+The homepage uses both crawlable HTML in `index.html` and structured data arrays in
+`script.js`. When adding, renaming, recategorising, or removing a tool, update every
+applicable location:
 
 - `tools`
 - `categories`
 - `problems`
 - `searchItems` indirectly via the arrays
+- static Featured Tools cards in `index.html`
+- the static `All tools` links in `index.html`
 - featured category counts
-- sitemap
-- homepage links/cards
+- homepage decision-workspace preview if the tool is represented there
+- `sitemap.xml`
+- `README.md`
+- canonical, Open Graph, structured-data, and internal-link URLs
 
 When adding a new tool, add all practical plain-language questions the tool can answer to the homepage `problems` array so `Start With a Problem` and global search can route users to that tool. Keep these questions accurate to the tool's actual scope and avoid mapping problems to unavailable features.
+
+When removing a tool, remove its cards, links, search entries, problem mappings,
+category counts, preview references, sitemap entry, and README entry in the same
+change. Do not leave dead links, stale counts, orphaned saved-tool identifiers, or
+claims that the removed capability is available.
 
 ## Design Patterns
 
@@ -112,6 +131,8 @@ Use these visual patterns:
 - Clear primary/secondary buttons.
 - Browser-local privacy notes near upload/input areas.
 - Management-ready interpretation panels where results need explanation.
+- The same maximum content width, hero treatment, typography scale, panel padding,
+  vertical rhythm, and navigation placement across every tool page.
 
 Shared brand colors are defined in `styles.css` and `tool-theme.css`:
 
@@ -165,7 +186,14 @@ General:
 Formatting/conventions:
 
 - Use two-space indentation in root homepage files where already present.
-- Preserve the existing style of each tool file, even when it differs slightly.
+- Preserve tool-specific calculation and interaction logic, but normalise shared
+  presentation through `tool-theme.css`. Tool-specific CSS should cover only controls
+  and visualisations unique to that tool.
+- New tool pages must use the shared content width, hero, panel, heading, spacing,
+  navigation, `Why use this tool?`, methodology, guidance, and FAQ patterns before
+  adding local overrides.
+- Avoid broad element selectors in tool-specific CSS when a page or component class
+  can scope the rule.
 - Use `const`/`let`, not `var`.
 - Use descriptive function names such as `calculate`, `renderResults`, `drawChart`, `loadSample`, `exportCsv`.
 - Prefer small helper functions for formatting, validation, chart drawing, and exports.
@@ -188,12 +216,23 @@ Most tools use:
 - CSV/Excel/JSON/image export where relevant.
 - Error messages via visible error areas or alerts.
 
+Controls must perform the action their label promises. Do not ship placeholder
+bookmarks, export buttons, navigation links, newsletter controls, filters, or toggles
+that do nothing. Hide unavailable actions or label genuinely planned capabilities as
+`Coming soon`.
+
 Current examples:
 
 - Break-Even, EOQ, and Safety Stock use scenario planning toggles with interactive canvas charts.
 - Gantt Chart supports JSON save/load, fullscreen timeline, current-date-based sample plans.
 - ABC Analysis supports ABC-only and ABC + XYZ modes, spreadsheet import, manual entry, Pareto chart, management interpretation, ABC-XYZ matrix, and CSV/XLSX export.
 - Kraljic Matrix uses local storage for category state.
+- Analytic Hierarchy Process uses JSON questionnaire/response exchange, Saaty-scale
+  pairwise comparisons, consistency checks, alternative ranking, and criteria-weight
+  visualisation.
+- Monte Carlo Risk Simulation uses a Web Worker where supported, deterministic seeded
+  examples, cancellation, outcome distributions, percentile summaries, and
+  sensitivity interpretation.
 
 When adding interactivity:
 
@@ -202,6 +241,43 @@ When adding interactivity:
 - Preserve keyboard accessibility and visible focus states.
 - Use `aria-pressed` for toggle buttons.
 - Use `aria-live` for dynamic summaries where helpful.
+- Keep long calculations responsive. Show progress, support cancellation where
+  practical, and surface worker/runtime errors instead of leaving an indefinite
+  `Running` state.
+- Keep dynamic panels dimensionally stable where changing labels would otherwise move
+  charts, sliders, or controls.
+
+### Result Interpretation
+
+Every analytical tool whose output requires judgement should include a visible
+interpretation panel generated from the current result, not generic static advice.
+Where relevant, cover:
+
+- what the principal result means
+- the decision or action it supports
+- important thresholds, risks, or exceptions
+- assumptions and limitations that materially affect interpretation
+- recommended review cadence or next step
+
+Interpretation must change with the selected mode, model, scenario, and available
+inputs. Never mention XYZ risk in ABC-only mode, supplier attributes that were not
+entered, or confidence levels that were not calculated.
+
+### Exports and Persistence
+
+- Use CSV/XLSX for tabular results, image export for individual charts, PDF only when
+  a readable report is intentionally implemented, and JSON for reusable project state,
+  templates, questionnaires, responses, or model configuration.
+- Label JSON actions by purpose, such as `Save Project JSON`, rather than a vague
+  `Export JSON`.
+- Exported files must contain enough metadata to understand units, method, settings,
+  and generation context.
+- Use namespaced, versioned `localStorage` keys and tolerate missing, malformed, or
+  stale values.
+- Explain that local persistence is browser/device specific and may be cleared with
+  browser data. Do not imply account-based or cross-device saving.
+- Homepage saved-tool bookmarks use tool URLs as stable identifiers. If a tool URL
+  changes, update or migrate saved identifiers rather than silently breaking them.
 
 ## Business Rules
 
@@ -238,6 +314,8 @@ Available tools should be represented consistently:
 - Break-Even Analysis
 - Economic Order Quantity
 - Safety Stock & Reorder Point
+- Analytic Hierarchy Process
+- Monte Carlo Risk Simulation
 
 ## Current Tool-Specific Rules
 
@@ -280,6 +358,32 @@ Available tools should be represented consistently:
 - Make it clear that project data is browser-based and users should save/export JSON before refresh if persistence is not implemented.
 - Timeline range should be based on actual task dates, with reasonable padding only.
 
+### Analytic Hierarchy Process
+
+- Use Saaty's 1-9 pairwise comparison scale and its reciprocals accurately.
+- Preference wording must identify the left and right alternatives and, for
+  alternative comparisons, the criterion being considered.
+- Keep comparison sliders vertically stable when preference text wraps.
+- Report criterion weights, ranked alternatives, and consistency ratios with plain
+  interpretation. A consistency ratio around `0.10` or lower is guidance, not proof
+  that a judgement is objectively correct.
+- Preserve the questionnaire design -> expert response -> analysis JSON workflow.
+- Treat imported JSON as untrusted input and validate schema, required fields, ranges,
+  and compatibility before rendering or calculating.
+
+### Monte Carlo Risk Simulation
+
+- Categorise the tool under `Statistics` on the homepage and in search/category data.
+- Seeded sample scenarios must reproduce the same result for verification.
+- Simulation must finish or fail with a visible message; never leave the interface in
+  an indefinite running state.
+- Validate distributions, bounds, formulas, iteration limits, and target direction
+  before starting a worker.
+- Keep histogram and cumulative-probability charts readable in a single-column flow
+  and pair them with textual percentile and range summaries.
+- Do not present simulated precision as certainty. Explain that results depend on the
+  selected distributions, assumptions, correlations, and model structure.
+
 ## SEO Requirements
 
 Every production page should have:
@@ -295,6 +399,8 @@ Every production page should have:
 - Semantic heading hierarchy.
 - Internal links back to ATH home and featured tools.
 - Sitemap entry for every live tool page.
+- Crawlable tool name, purpose, and decision-oriented explanatory copy in the HTML.
+  Do not make essential SEO content dependent only on JavaScript rendering.
 
 Avoid keyword stuffing. Use natural, decision-oriented language.
 
@@ -313,6 +419,12 @@ Maintain WCAG-minded implementation:
 - Do not rely on color alone for chart/status meaning.
 - Canvas charts should have adjacent text summaries or chart summaries.
 - Tables/previews must not overflow mobile viewports without a deliberate scroll container.
+- Test charts at phone and tablet widths. Canvas and SVG dimensions must respond to
+  their container, preserve readable labels, and avoid clipped legends, axes, or
+  tooltips.
+- Stack visualisations on narrow screens unless side-by-side comparison is essential.
+- Use stable chart containers so loading, hover, or scenario values do not shift nearby
+  controls.
 
 ## Security and Privacy Constraints
 
@@ -328,6 +440,8 @@ Do:
 - Quote CSV fields and escape quotes.
 - Revoke object URLs after downloads where practical.
 - Keep legal/privacy overlays accurate if data handling changes.
+- Put reasonable upper bounds on uploaded rows, file sizes, simulation iterations, and
+  dynamically generated questionnaire fields to prevent browser lockups.
 
 Do not:
 
@@ -355,9 +469,17 @@ Before finishing changes:
    - export button
    - scenario planning toggle if applicable
    - mobile layout
+   - chart resizing at phone and tablet widths
+   - local-storage restoration and malformed-storage fallback if persistence changed
+   - keyboard operation and announced state for custom sliders, tabs, filters, and toggles
    - keyboard navigation for dialogs/menus
 4. If Node is available, run a syntax check for changed JS:
    - `node --check path/to/file.js`
+5. For calculation changes, verify at least:
+   - one known hand-calculated or independently calculated example
+   - boundary and invalid-input cases
+   - reset and rerun behaviour
+   - deterministic output when a seed is supported
 
 If Node is not available, state that clearly in the final response.
 
@@ -376,6 +498,10 @@ Before deployment:
 - Update canonical URLs when route names change.
 - Keep asset paths relative and static-host friendly.
 - Avoid server-only features unless the deployment target changes.
+- Check every internal link and encoded folder URL after adding, renaming, or removing
+  a tool.
+- Confirm the homepage category count, Featured Tools card, global search, problem
+  mapping, README, and sitemap all describe the same live tool set.
 
 ## Things Future Agents Must Not Change Without Explicit Approval
 
@@ -394,6 +520,11 @@ Before deployment:
 - Do not remove legal overlay content unless replacing it with an equivalent page/flow.
 - Do not alter `CNAME`, `robots.txt`, or canonical domain unless the user asks.
 - Do not erase existing user changes in a dirty working tree.
+- Do not expose a control unless its action is implemented and testable.
+- Do not change shared tool widths, typography, or spacing in one tool's local CSS;
+  make justified shared changes in `tool-theme.css`.
+- Do not silently change calculation formulas, thresholds, default units, currencies,
+  statistical assumptions, or interpretation rules.
 
 ## Things Future Agents Should Do
 
@@ -406,5 +537,10 @@ Before deployment:
 - Use current-date-relative sample data when dates matter.
 - Keep charts readable, labelled, and paired with textual summaries.
 - Keep exports useful and human-readable.
+- Classify each new tool accurately as data-driven, expert judgement, or hybrid where
+  that distinction is shown. Do not imply every method uses subjective judgement.
+- Generate result recommendations from actual calculated values and available inputs.
+- Keep category availability labels and tool counts accurate; unavailable categories
+  must say `Coming soon`.
 - Update README briefly when major project capabilities change.
 - Keep `AGENTS.md` updated when durable architecture, deployment, privacy, or business rules change.

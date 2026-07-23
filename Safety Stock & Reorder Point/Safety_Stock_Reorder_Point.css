@@ -304,11 +304,12 @@
   width: 100%;
   height: auto;
   cursor: default;
-  touch-action: none;
+  touch-action: pan-x pan-y;
 }
 
 .ssrop-page.scenario-planning #stockChart {
   cursor: crosshair;
+  touch-action: none;
 }
 
 .chart-readout {
@@ -527,7 +528,13 @@
   }
 
   .chart-workspace {
+    min-width: 620px;
     grid-template-columns: 1fr;
+  }
+
+  .chart-stage,
+  #stockChart {
+    min-width: 620px;
   }
 
   .chart-readout dl {

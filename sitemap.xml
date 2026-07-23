@@ -45,4 +45,9 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://analyticaltoolshub.com/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

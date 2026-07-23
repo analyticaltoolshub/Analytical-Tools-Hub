@@ -137,7 +137,7 @@
           <div class="hero-copy">
             <span class="badge">Decision intelligence for practical analysis</span>
             <h1><span class="headline-line">Analyze Evidence.</span><span class="headline-line">Structure Judgement.</span><span class="headline-line">Decide Clearly.</span></h1>
-            <p class="hero-lede">Analytical Tools Hub helps supply chain, procurement, operations, business, and research users apply data-driven analytics, structured expert judgement, and transparent decision methods in one browser-based workspace.</p>
+            <p class="hero-lede">Analytical Tools Hub helps professionals make better decisions by combining analytical methods, structured expert judgement, and interactive tools in one browser-based platform.</p>
             <div class="hero-actions">
               <a class="button button-primary button-large" href="#tools">Find the Right Tool</a>
               <a class="button button-secondary button-large" href="#how-it-works">See How ATH Works</a>
@@ -149,66 +149,75 @@
               <li>Built for practical business and academic decisions</li>
             </ul>
           </div>
-          <div class="workspace-preview" aria-label="ATH analytical workspace preview">
-            <div class="preview-shell">
+          <div class="workspace-preview" data-decision-preview aria-label="ATH decision workspace preview">
+            <div class="preview-shell decision-preview-shell">
               <div class="preview-topbar">
                 <img src="assets/ath-symbol.png" alt="" width="38" height="38">
                 <div>
-                  <strong>ATH Workspace</strong>
-                  <span>Input → Analysis → Insight → Decision</span>
+                  <strong>ATH Decision Workspace</strong>
+                  <span>Question &rarr; Method &rarr; Analysis &rarr; Decision</span>
                 </div>
-                <span class="status-pill">Live preview</span>
+                <span class="status-pill">Interactive preview</span>
               </div>
-              <div class="preview-layout">
-                <aside class="preview-sidebar">
-                  <span class="active">Inventory</span>
-                  <span>Forecasting</span>
-                  <span>Finance</span>
-                  <span>Quality</span>
-                </aside>
-                <div class="preview-main">
-                  <div class="tool-search-mini">
-                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.35-4.35M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"/></svg>
-                    <span>Search ABC, smoothing, supplier risk...</span>
-                  </div>
-                  <div class="kpi-grid">
-                    <article><span>Forecast Accuracy</span><strong data-count="92">0</strong><em>%</em></article>
-                    <article><span>Inventory Value</span><strong data-prefix="$" data-count="486">0</strong><em>k</em></article>
-                    <article><span>Service Level</span><strong data-count="96">0</strong><em>%</em></article>
-                  </div>
-                  <div class="chart-card">
-                    <div class="chart-head">
-                      <div><strong>Demand Trend</strong><span>12-month forecast</span></div>
-                      <span class="dot-label">Stable</span>
+              <div class="decision-preview-layout">
+                <div class="preview-method-tabs" role="tablist" aria-label="Decision preview methods">
+                  <button type="button" id="preview-tab-ahp" role="tab" aria-selected="true" aria-controls="decision-preview-panel" data-preview-method="ahp">AHP</button>
+                  <button type="button" id="preview-tab-abc" role="tab" aria-selected="false" aria-controls="decision-preview-panel" data-preview-method="abc">ABC Analysis</button>
+                  <button type="button" id="preview-tab-forecasting" role="tab" aria-selected="false" aria-controls="decision-preview-panel" data-preview-method="forecasting">Forecasting</button>
+                  <button type="button" id="preview-tab-kraljic" role="tab" aria-selected="false" aria-controls="decision-preview-panel" data-preview-method="kraljic">Kraljic Matrix</button>
+                </div>
+                <div class="preview-main decision-preview-main" id="decision-preview-panel" role="tabpanel" aria-labelledby="preview-tab-ahp" data-preview-content>
+                  <span class="preview-example-label">Example decision workflow</span>
+                  <article class="preview-question-card">
+                    <span>Decision question</span>
+                    <h2>Which 3PL provider should we select?</h2>
+                    <p>Multi-criteria supplier selection</p>
+                  </article>
+                  <article class="preview-method-card">
+                    <div>
+                      <span>Recommended method</span>
+                      <h3>Analytic Hierarchy Process</h3>
+                      <p>Recommended because the decision involves several criteria, expert judgement, and trade-offs between alternatives.</p>
                     </div>
-                    <svg class="forecast-chart" viewBox="0 0 420 190" role="img" aria-labelledby="chart-title chart-desc">
-                      <title id="chart-title">Forecast chart preview</title>
-                      <desc id="chart-desc">A rising demand trend line with a mild seasonal dip and forecast range.</desc>
-                      <path class="chart-grid" d="M28 36H390M28 82H390M28 128H390M28 174H390"/>
-                      <path class="chart-band" d="M32 142C82 124 110 111 152 118S224 78 267 86 326 58 388 38v76C330 136 298 142 262 128S194 154 154 146 82 162 32 178Z"/>
-                      <path class="chart-line" d="M32 154C78 132 111 118 150 124S218 80 264 91 326 58 388 45"/>
-                      <circle cx="388" cy="45" r="5"/>
-                    </svg>
+                    <strong>Expert Judgement</strong>
+                  </article>
+                  <div class="preview-evidence-grid">
+                    <article class="preview-card">
+                      <span>Input summary</span>
+                      <div class="preview-metric-grid">
+                        <div><strong>5</strong><span>Experts</span></div>
+                        <div><strong>4</strong><span>Criteria</span></div>
+                        <div><strong>3</strong><span>Alternatives</span></div>
+                      </div>
+                      <div class="preview-list-pair">
+                        <div><strong>Criteria</strong><ul><li>Service coverage</li><li>Delivery performance</li><li>Technology capability</li><li>Logistics cost</li></ul></div>
+                        <div><strong>Alternatives</strong><ul><li>3PL Provider A</li><li>3PL Provider B</li><li>3PL Provider C</li></ul></div>
+                      </div>
+                    </article>
+                    <article class="preview-card">
+                      <span>Analysis</span>
+                      <h3>Criteria weights</h3>
+                      <div class="preview-bars" aria-label="Criteria weights: service coverage 34%, delivery performance 27%, technology capability 22%, logistics cost 17%">
+                        <div><span>Service coverage</span><strong>34%</strong><i style="--value: 34%;"></i></div>
+                        <div><span>Delivery performance</span><strong>27%</strong><i style="--value: 27%;"></i></div>
+                        <div><span>Technology capability</span><strong>22%</strong><i style="--value: 22%;"></i></div>
+                        <div><span>Logistics cost</span><strong>17%</strong><i style="--value: 17%;"></i></div>
+                      </div>
+                      <div class="preview-status-row"><span>Consistency ratio: <strong>0.07</strong></span><span class="is-status">Consistency status: <strong>Acceptable</strong></span></div>
+                    </article>
                   </div>
-                  <div class="preview-bottom">
-                    <div class="input-panel">
-                      <strong>Analysis Settings</strong>
-                      <label><span>Classification</span><select aria-label="Classification setting"><option>ABC + XYZ</option></select></label>
-                      <label><span>Review period</span><input value="12 months" aria-label="Review period"></label>
-                      <p class="valid">Validation complete</p>
+                  <article class="preview-result-card">
+                    <span>Decision result</span>
+                    <h3>Recommended option: 3PL Provider B</h3>
+                    <div class="preview-score-list" aria-label="Alternative scores">
+                      <span><strong>Provider B</strong>0.42</span>
+                      <span><strong>Provider A</strong>0.34</span>
+                      <span><strong>Provider C</strong>0.24</span>
                     </div>
-                    <div class="decision-card">
-                      <span>Decision Summary</span>
-                      <strong>Recommended Order Quantity: 1,250 units</strong>
-                      <p>Prioritize A-class stock controls and review supplier risk for two high-value items.</p>
-                    </div>
-                  </div>
-                  <div class="table-preview" role="table" aria-label="Inventory classification preview">
-                    <div role="row"><span role="columnheader">Item</span><span role="columnheader">Value</span><span role="columnheader">Segment</span></div>
-                    <div role="row"><span role="cell">SKU-104</span><span role="cell">$82k</span><span role="cell">AX</span></div>
-                    <div role="row"><span role="cell">SKU-221</span><span role="cell">$31k</span><span role="cell">BY</span></div>
-                    <div role="row"><span role="cell">SKU-318</span><span role="cell">$8k</span><span role="cell">CZ</span></div>
-                  </div>
+                    <p>Provider B ranks highest under the current expert judgements. The consistency ratio is within acceptable guidance, so the result is suitable for decision review.</p>
+                    <strong class="preview-confidence">Decision confidence: High</strong>
+                  </article>
+                  <p class="sr-only">Illustrative example showing an AHP decision workflow from question to method, analysis, and decision result.</p>
                 </div>
               </div>
             </div>
@@ -218,7 +227,7 @@
 
       <section class="section surface-section" aria-labelledby="decision-methods-heading">
         <div class="container">
-          <div class="section-heading">
+          <div class="section-heading decision-method-heading">
             <span class="eyebrow">Decision Support</span>
             <h2 id="decision-methods-heading">The Right Method for the Right Decision</h2>
             <p>Some business decisions rely entirely on measurable historical data. Others depend on structured expert judgement. Many important decisions require a combination of both. Analytical Tools Hub brings together quantitative analysis, structured expert judgement, Multi-Criteria Decision Making (MCDM), practical business analytics, and transparent analytical methods so users can choose an approach that fits the decision in front of them.</p>
@@ -385,6 +394,12 @@
                 <button type="button" data-problem="Which warehouse location is strongest across cost, access, labour, and customer proximity?">Which warehouse location is strongest across cost, access, labour, and customer proximity?</button>
                 <button type="button" data-problem="Which transport mode should I choose when cost, speed, reliability, and emissions matter?">Which transport mode should I choose when cost, speed, reliability, and emissions matter?</button>
                 <button type="button" data-problem="Which inventory policy is best when service level, working capital, and stockout risk conflict?">Which inventory policy is best when service level, working capital, and stockout risk conflict?</button>
+                <button type="button" data-problem="What is the probability of achieving a target profit when demand and costs are uncertain?">What is the probability of achieving a target profit when demand and costs are uncertain?</button>
+                <button type="button" data-problem="What project budget gives me an 80% or 90% confidence level?">What project budget gives me an 80% or 90% confidence level?</button>
+                <button type="button" data-problem="Which uncertain input has the strongest relationship with my result?">Which uncertain input has the strongest relationship with my result?</button>
+                <button type="button" data-problem="How likely is my project to finish before the deadline?">How likely is my project to finish before the deadline?</button>
+                <button type="button" data-problem="What is the risk of stockout when demand and replenishment are uncertain?">What is the risk of stockout when demand and replenishment are uncertain?</button>
+                <button type="button" data-problem="How can I model best case, likely case, and worst case expert estimates?">How can I model best case, likely case, and worst case expert estimates?</button>
               </div>
             </article>
           </div>
@@ -424,8 +439,8 @@
             <article class="category-card">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 3v18M16 3v18"/><path d="M3 8h10M11 16h10"/></svg>
               <h3>Statistics</h3>
-              <span class="card-meta">Expanding soon</span>
-              <p>Analyze relationships, distributions, samples, and uncertainty.</p>
+              <span class="card-meta">1 tool available</span>
+              <p>Analyze distributions, uncertainty, samples, and probability-driven outcomes.</p>
               <button class="card-link card-link-button" type="button" data-category-search="Statistics" aria-label="Explore Statistics category">Explore category</button>
             </article>
             <article class="category-card">
@@ -452,7 +467,7 @@
             <article class="category-card">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-7"/></svg>
               <h3>Business Analysis</h3>
-              <span class="card-meta">2 tools available</span>
+              <span class="card-meta">3 tools available</span>
               <p>Compare scenarios and support strategic decisions.</p>
               <button class="card-link card-link-button" type="button" data-category-search="Business Analysis" aria-label="Explore Business Analysis category">Explore category</button>
             </article>
@@ -465,60 +480,74 @@
           <div class="section-heading split-heading">
             <div>
               <span class="eyebrow">Featured Tools</span>
-              <h2>Flagship Tools to Start With</h2>
+              <h2>Practical Tools for Better Decisions</h2>
             </div>
-            <p>A focused set of practical tools before ATH grows into a broader analytical workspace.</p>
+            <div class="featured-tools-heading-actions">
+              <p>Explore focused tools for analysing evidence, comparing options, and turning results into practical action.</p>
+              <button class="saved-tools-filter" type="button" aria-pressed="false" data-saved-tools-filter>
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg>
+                <span>Saved tools</span>
+                <strong data-saved-tools-count>0</strong>
+              </button>
+            </div>
           </div>
           <div class="tools-grid" data-render="tools">
             <article class="tool-card">
-              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>ABC Analysis</h3></div><button class="bookmark-button" type="button" aria-label="Save ABC Analysis placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>ABC Analysis</h3></div><button class="bookmark-button" type="button" aria-label="Save ABC Analysis"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Classify inventory by annual consumption value, with optional XYZ demand variability segmentation.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Annual value or monthly quantity plus unit cost</span><span><strong>Output:</strong> ABC classes, optional ABC-XYZ matrix, and Pareto chart</span></div>
               <a class="card-link" href="ABC%20Analysis/ABC_Analysis.html" aria-label="Open ABC Analysis">Open ABC Analysis</a>
             </article>
             <article class="tool-card">
-              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>Economic Order Quantity</h3></div><button class="bookmark-button" type="button" aria-label="Save Economic Order Quantity placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>Economic Order Quantity</h3></div><button class="bookmark-button" type="button" aria-label="Save Economic Order Quantity"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Estimate the order quantity that balances ordering and holding costs.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Demand, order cost, holding cost</span><span><strong>Output:</strong> EOQ, cost curve, and reorder point</span></div>
               <a class="card-link" href="Economic%20Order%20Quantity/Economic_Order_Quantity.html" aria-label="Open Economic Order Quantity">Open Economic Order Quantity</a>
             </article>
             <article class="tool-card">
-              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>Safety Stock &amp; Reorder Point</h3></div><button class="bookmark-button" type="button" aria-label="Save Safety Stock and Reorder Point placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>Safety Stock &amp; Reorder Point</h3></div><button class="bookmark-button" type="button" aria-label="Save Safety Stock and Reorder Point"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Estimate buffer stock and replenishment trigger levels under demand and lead time uncertainty.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Demand variability, lead time, service level</span><span><strong>Output:</strong> Safety stock, reorder point, and stock action</span></div>
               <a class="card-link" href="Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html" aria-label="Open Safety Stock and Reorder Point">Open Safety Stock &amp; Reorder Point</a>
             </article>
             <article class="tool-card">
-              <div class="tool-card-header"><div><span class="card-meta">Forecasting</span><h3>Exponential Smoothing</h3></div><button class="bookmark-button" type="button" aria-label="Save Exponential Smoothing placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <div class="tool-card-header"><div><span class="card-meta">Forecasting</span><h3>Exponential Smoothing</h3></div><button class="bookmark-button" type="button" aria-label="Save Exponential Smoothing"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Forecast demand using simple smoothing, Holt's trend method, or Holt-Winters seasonality.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Historical demand series</span><span><strong>Output:</strong> Forecast table, error metric, and chart</span></div>
               <a class="card-link" href="Exponential%20Smoothing/Exponential_Smoothing.html" aria-label="Open Exponential Smoothing">Open Exponential Smoothing</a>
             </article>
             <article class="tool-card">
-              <div class="tool-card-header"><div><span class="card-meta">Procurement</span><h3>Kraljic Matrix</h3></div><button class="bookmark-button" type="button" aria-label="Save Kraljic Matrix placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <div class="tool-card-header"><div><span class="card-meta">Procurement</span><h3>Kraljic Matrix</h3></div><button class="bookmark-button" type="button" aria-label="Save Kraljic Matrix"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Segment suppliers and purchases by supply risk and profit impact.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Risk and impact ratings</span><span><strong>Output:</strong> Portfolio quadrant and strategy</span></div>
               <a class="card-link" href="Kraljic%20Matrix/Kraljic_Matrix.html" aria-label="Open Kraljic Matrix">Open Kraljic Matrix</a>
             </article>
             <article class="tool-card">
-              <div class="tool-card-header"><div><span class="card-meta">Finance</span><h3>Break-Even Analysis</h3></div><button class="bookmark-button" type="button" aria-label="Save Break-Even Analysis placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <div class="tool-card-header"><div><span class="card-meta">Finance</span><h3>Break-Even Analysis</h3></div><button class="bookmark-button" type="button" aria-label="Save Break-Even Analysis"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Find the volume or revenue needed to cover fixed and variable costs.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Price, fixed cost, variable cost</span><span><strong>Output:</strong> Break-even quantity and margin</span></div>
               <a class="card-link" href="Break%20Even%20Analysis/Break_Even_Analysis.html" aria-label="Open Break-Even Analysis">Open Break-Even Analysis</a>
             </article>
             <article class="tool-card">
-              <div class="tool-card-header"><div><span class="card-meta">Business Analysis</span><h3>Analytic Hierarchy Process</h3></div><button class="bookmark-button" type="button" aria-label="Save Analytic Hierarchy Process placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <div class="tool-card-header"><div><span class="card-meta">Business Analysis</span><h3>Analytic Hierarchy Process</h3></div><button class="bookmark-button" type="button" aria-label="Save Analytic Hierarchy Process"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Design pairwise questionnaires, collect expert judgements, and rank alternatives across multiple criteria.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Criteria, alternatives, expert pairwise comparisons</span><span><strong>Output:</strong> Criteria weights, consistency ratios, and ranked alternatives</span></div>
               <a class="card-link" href="Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html" aria-label="Open Analytic Hierarchy Process">Open Analytic Hierarchy Process</a>
             </article>
             <article class="tool-card">
-              <div class="tool-card-header"><div><span class="card-meta">Project Management</span><h3>Gantt Chart Planner</h3></div><button class="bookmark-button" type="button" aria-label="Save Gantt Chart Planner placeholder"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <div class="tool-card-header"><div><span class="card-meta">Project Management</span><h3>Gantt Chart Planner</h3></div><button class="bookmark-button" type="button" aria-label="Save Gantt Chart Planner"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Plan task dates, progress, and milestones on a project timeline.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Tasks, dates, progress, milestones</span><span><strong>Output:</strong> Gantt timeline and JSON plan export</span></div>
               <a class="card-link" href="Gantt%20Chart/Gantt_Chart.html" aria-label="Open Gantt Chart Planner">Open Gantt Chart Planner</a>
             </article>
+            <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Statistics</span><h3>Monte Carlo Risk Simulation</h3></div><button class="bookmark-button" type="button" aria-label="Save Monte Carlo Risk Simulation"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Simulate uncertain inputs, estimate outcome probabilities, and identify the variables that drive risk.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Distributions, formula, target, seed</span><span><strong>Output:</strong> Outcome distribution, target probability, percentiles, and sensitivity</span></div>
+              <a class="card-link" href="Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html" aria-label="Open Monte Carlo Risk Simulation">Open Monte Carlo Simulation</a>
+            </article>
           </div>
+          <p class="saved-tools-empty" data-saved-tools-empty hidden>No tools are saved on this device yet. Select a bookmark on any tool card to add it here.</p>
           <div class="all-tools-links" aria-label="All tools">
             <span>All tools:</span>
             <a href="ABC%20Analysis/ABC_Analysis.html">ABC Analysis</a>
@@ -529,6 +558,7 @@
             <a href="Break%20Even%20Analysis/Break_Even_Analysis.html">Break-Even</a>
             <a href="Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html">AHP</a>
             <a href="Gantt%20Chart/Gantt_Chart.html">Gantt Planner</a>
+            <a href="Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html">Monte Carlo</a>
           </div>
         </div>
       </section>
@@ -689,6 +719,7 @@
         <p>© 2026 Analytical Tools Hub. All rights reserved.</p>
       </div>
     </footer>
+    <div class="saved-tools-toast" role="status" aria-live="polite" data-saved-tools-message hidden></div>
     <script src="script.js" defer></script>
   </body>
 </html>

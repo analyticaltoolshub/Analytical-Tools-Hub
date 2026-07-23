@@ -295,11 +295,12 @@
   width: 100%;
   height: auto;
   cursor: default;
-  touch-action: none;
+  touch-action: pan-x pan-y;
 }
 
 .eoq-page.scenario-planning #eoqChart {
   cursor: crosshair;
+  touch-action: none;
 }
 
 .chart-readout {
@@ -513,7 +514,13 @@
   }
 
   .chart-workspace {
+    min-width: 620px;
     grid-template-columns: 1fr;
+  }
+
+  .chart-stage,
+  #eoqChart {
+    min-width: 620px;
   }
 
   .chart-readout dl {
