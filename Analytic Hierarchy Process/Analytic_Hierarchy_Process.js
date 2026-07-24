@@ -65,6 +65,20 @@ let currentQuestionnaire = null;
 let loadedResponses = [];
 let latestAnalysis = null;
 
+function updateAhpWorkflow(activeIndex) {
+  document.querySelectorAll("[data-ahp-workflow-index]").forEach((item) => {
+    const index = Number(item.dataset.ahpWorkflowIndex);
+    item.classList.toggle("active", index === activeIndex);
+    item.classList.toggle("complete", index < activeIndex);
+
+    if (index === activeIndex) {
+      item.setAttribute("aria-current", "step");
+    } else {
+      item.removeAttribute("aria-current");
+    }
+  });
+}
+
 const sampleTemplates = {
   "supplier-selection": {
     projectTitle: "Supplier Selection Decision",
@@ -130,6 +144,28 @@ function safeName(value, fallback) {
   return text || fallback;
 }
 
+function createStructureGroupHeader(title, type, count) {
+  const header = document.createElement("div");
+  header.className = "field-group-header";
+
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "add-structure-button";
+  button.dataset.addStructure = type;
+  button.textContent = type === "criteria" ? "+ Add Criterion" : "+ Add Alternative";
+  button.disabled = count >= 10;
+  button.setAttribute(
+    "aria-label",
+    type === "criteria" ? "Add another decision criterion" : "Add another decision alternative"
+  );
+
+  header.append(heading, button);
+  return header;
+}
+
 function buildStructureFields(criteria = [], alternatives = []) {
   const criteriaCount = clampCount(elements.criteriaCount);
   const alternativeCount = clampCount(elements.alternativeCount);
@@ -140,37 +176,66 @@ function buildStructureFields(criteria = [], alternatives = []) {
   }
 
   clearErrors();
+  currentQuestionnaire = null;
   elements.structureFields.textContent = "";
 
   const criteriaGroup = document.createElement("div");
   criteriaGroup.className = "field-group";
-  const criteriaTitle = document.createElement("h3");
-  criteriaTitle.textContent = "Criteria";
+  const criteriaHeader = createStructureGroupHeader("Criteria", "criteria", criteriaCount);
   const criteriaGrid = document.createElement("div");
   criteriaGrid.className = "name-grid";
 
   for (let i = 0; i < criteriaCount; i++) {
-    criteriaGrid.appendChild(createNameInput("criteria", i, criteria[i] || `Criterion ${i + 1}`));
+    criteriaGrid.appendChild(createNameInput("criteria", i, criteria[i] ?? `Criterion ${i + 1}`));
   }
 
-  criteriaGroup.append(criteriaTitle, criteriaGrid);
+  criteriaGroup.append(criteriaHeader, criteriaGrid);
 
   const alternativeGroup = document.createElement("div");
   alternativeGroup.className = "field-group";
-  const alternativeTitle = document.createElement("h3");
-  alternativeTitle.textContent = "Alternatives";
+  const alternativeHeader = createStructureGroupHeader("Alternatives", "alternative", alternativeCount);
   const alternativeGrid = document.createElement("div");
   alternativeGrid.className = "name-grid";
 
   for (let i = 0; i < alternativeCount; i++) {
-    alternativeGrid.appendChild(createNameInput("alternative", i, alternatives[i] || `Alternative ${i + 1}`));
+    alternativeGrid.appendChild(createNameInput("alternative", i, alternatives[i] ?? `Alternative ${i + 1}`));
   }
 
-  alternativeGroup.append(alternativeTitle, alternativeGrid);
+  alternativeGroup.append(alternativeHeader, alternativeGrid);
   elements.structureFields.append(criteriaGroup, alternativeGroup);
   elements.exportQuestionnaireButton.disabled = true;
   elements.questionnairePreview.textContent = "";
   elements.questionnairePreview.classList.add("hidden");
+}
+
+function addStructureItem(type) {
+  const criteria = Array.from(
+    elements.structureFields.querySelectorAll('input[data-type="criteria"]'),
+    (input) => input.value
+  );
+  const alternatives = Array.from(
+    elements.structureFields.querySelectorAll('input[data-type="alternative"]'),
+    (input) => input.value
+  );
+  const items = type === "criteria" ? criteria : alternatives;
+
+  if (items.length >= 10) {
+    setError(
+      elements.designError,
+      `AHP supports up to 10 ${type === "criteria" ? "criteria" : "alternatives"} in this tool.`
+    );
+    return;
+  }
+
+  items.push("");
+  elements.criteriaCount.value = criteria.length;
+  elements.alternativeCount.value = alternatives.length;
+  buildStructureFields(criteria, alternatives);
+
+  const addedInput = elements.structureFields.querySelector(
+    `input[data-type="${type}"][data-index="${items.length - 1}"]`
+  );
+  addedInput?.focus();
 }
 
 function createNameInput(type, index, value) {
@@ -314,6 +379,7 @@ function resetQuestionnaireDesign() {
   elements.questionnairePreview.textContent = "";
   elements.questionnairePreview.classList.add("hidden");
   elements.exportQuestionnaireButton.disabled = true;
+  updateAhpWorkflow(0);
   clearErrors();
 }
 
@@ -415,6 +481,7 @@ function renderSurvey(questionnaire) {
   });
 
   updateSurveyCompleteness();
+  updateAhpWorkflow(1);
 }
 
 function createQuestionGroup(title, questions) {
@@ -631,6 +698,7 @@ function renderWeightDistribution(labels, weights) {
 
 function renderAnalysis(analysis) {
   elements.results.classList.remove("hidden");
+  updateAhpWorkflow(2);
   renderWeightDistribution(analysis.questionnaire.criteria, analysis.criteriaResult.weights);
   elements.alternativeRanking.textContent = "";
   elements.consistencyPanel.textContent = "";
@@ -683,6 +751,7 @@ function renderAnalysis(analysis) {
 
 function renderResponses() {
   elements.responseList.textContent = "";
+  updateAhpWorkflow(2);
 
   loadedResponses.forEach((response, index) => {
     const item = document.createElement("div");
@@ -784,6 +853,12 @@ function sampleResponse() {
 }
 
 elements.buildStructureButton.addEventListener("click", () => buildStructureFields());
+elements.structureFields.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-add-structure]");
+  if (button) {
+    addStructureItem(button.dataset.addStructure);
+  }
+});
 elements.loadSampleDesignButton.addEventListener("click", loadSampleDesign);
 elements.resetDesignButton.addEventListener("click", resetQuestionnaireDesign);
 elements.previewQuestionnaireButton.addEventListener("click", previewQuestionnaire);

@@ -50,4 +50,9 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://analyticaltoolshub.com/Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

@@ -9,6 +9,86 @@
   align-items: start;
 }
 
+.ahp-workflow-strip {
+  padding: .65rem .8rem !important;
+}
+
+.ahp-workflow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ahp-workflow li {
+  position: relative;
+  min-height: 58px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  padding: .45rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  background: var(--surface);
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.ahp-workflow li strong {
+  color: var(--navy-950);
+  font-size: .92rem;
+}
+
+.ahp-workflow li small {
+  flex-basis: 100%;
+  padding-left: 2.15rem;
+  color: var(--text-secondary);
+  font-size: .76rem;
+  font-weight: 550;
+}
+
+.ahp-workflow li span {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: .76rem;
+}
+
+.ahp-workflow li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -.2rem;
+  width: .4rem;
+  height: 1px;
+  background: var(--border);
+}
+
+.ahp-workflow .active {
+  color: var(--blue-600);
+}
+
+.ahp-workflow .active span {
+  color: #fff;
+  border-color: var(--blue-600);
+  background: var(--blue-600);
+}
+
+.ahp-workflow .complete span {
+  color: #166534;
+  border-color: #86efac;
+  background: #dcfce7;
+}
+
 .ahp-content {
   display: grid;
   gap: 24px;
@@ -184,11 +264,37 @@ button:disabled {
   margin-top: 16px;
 }
 
+.field-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.field-group-header .add-structure-button {
+  min-height: 42px;
+  padding: 8px 14px;
+  color: var(--blue-600);
+  border: 1px solid rgba(31, 111, 235, .3);
+  background: #fff;
+  box-shadow: none;
+}
+
+.field-group-header .add-structure-button:hover {
+  color: #fff;
+  border-color: var(--blue-600);
+  background: var(--blue-600);
+}
+
 .field-group h3,
 .result-card h3,
 .question-group h3 {
   margin: 0 0 14px;
   color: var(--text-primary);
+}
+
+.field-group-header h3 {
+  margin-bottom: 0;
 }
 
 .question-preview {
@@ -513,6 +619,19 @@ button:disabled {
 }
 
 @media (max-width: 720px) {
+  .ahp-workflow {
+    grid-template-columns: 1fr;
+    gap: .4rem;
+  }
+
+  .ahp-workflow li {
+    min-height: 48px;
+  }
+
+  .ahp-workflow li:not(:last-child)::after {
+    display: none;
+  }
+
   .section-header,
   .action-row,
   .file-row,
@@ -527,5 +646,14 @@ button:disabled {
   .guidance-grid,
   .question-card {
     grid-template-columns: 1fr;
+  }
+
+  .field-group-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .field-group-header .add-structure-button {
+    width: 100%;
   }
 }

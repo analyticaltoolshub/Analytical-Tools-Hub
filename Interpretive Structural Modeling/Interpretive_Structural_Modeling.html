@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interpretive Structural Modeling Tool | Analytical Tools Hub</title>
+  <meta name="description" content="Structure complex factors, define expert relationships, and build an ISM hierarchy with editable supply-chain problem templates.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Interpretive Structural Modeling Tool | Analytical Tools Hub">
+  <meta property="og:description" content="Structure complex factors, define expert relationships, and build an ISM hierarchy with editable supply-chain problem templates.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Interpretive Structural Modeling Tool | Analytical Tools Hub">
+  <meta name="twitter:description" content="Build an ISM hierarchy, review transitivity, and interpret driving and dependence power in your browser.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Interpretive_Structural_Modeling.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html#software",
+          "name": "Interpretive Structural Modeling",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html",
+          "description": "A browser-based tool for defining factors, recording expert relationships, generating ISM matrices and levels, and reviewing driving and dependence power.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "General-purpose model design with editable supply-chain templates",
+            "V A X O relationship entry",
+            "Structural Self-Interaction Matrix",
+            "Initial and final reachability matrices",
+            "Transitivity analysis",
+            "Level partitioning",
+            "ISM hierarchy diagram",
+            "Driving and dependence power",
+            "MICMAC-style classification",
+            "CSV JSON SVG and print exports"
+          ],
+          "publisher": {
+            "@type": "Organization",
+            "name": "Analytical Tools Hub",
+            "url": "https://analyticaltoolshub.com/"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Interpretive Structural Modeling", "item": "https://analyticaltoolshub.com/Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="ism-page">
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text">
+          <strong>Interpretive Structural Modeling</strong>
+          <span>Structural relationship workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="tool-hero" aria-labelledby="ism-page-title">
+      <span class="tool-badge">Decision Science</span>
+      <h1 id="ism-page-title">Interpretive Structural Modeling</h1>
+      <p>Structure expert judgements about how factors influence one another, then build a transparent hierarchy of drivers and dependent outcomes.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based analysis</span>
+        <span>Expert-defined relationships</span>
+        <span>Transparent matrices and hierarchy</span>
+      </div>
+    </section>
+
+    <section class="panel content-section" aria-labelledby="decision-guide-heading">
+      <h2 id="decision-guide-heading">Why use this tool?</h2>
+      <div class="guidance-grid">
+        <div class="guidance-card">
+          <span>Decision Supported</span>
+          <p>Use ISM when a complex problem contains interrelated barriers, risks, enablers, or variables that need a structured expert view.</p>
+        </div>
+        <div class="guidance-card">
+          <span>What It Tells You</span>
+          <p>It identifies hierarchy levels, foundational drivers, dependent factors, linkage factors, and the direct or transitive paths connecting them.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Example Input</span>
+          <p>Define a custom problem or load a supply-chain template, adapt the factors, and confirm each V, A, X, or O relationship.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Sample Output Interpretation</span>
+          <p>Factors at the base with high driving power usually warrant early management attention because they influence several factors above them.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel workflow-strip" aria-label="ISM workflow">
+      <ol class="ism-workflow ism-primary-workflow">
+        <li class="active" data-workflow-index="0"><span>1</span><strong>Design</strong><small>Define the problem and factors</small></li>
+        <li data-workflow-index="1"><span>2</span><strong>Expert Survey</strong><small>Record pairwise relationships</small></li>
+        <li data-workflow-index="2"><span>3</span><strong>Analysis</strong><small>Build matrices and hierarchy</small></li>
+      </ol>
+    </section>
+
+    <div class="ism-layout">
+      <div class="ism-content">
+        <section class="panel" id="problem-setup">
+          <div class="section-header">
+            <div>
+              <h2>1. Design</h2>
+              <p>Define the problem and factors before sending the questionnaire to an expert or facilitation group.</p>
+            </div>
+          </div>
+
+          <div class="privacy-note">All factors, judgements, calculations, and exported files remain in your browser. Save the project JSON before refreshing if you want to continue later.</div>
+          <div id="setupError" class="error-message" role="alert"></div>
+
+          <div class="template-load-row">
+            <label>
+              Sample template
+              <select id="problemSelect">
+                <option value="custom">Blank custom model</option>
+                <optgroup label="Supply-chain sample templates">
+                  <option value="supplier-selection">Supplier selection barriers</option>
+                  <option value="resilience">Supply-chain resilience barriers</option>
+                  <option value="sustainable">Sustainable supply-chain implementation barriers</option>
+                  <option value="digital">Digital supply-chain adoption barriers</option>
+                  <option value="circular">Circular supply-chain barriers</option>
+                  <option value="green-procurement">Green procurement barriers</option>
+                  <option value="industry-4">Industry 4.0 adoption challenges</option>
+                  <option value="blockchain">Blockchain adoption in supply chains</option>
+                  <option value="risk">Supply-chain risk factors</option>
+                  <option value="outsourcing">Logistics outsourcing barriers</option>
+                  <option value="last-mile">Last-mile delivery challenges</option>
+                  <option value="inventory">Inventory management barriers</option>
+                  <option value="reverse-logistics">Reverse logistics barriers</option>
+                  <option value="cold-chain">Cold-chain implementation barriers</option>
+                </optgroup>
+              </select>
+            </label>
+            <div class="template-actions">
+              <button id="loadTemplateButton" type="button">Load Sample Template</button>
+              <button class="reset" id="resetToolButton" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div id="problemDetails" class="problem-details" aria-live="polite">
+            <label>
+              Problem title
+              <input id="problemTitle" type="text" maxlength="120">
+            </label>
+            <label>
+              Problem description
+              <textarea id="problemDescription" rows="3" maxlength="600"></textarea>
+            </label>
+          </div>
+
+          <div class="suggested-note" id="suggestedFactorsNote" hidden>
+            <strong>Suggested starting factors — review and adapt them to your organisation or research context.</strong>
+            <span>Supply-chain templates are optional examples. Their factors are not universal, exhaustive, or validated for every organisation.</span>
+          </div>
+
+          <div class="design-subsection" id="factor-editor">
+            <div class="section-header">
+            <div>
+              <h3>Review and Edit Factors</h3>
+              <p>Use 2–12 clearly defined factors at a comparable level of abstraction. Reordering factors resets existing pairwise judgements.</p>
+            </div>
+            <button id="addFactorButton" type="button">Add Factor</button>
+            </div>
+
+            <div id="factorError" class="error-message" role="alert"></div>
+            <div id="factorList" class="factor-list"></div>
+
+            <div class="action-row">
+              <button id="exportQuestionnaireButton" class="secondary-button" type="button">Export Questionnaire JSON</button>
+              <button id="prepareRelationshipsButton" type="button">Open in Expert Survey</button>
+            </div>
+            <div id="factorActionMessage" class="action-message" role="status" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section class="panel" id="relationship-entry">
+          <div class="section-header">
+            <div>
+              <h2>2. Expert Survey</h2>
+              <p>Import an ISM questionnaire or use the current design, then confirm one relationship for every unique pair.</p>
+            </div>
+            <span id="relationshipProgress" class="progress-badge">0 / 0 confirmed</span>
+          </div>
+
+          <div class="file-action-row">
+            <label>
+              Import questionnaire JSON
+              <input id="questionnaireFileInput" type="file" accept=".json,application/json">
+              <small class="file-purpose">Upload an <strong>ath-ism-questionnaire</strong> file created in Design. It contains the problem and factors but no completed relationship judgements.</small>
+            </label>
+            <button id="loadQuestionnaireButton" class="secondary-button" type="button">Load Questionnaire</button>
+          </div>
+          <div id="surveyImportError" class="error-message" role="alert"></div>
+
+          <div id="surveyWorkspace" hidden>
+            <div class="survey-factor-note">
+              <strong>Need more context about a factor?</strong>
+              <span>Review its name and description in the <a href="#factor-editor">Design section</a> before making pairwise judgements.</span>
+            </div>
+
+            <div class="survey-context">
+              <div>
+                <span>Questionnaire</span>
+                <strong id="surveyProblemTitle">Not loaded</strong>
+              </div>
+              <label>
+                Expert name, role, or group
+                <input id="expertName" type="text" maxlength="120" placeholder="e.g. Cross-functional workshop">
+              </label>
+            </div>
+
+            <div class="symbol-guide" aria-label="ISM relationship symbols">
+              <div><strong>V</strong><span>Factor i influences factor j</span></div>
+              <div><strong>A</strong><span>Factor j influences factor i</span></div>
+              <div><strong>X</strong><span>Both factors influence each other</span></div>
+              <div><strong>O</strong><span>No direct relationship</span></div>
+            </div>
+
+            <div class="method-note">
+              <strong>Expert judgement required</strong>
+              <p>The tool does not infer relationships. Select the symbol that best reflects the agreed contextual relationship for each pair. Use X only when each factor directly influences the other; overusing reciprocal relationships can collapse the hierarchy into one level.</p>
+            </div>
+            <div id="relationshipError" class="error-message" role="alert"></div>
+            <div id="relationshipList" class="relationship-list"></div>
+
+            <div class="action-row">
+              <button id="exportSurveyButton" class="secondary-button" type="button">Export Completed Survey JSON</button>
+              <button id="buildMatricesButton" type="button">Use Response in Analysis</button>
+            </div>
+            <div id="surveyActionMessage" class="action-message" role="status" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section class="panel" id="matrix-review">
+          <div class="section-header">
+            <div>
+              <h2>3. Analysis</h2>
+              <p>Import a completed expert response, review the matrices, and generate the ISM hierarchy.</p>
+            </div>
+          </div>
+
+          <div class="file-action-row">
+            <label>
+              Import completed expert response JSON
+              <input id="responseFileInput" type="file" accept=".json,application/json">
+              <small class="file-purpose">Upload an <strong>ath-ism-response</strong> file exported from Expert Survey after every pairwise judgement was confirmed.</small>
+            </label>
+            <div class="analysis-load-actions">
+              <button id="loadResponseButton" class="secondary-button" type="button">Load Expert Response</button>
+              <button id="loadSampleResponseButton" type="button">Load Sample Response</button>
+            </div>
+          </div>
+          <p class="sample-data-note"><strong>Sample response:</strong> Loads synthetic resilience factors and completed pairwise judgements that produce a five-level hierarchy. Review the matrices before generating results; the example is not validated evidence.</p>
+          <div id="analysisError" class="error-message" role="alert"></div>
+
+          <div id="analysisWorkspace" hidden>
+            <div class="analysis-steps" aria-label="ISM analysis stages">
+              <span>4. Build SSIM</span>
+              <span>5. Reachability matrix</span>
+              <span>6. Apply transitivity</span>
+              <span>7. Partition levels</span>
+              <span>8. Build hierarchy</span>
+              <span>9. Review power</span>
+            </div>
+
+            <div class="matrix-tabs" role="tablist" aria-label="Direct relationship matrices">
+              <button id="ssimTab" role="tab" aria-selected="true" aria-controls="ssimPanel" type="button">SSIM</button>
+              <button id="initialTab" role="tab" aria-selected="false" aria-controls="initialPanel" type="button">Initial Reachability Matrix</button>
+            </div>
+            <div id="ssimPanel" role="tabpanel" aria-labelledby="ssimTab">
+              <p class="matrix-explanation">The Structural Self-Interaction Matrix records one V, A, X, or O judgement for each unique factor pair.</p>
+              <div id="ssimTable" class="table-wrap matrix-table-wrap"></div>
+            </div>
+            <div id="initialPanel" role="tabpanel" aria-labelledby="initialTab" hidden>
+              <p class="matrix-explanation">The initial reachability matrix converts direct judgements to binary links and includes each factor’s relationship with itself.</p>
+              <div id="initialMatrixTable" class="table-wrap matrix-table-wrap"></div>
+            </div>
+
+            <div class="action-row">
+              <button id="generateResultsButton" type="button">Apply Transitivity and Generate Hierarchy</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="results" hidden>
+          <div class="section-header">
+            <div>
+              <h2>Analysis Results and Interpretation</h2>
+              <p>Review hierarchy levels, transitive relationships, and driving/dependence power.</p>
+            </div>
+            <div class="export-actions">
+              <button id="exportCsvButton" type="button">Export Model CSV</button>
+              <button id="printReportButton" class="secondary-button" type="button">Print Report</button>
+            </div>
+          </div>
+
+          <div id="hierarchyDiagnostic" class="hierarchy-diagnostic" aria-live="polite"></div>
+          <div id="resultSummary" class="interpretation-panel" aria-live="polite"></div>
+          <div id="resultMetrics" class="result-metrics"></div>
+
+          <article class="result-section">
+            <div class="result-section-header">
+              <div>
+                <h3>ISM Hierarchical Model</h3>
+                <p>Foundational driving factors appear at the bottom; more dependent factors appear toward the top.</p>
+              </div>
+              <div class="hierarchy-controls" aria-label="Hierarchy link controls">
+                <label class="toggle-control">
+                  <input id="directLinksToggle" type="checkbox" checked>
+                  <span>Show direct links</span>
+                </label>
+                <label class="toggle-control">
+                  <input id="transitiveToggle" type="checkbox">
+                  <span>Show transitive links</span>
+                </label>
+              </div>
+            </div>
+            <div id="hierarchyDiagram" class="svg-output" aria-live="polite"></div>
+            <p id="hierarchyTextSummary" class="chart-summary"></p>
+            <button id="exportSvgButton" class="secondary-button" type="button">Save Hierarchy SVG</button>
+          </article>
+
+          <article class="result-section">
+            <h3>Final Reachability Matrix</h3>
+            <p>Direct links are shown as <strong>1</strong>. Relationships added through transitivity are shown as <strong>1*</strong>.</p>
+            <div id="finalMatrixTable" class="table-wrap matrix-table-wrap"></div>
+          </article>
+
+          <article class="result-section">
+            <h3>Level Partitioning</h3>
+            <p>At each iteration, factors whose reachability set equals the intersection set are assigned to the current level and removed from the next iteration.</p>
+            <div id="partitionTable" class="table-wrap"></div>
+          </article>
+
+          <div class="result-columns">
+            <article class="result-section">
+              <h3>Driving and Dependence Power</h3>
+              <div id="powerTable" class="table-wrap"></div>
+            </article>
+            <article class="result-section">
+              <h3>MICMAC-Style Classification</h3>
+              <div id="micmacChart" class="svg-output"></div>
+              <p id="micmacSummary" class="chart-summary"></p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="about-ism">
+          <h2>About Interpretive Structural Modeling</h2>
+          <p>Interpretive Structural Modeling structures expert knowledge about contextual relationships among factors. It converts pairwise judgements into a directed reachability model, applies transitivity, and partitions factors into hierarchy levels.</p>
+          <p>ISM is useful when variables are interdependent and a team needs a transparent way to discuss which factors may act as foundational drivers. It structures judgement; it does not establish statistical or causal proof.</p>
+        </section>
+
+        <section class="panel content-section" id="guidance">
+          <h2>Guidance</h2>
+          <ol class="method-list">
+            <li>In Design, define one specific problem, its boundary, and a focused set of distinct factors at a comparable level of abstraction.</li>
+            <li>Export the questionnaire JSON and send it to a knowledgeable expert or use it in a facilitated group workshop.</li>
+            <li>In Expert Survey, import the questionnaire, judge every unique factor pair, and export the completed survey JSON. Use X only when influence is genuinely reciprocal.</li>
+            <li>In Analysis, import the completed response and review the SSIM and initial reachability matrix before applying transitivity.</li>
+            <li>Check whether base, dependent, and linkage factors make practical sense. Revisit unclear definitions or judgements when the model collapses into one level.</li>
+            <li>Use the hierarchy and MICMAC-style classification to support discussion and prioritisation, then validate proposed actions with evidence and stakeholder review.</li>
+          </ol>
+          <div class="json-workflow-guide">
+            <h3>JSON file workflow</h3>
+            <ul>
+              <li><strong>Questionnaire JSON:</strong> Created with <em>Export Questionnaire JSON</em> in Design and opened in Expert Survey.</li>
+              <li><strong>Completed survey JSON:</strong> Created with <em>Export Completed Survey JSON</em> after the expert confirms every relationship and opened in Analysis.</li>
+            </ul>
+          </div>
+          <p class="guidance-note"><strong>Multiple experts:</strong> V, A, X, and O are categorical judgements, so this version does not automatically average independent responses. Use one agreed group response or reconcile individual responses before analysis.</p>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card">
+              <span>SSIM Conversion</span>
+              <p>V creates i→j, A creates j→i, X creates both directions, and O creates neither direction. Diagonal values are set to 1.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Transitivity</span>
+              <p>If factor i reaches factor j and factor j reaches factor k, the final matrix adds an inferred i→k relationship. These links are marked separately as 1*.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Level Partitioning</span>
+              <p>Factors whose reachability set equals their reachability/antecedent intersection form the current top level, then the process repeats with the remaining factors.</p>
+            </div>
+            <div class="guidance-card">
+              <span>MICMAC-Style View</span>
+              <p>Driving and dependence power come from final-matrix row and column totals. This tool uses the model averages as transparent high/low classification boundaries.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Assumptions</span>
+              <p>Experts understand the problem context, factor definitions are distinct, and the selected directional relationships are meaningful for that context.</p>
+            </div>
+            <div class="guidance-card">
+              <span>Limitations</span>
+              <p>Results are sensitive to factor selection and expert judgement. ISM does not estimate effect size, probability, time lag, or statistical causality.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details>
+            <summary>Are the suggested factors validated for my organisation?</summary>
+            <p>No. They are illustrative starting points only. Review, rename, add, or remove factors to match your organisation or research context.</p>
+          </details>
+          <details>
+            <summary>Does the tool decide relationships automatically?</summary>
+            <p>No. Every V, A, X, or O relationship must be selected or confirmed by the user or expert group.</p>
+          </details>
+          <details>
+            <summary>Can several experts complete the questionnaire?</summary>
+            <p>Yes, but this version analyses one completed response at a time. Ask the group to agree a consensus response or reconcile separate expert responses before analysis.</p>
+          </details>
+          <details>
+            <summary>What does a transitive relationship mean?</summary>
+            <p>It is an inferred pathway added when one factor reaches another through an intermediate factor. It is not a separately entered direct judgement.</p>
+          </details>
+          <details>
+            <summary>Why does my model show only one hierarchy level?</summary>
+            <p>A single level means every factor can reach every other factor through the current direct and transitive paths. Review reciprocal X judgements and circular directional chains. Separate levels should only appear when the confirmed relationship structure supports them.</p>
+          </details>
+          <details>
+            <summary>Does high driving power prove causality?</summary>
+            <p>No. Driving power describes reachability within the expert-defined model. It does not demonstrate statistical causality or quantify the strength of an effect.</p>
+          </details>
+          <details>
+            <summary>Is my model uploaded?</summary>
+            <p>No. The tool processes factors, judgements, matrices, and exports locally in the browser without a backend or external API.</p>
+          </details>
+        </section>
+      </div>
+
+      <aside class="ism-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Interpretive Structural Modeling page sections">
+          <a href="#problem-setup">1. Design</a>
+          <a href="#relationship-entry">2. Expert Survey</a>
+          <a href="#matrix-review">3. Analysis</a>
+          <a href="#about-ism">About ISM</a>
+          <a href="#guidance">Guidance</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <script src="Interpretive_Structural_Modeling.js"></script>
+</body>
+</html>

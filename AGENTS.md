@@ -57,6 +57,7 @@ The same folder/file pattern is used for:
 - `Economic Order Quantity`
 - `Safety Stock & Reorder Point`
 - `Analytic Hierarchy Process`
+- `Interpretive Structural Modeling`
 
 `Monte Carlo Risk Simulation` follows the same static tool-page pattern but also uses
 `monte-carlo-worker.js` for background simulation.
@@ -192,6 +193,15 @@ Formatting/conventions:
 - New tool pages must use the shared content width, hero, panel, heading, spacing,
   navigation, `Why use this tool?`, methodology, guidance, and FAQ patterns before
   adding local overrides.
+- Use a full-width workflow strip for tools with genuine multi-stage journeys. Place
+  it after `Why use this tool?` and before the content/side-navigation grid so the
+  workflow does not compete with the navigation panel.
+- Workflow stages should use the shared ATH card treatment: numbered stage, concise
+  title, one-line purpose, blue active state, green completed state, and
+  `aria-current="step"`. Keep state synchronized with actual user progress.
+- Keep workflow cards in one row where they remain readable, wrap them on tablets,
+  and stack them on phones. Do not force a horizontally scrolling workflow or add a
+  workflow strip to a simple tool that does not have distinct stages.
 - Avoid broad element selectors in tool-specific CSS when a page or component class
   can scope the rule.
 - Use `const`/`let`, not `var`.
@@ -316,6 +326,7 @@ Available tools should be represented consistently:
 - Safety Stock & Reorder Point
 - Analytic Hierarchy Process
 - Monte Carlo Risk Simulation
+- Interpretive Structural Modeling
 
 ## Current Tool-Specific Rules
 
@@ -383,6 +394,34 @@ Available tools should be represented consistently:
   and pair them with textual percentile and range summaries.
 - Do not present simulated precision as certainty. Explain that results depend on the
   selected distributions, assumptions, correlations, and model structure.
+
+### Interpretive Structural Modeling
+
+- Present ISM as a general-purpose decision-science method. Supply-chain problem
+  scenarios are optional sample templates, not the boundary of the tool.
+- Start with a blank custom model. Loading a sample template must be an explicit user
+  action so illustrative factors are not mistaken for a default or validated model.
+- Preserve the three-stage `Design -> Expert Survey -> Analysis` workflow. Questionnaire
+  JSON contains the problem and factors, and completed survey JSON contains the
+  confirmed relationships. Do not reintroduce a full-project JSON save/resume flow
+  unless the user explicitly requests reusable editing state before final analysis.
+- Do not automatically average independent ISM responses. `V`, `A`, `X`, and `O` are
+  categorical judgements, so use a consensus response or an explicitly reconciled
+  response unless a documented aggregation method is added and validated.
+- Treat predefined supply-chain factors as illustrative starting points, not universal
+  or validated factors. Users must be able to edit, reorder, add, and remove them.
+- Never infer pairwise relationships automatically. The user must define or confirm
+  every `V`, `A`, `X`, or `O` judgement.
+- Build the initial reachability matrix directly from confirmed SSIM judgements, then
+  distinguish transitive links from direct links in matrix and hierarchy views.
+- Place foundational driving factors at the bottom of the hierarchy and highly
+  dependent factors at the top.
+- Report reachability, antecedent, intersection, level partitioning, driving power,
+  dependence power, and MICMAC-style classification with textual interpretation.
+- State that ISM structures expert judgement and does not establish statistical
+  causality. Do not present a hierarchy as objectively validated evidence.
+- Validate imported model JSON and keep the editable workflow limited to 12 factors
+  unless performance and mobile usability are deliberately redesigned and tested.
 
 ## SEO Requirements
 

@@ -62,13 +62,13 @@
 }
 
 .workflow-strip {
-  padding: .75rem 1rem !important;
+  padding: .65rem .8rem !important;
 }
 
 .workflow-steps {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: .6rem;
+  gap: .55rem;
   padding: 0;
   margin: 0;
   list-style: none;
@@ -76,16 +76,32 @@
 
 .workflow-steps li {
   position: relative;
-  min-height: 40px;
+  min-height: 70px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: .5rem;
-  padding: .4rem .55rem;
-  border: 0;
-  background: transparent;
+  padding: .45rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
   color: var(--text-secondary);
-  font-size: .8rem;
-  font-weight: 850;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.workflow-steps li strong {
+  color: var(--navy-950);
+  font-size: .86rem;
+}
+
+.workflow-steps li small {
+  flex-basis: 100%;
+  padding-left: 2.15rem;
+  color: var(--text-secondary);
+  font-size: .72rem;
+  font-weight: 550;
+  line-height: 1.35;
 }
 
 .workflow-steps li span {
@@ -105,8 +121,8 @@
   content: "";
   position: absolute;
   top: 50%;
-  right: -.45rem;
-  width: .9rem;
+  right: -.2rem;
+  width: .4rem;
   height: 1px;
   background: var(--border);
 }
@@ -841,6 +857,14 @@ th {
     grid-template-columns: 1fr;
   }
 
+  .workflow-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workflow-steps li:not(:last-child)::after {
+    display: none;
+  }
+
   .monte-carlo-side-nav {
     position: static;
   }
@@ -866,14 +890,12 @@ th {
   }
 
   .workflow-steps {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
+    grid-template-columns: 1fr;
+    gap: .4rem;
   }
 
   .workflow-steps li {
-    min-width: 150px;
-    scroll-snap-align: start;
+    min-height: 48px;
   }
 
   .discrete-row {

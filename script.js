@@ -4,6 +4,7 @@ const icons = {
   settings: '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.2.4.5.75.9 1 .32.2.7.3 1.1.3h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-2 1Z"/></svg>',
   calculator: '<svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>',
   shield: '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/></svg>',
+  decision: '<svg aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="5" rx="1"/><rect x="3" y="17" width="6" height="5" rx="1"/><rect x="15" y="17" width="6" height="5" rx="1"/><path d="M12 7v4M6 17v-3h12v3"/></svg>',
   book: '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5Z"/></svg>',
   compare: '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 3v18M16 3v18"/><path d="M3 8h10M11 16h10"/></svg>',
   bookmark: '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg>'
@@ -331,6 +332,126 @@ const problems = [
     title: 'How can I model best case, likely case, and worst case expert estimates?',
     detail: 'Recommended tool: Monte Carlo Risk Simulation',
     href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+  },
+  {
+    title: 'How can I structure relationships among complex factors?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which factors are foundational drivers and which are dependent outcomes?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'How can I turn expert relationship judgements into a structural hierarchy?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which supply-chain barriers have the strongest driving power?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'How do supply-chain resilience barriers influence one another?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which factors form the foundation of a supply-chain implementation hierarchy?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which barriers are dependent outcomes rather than root drivers?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'How can I structure expert judgements about relationships among supply-chain factors?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which digital or sustainable supply-chain barriers need early management attention?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'How can I build an ISM hierarchy from expert-defined V, A, X, and O relationships?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which supply-chain factors are autonomous, dependent, linkage, or driving factors?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which supplier selection barriers influence the rest of the evaluation process?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'What are the foundational barriers to sustainable supply-chain implementation?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'How are digital supply-chain adoption barriers structurally connected?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which circular supply-chain barriers should be addressed first?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which green procurement barriers drive other implementation difficulties?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'How do Industry 4.0 adoption challenges influence one another?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which blockchain adoption barriers sit at the base of the supply-chain hierarchy?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'How are supply-chain risk factors linked through direct and transitive relationships?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which logistics outsourcing barriers require early management action?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'What drives last-mile delivery challenges in our operating context?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which inventory management barriers are root drivers and which are outcomes?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'How should reverse logistics barriers be arranged in an implementation hierarchy?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which cold-chain implementation barriers have the greatest driving power?',
+    detail: 'Recommended tool: Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
   }
 ];
 
@@ -340,9 +461,9 @@ const categories = [
   { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Expanding soon', icon: 'settings' },
   { title: 'Statistics', benefit: 'Analyze distributions, uncertainty, samples, and probability-driven outcomes.', count: '1 tool available', icon: 'compare' },
   { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: '1 tool available', icon: 'calculator' },
-  { title: 'Quality and Engineering', benefit: 'Measure process capability, reliability, variation, and performance.', count: 'Expanding soon', icon: 'shield' },
+  { title: 'Decision Science', benefit: 'Structure complex decisions, expert judgements, relationships, priorities, and trade-offs.', count: '2 tools available', icon: 'decision' },
   { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '3 tools available', icon: 'chart' }
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '4 tools available', icon: 'chart' }
 ];
 
 const tools = [
@@ -408,12 +529,12 @@ const tools = [
   {
     name: 'Analytic Hierarchy Process',
     description: 'Design pairwise questionnaires, collect expert judgements, and rank alternatives across multiple criteria.',
-    category: 'Business Analysis',
+    category: 'Decision Science',
     input: 'Criteria, alternatives, expert pairwise comparisons',
     output: 'Criteria weights, consistency ratios, and ranked alternatives',
     cta: 'Open Analytic Hierarchy Process',
     href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html',
-    categories: ['Business Analysis']
+    categories: ['Decision Science', 'Business Analysis']
   },
   {
     name: 'Gantt Chart Planner',
@@ -433,6 +554,16 @@ const tools = [
     cta: 'Open Monte Carlo Simulation',
     href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html',
     categories: ['Statistics', 'Business Analysis']
+  },
+  {
+    name: 'Interpretive Structural Modeling',
+    description: 'Structure expert-defined relationships among complex factors and identify hierarchy levels, drivers, and dependent outcomes.',
+    category: 'Decision Science',
+    input: 'Editable factors and V, A, X, or O expert relationships',
+    output: 'SSIM, reachability matrices, ISM hierarchy, and MICMAC-style classification',
+    cta: 'Open Interpretive Structural Modeling',
+    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html',
+    categories: ['Decision Science', 'Business Analysis']
   }
 ];
 

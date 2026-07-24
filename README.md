@@ -14,6 +14,8 @@ Website: https://analyticaltoolshub.com/
 - Economic Order Quantity
 - Safety Stock & Reorder Point
 - Analytic Hierarchy Process
+- Monte Carlo Risk Simulation
+- Interpretive Structural Modeling
 
 ## Run Locally
 
