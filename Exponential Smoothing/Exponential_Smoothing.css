@@ -219,6 +219,83 @@
     line-height: 1.45;
 }
 
+.forecast-import-guidance {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+    border-left: 3px solid var(--blue-600);
+    border-radius: 0 8px 8px 0;
+    color: var(--text-secondary);
+    background: var(--surface);
+}
+
+.forecast-import-guidance-heading {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.forecast-import-guidance h3 {
+    margin: 0;
+    color: var(--navy-950);
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.35;
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: var(--navy-950);
+}
+
+.forecast-import-guidance p,
+.forecast-import-column-guide,
+.forecast-import-column-guide dd {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.55;
+}
+
+.forecast-import-column-guide {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.forecast-import-column-guide > div {
+    padding: 0 0.9rem;
+    border-left: 1px solid var(--border);
+}
+
+.forecast-import-column-guide > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+}
+
+.forecast-import-column-guide > div:last-child {
+    padding-right: 0;
+}
+
+.forecast-import-column-guide dt {
+    margin-bottom: 0.2rem;
+    color: var(--navy-950);
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.forecast-import-column-guide dd {
+    margin: 0;
+}
+
+.forecast-import-example {
+    padding: 0.55rem 0.7rem;
+    border-radius: 6px;
+    color: var(--navy-800) !important;
+    background: var(--blue-100);
+}
+
+.forecast-import-next-step {
+    color: var(--navy-800) !important;
+}
+
 #exampleButton {
     justify-self: start;
 }
@@ -540,6 +617,27 @@ td {
 
     .forecast-side-nav {
         display: none;
+    }
+
+    .forecast-import-column-guide {
+        grid-template-columns: 1fr;
+    }
+
+    .forecast-import-column-guide > div,
+    .forecast-import-column-guide > div:first-child,
+    .forecast-import-column-guide > div:last-child {
+        padding: 0.65rem 0;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+    }
+
+    .forecast-import-column-guide > div:first-child {
+        padding-top: 0;
+        border-top: 0;
+    }
+
+    .forecast-import-column-guide > div:last-child {
+        padding-bottom: 0;
     }
 }
 

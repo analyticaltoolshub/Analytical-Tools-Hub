@@ -225,6 +225,84 @@ html {
   line-height: 1.45;
 }
 
+.abc-page .abc-import-guidance {
+  display: grid;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--blue-600);
+  border-radius: 0 8px 8px 0;
+  color: var(--text-secondary);
+  background: var(--surface);
+}
+
+.abc-page .abc-import-guidance-heading {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.abc-page .abc-import-guidance h3 {
+  margin: 0;
+  color: var(--navy-950) !important;
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: var(--navy-950) !important;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.abc-page .abc-import-guidance p,
+.abc-page .abc-import-column-guide,
+.abc-page .abc-import-column-guide dd {
+  margin: 0;
+  color: var(--text-secondary) !important;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.abc-page .abc-import-column-guide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.abc-page .abc-import-column-guide > div {
+  padding: 0 0.75rem;
+  border-left: 1px solid var(--border);
+}
+
+.abc-page .abc-import-column-guide > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.abc-page .abc-import-column-guide > div:last-child {
+  padding-right: 0;
+}
+
+.abc-page .abc-import-column-guide dt {
+  margin-bottom: 0.2rem;
+  color: var(--navy-950);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.abc-page .abc-import-column-guide dd {
+  margin: 0;
+}
+
+.abc-page .abc-import-example {
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  color: var(--navy-800) !important;
+  background: var(--blue-100);
+}
+
+.abc-page .abc-import-next-step {
+  color: var(--navy-800) !important;
+}
+
 .abc-page .abc-threshold-warning {
   padding: 0.75rem 0.9rem;
   color: #fecdd3;
@@ -967,6 +1045,27 @@ html {
 
   .abc-page .abc-side-nav {
     display: none;
+  }
+
+  .abc-page .abc-import-column-guide {
+    grid-template-columns: 1fr;
+  }
+
+  .abc-page .abc-import-column-guide > div,
+  .abc-page .abc-import-column-guide > div:first-child,
+  .abc-page .abc-import-column-guide > div:last-child {
+    padding: 0.65rem 0;
+    border-top: 1px solid var(--border);
+    border-left: 0;
+  }
+
+  .abc-page .abc-import-column-guide > div:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .abc-page .abc-import-column-guide > div:last-child {
+    padding-bottom: 0;
   }
 
   /* Reduce chart container height on small screens */

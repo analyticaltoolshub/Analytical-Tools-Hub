@@ -232,11 +232,6 @@
   line-height: 1.55;
 }
 
-.model-grid label:last-child {
-  grid-column: 1 / -1;
-  min-height: 96px;
-}
-
 .model-grid small,
 .formula-builder p,
 .distribution-help,

@@ -11,7 +11,7 @@ const distributionGuidance = {
 
 const templates = {
   profit: {
-    name: 'Profit and Break-Even Risk',
+    name: 'Profit Target Risk',
     outputName: 'Annual Profit',
     unitType: 'currency',
     unitSymbol: '£',
@@ -54,19 +54,33 @@ const templates = {
       { name: 'Opening Inventory', id: 'Opening_Inventory', unit: 'units', distribution: 'uniform', params: { min: 700, max: 1300 }, description: 'Opening inventory uncertainty.' }
     ]
   },
-  duration: {
-    name: 'Project Completion Risk',
-    outputName: 'Total Duration',
-    unitType: 'days',
-    unitSymbol: 'days',
-    formula: 'Planning_Duration + Procurement_Duration + Implementation_Duration + Testing_Duration',
-    targetValue: 180,
+  leadTimeStockout: {
+    name: 'Supplier Lead-Time and Stockout Risk',
+    outputName: 'Inventory Before Replenishment',
+    unitType: 'units',
+    unitSymbol: 'units',
+    formula: 'Opening_Inventory - Daily_Demand * Supplier_Lead_Time',
+    targetValue: 0,
+    targetCondition: 'gte',
+    variables: [
+      { name: 'Opening Inventory', id: 'Opening_Inventory', unit: 'units', distribution: 'uniform', params: { min: 900, max: 1100 }, description: 'Usable inventory available when the order is placed.' },
+      { name: 'Daily Demand', id: 'Daily_Demand', unit: 'units/day', distribution: 'normal', params: { mean: 85, sd: 15, min: 0, max: '' }, description: 'Demand expected per day during supplier lead time.' },
+      { name: 'Supplier Lead Time', id: 'Supplier_Lead_Time', unit: 'days', distribution: 'triangular', params: { min: 7, mode: 10, max: 18 }, description: 'Elapsed time from ordering until replenishment is available.' }
+    ]
+  },
+  transportCost: {
+    name: 'Transportation Cost Risk',
+    outputName: 'Total Shipment Cost',
+    unitType: 'currency',
+    unitSymbol: '£',
+    formula: 'Base_Freight + Fuel_Surcharge + Accessorial_Cost + Delay_Cost',
+    targetValue: 6500,
     targetCondition: 'lte',
     variables: [
-      { name: 'Planning Duration', id: 'Planning_Duration', unit: 'days', distribution: 'triangular', params: { min: 18, mode: 25, max: 36 }, description: 'Planning phase duration.' },
-      { name: 'Procurement Duration', id: 'Procurement_Duration', unit: 'days', distribution: 'lognormal', params: { meanLog: 3.55, sdLog: 0.22, max: 75 }, description: 'Right-skewed procurement lead time.' },
-      { name: 'Implementation Duration', id: 'Implementation_Duration', unit: 'days', distribution: 'triangular', params: { min: 70, mode: 90, max: 128 }, description: 'Implementation phase estimate.' },
-      { name: 'Testing Duration', id: 'Testing_Duration', unit: 'days', distribution: 'uniform', params: { min: 18, max: 34 }, description: 'Testing and stabilization duration.' }
+      { name: 'Base Freight', id: 'Base_Freight', unit: '£', distribution: 'triangular', params: { min: 3800, mode: 4200, max: 5000 }, description: 'Core carrier charge for the shipment.' },
+      { name: 'Fuel Surcharge', id: 'Fuel_Surcharge', unit: '£', distribution: 'triangular', params: { min: 450, mode: 650, max: 1000 }, description: 'Variable fuel-related surcharge.' },
+      { name: 'Accessorial Cost', id: 'Accessorial_Cost', unit: '£', distribution: 'discrete', discrete: [{ value: 0, probability: 0.45 }, { value: 250, probability: 0.35 }, { value: 600, probability: 0.2 }], description: 'Possible loading, waiting-time, redelivery, or special-handling charges.' },
+      { name: 'Delay Cost', id: 'Delay_Cost', unit: '£', distribution: 'discrete', discrete: [{ value: 0, probability: 0.7 }, { value: 500, probability: 0.2 }, { value: 1500, probability: 0.1 }], description: 'Operational cost arising from a delayed shipment.' }
     ]
   },
   custom: {
@@ -556,7 +570,7 @@ function renderResults(result) {
 function renderMetricCards(result) {
   const s = result.summary;
   const templateKey = state.lastConfig?.templateKey;
-  const usesDownside = templateKey === 'profit' || templateKey === 'inventory';
+  const usesDownside = templateKey === 'profit' || templateKey === 'inventory' || templateKey === 'leadTimeStockout';
   const planningKey = usesDownside ? 'P10' : 'P90';
   const planningLabel = usesDownside ? 'Downside planning value (P10)' : 'Conservative planning value (P90)';
   const mainDriver = result.sensitivity[0]?.name || 'No clear driver';
@@ -677,11 +691,17 @@ function renderInterpretation(result) {
         ? `Validate the demand and replenishment assumptions, then monitor ${driver} during the review period.`
         : `Test a higher replenishment quantity, earlier order timing, or a demand-risk response before accepting the inventory plan.`
     },
-    duration: {
-      planning: `Use P90 (${formatValue(result.percentiles.P90)}) as a conservative completion-duration reference under the current activity estimates.`,
+    leadTimeStockout: {
+      planning: `Use P10 (${formatValue(result.percentiles.P10)}) to review downside inventory exposure when supplier lead time and daily demand vary.`,
       action: probability >= 80
-        ? `Protect the schedule by monitoring ${driver} and retaining time contingency around the main driver.`
-        : `Review the deadline, activity estimates, and mitigation options for ${driver} before committing the schedule.`
+        ? `Validate the assumptions for ${driver} and confirm that the remaining inventory at a downside percentile is operationally acceptable.`
+        : `Review the reorder timing, available inventory, supplier lead-time mitigation, and the assumption for ${driver} before accepting the replenishment plan.`
+    },
+    transportCost: {
+      planning: `Use P90 (${formatValue(result.percentiles.P90)}) as a conservative shipment-cost reference under the current freight and exception assumptions.`,
+      action: probability >= 80
+        ? `Confirm the cost assumptions for ${driver} and retain appropriate allowance for accessorial or delay exposure.`
+        : `Review the transport budget, carrier terms, and the assumption for ${driver}, then test routing or service alternatives before booking the shipment.`
     },
     custom: {
       planning: `Review the median and central outcome range together; select a planning percentile that matches whether higher or lower outcomes are more conservative.`,

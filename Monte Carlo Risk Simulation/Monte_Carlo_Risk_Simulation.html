@@ -106,7 +106,7 @@
         </div>
         <div class="guidance-card">
           <span>Example Input</span>
-          <p>The default profit-risk example uses triangular price and cost estimates, normal demand uncertainty, and a fixed-cost range.</p>
+          <p>The default profit-target example uses triangular price and cost estimates, normal demand uncertainty, and a fixed-cost range.</p>
         </div>
         <div class="guidance-card">
           <span>Sample Output Interpretation</span>
@@ -159,10 +159,11 @@
           </div>
           <fieldset class="model-grid">
             <legend class="sr-only">Simulation model template</legend>
-            <label><input type="radio" name="modelTemplate" value="profit" checked> <span><strong>Profit and Break-Even Risk</strong><small>Test whether uncertain demand, price, and cost can achieve a profit target.</small></span></label>
+            <label><input type="radio" name="modelTemplate" value="profit" checked> <span><strong>Profit Target Risk</strong><small>Test whether uncertain demand, price, and cost can achieve a defined profit target.</small></span></label>
             <label><input type="radio" name="modelTemplate" value="cost"> <span><strong>Project Cost Risk</strong><small>Estimate the probability of completing a project within budget.</small></span></label>
             <label><input type="radio" name="modelTemplate" value="inventory"> <span><strong>Demand and Inventory Risk</strong><small>Assess stockout exposure when demand and inventory inputs vary.</small></span></label>
-            <label><input type="radio" name="modelTemplate" value="duration"> <span><strong>Project Completion Risk</strong><small>Estimate the likelihood of completing project activities on time.</small></span></label>
+            <label><input type="radio" name="modelTemplate" value="leadTimeStockout"> <span><strong>Supplier Lead-Time and Stockout Risk</strong><small>Estimate whether available inventory will cover demand until replenishment arrives.</small></span></label>
+            <label><input type="radio" name="modelTemplate" value="transportCost"> <span><strong>Transportation Cost Risk</strong><small>Estimate total shipment cost and the probability of remaining within budget.</small></span></label>
             <label><input type="radio" name="modelTemplate" value="custom"> <span><strong>Custom Model</strong><small>Add variables and combine them with a controlled arithmetic formula.</small></span></label>
           </fieldset>
           <div class="privacy-note" role="note">Your model inputs and simulation results remain in your browser and are not uploaded to a server.</div>
@@ -389,7 +390,7 @@
             </div>
             <div class="guidance-card">
               <span>Review Planning Percentiles</span>
-              <p>For cost and duration, higher percentiles can support conservative planning. For profit or remaining inventory, lower percentiles may better represent downside exposure.</p>
+              <p>For cost and lead-time outcomes, higher percentiles can support conservative planning. For profit or remaining inventory, lower percentiles may better represent downside exposure.</p>
             </div>
             <div class="guidance-card">
               <span>Test the Main Driver</span>
@@ -424,7 +425,7 @@
           <h2>FAQ</h2>
           <details><summary>How many iterations should I use?</summary><p>Start with 10,000 iterations for practical analysis. Increase the count when the output remains unstable or when tail percentiles are important, while recognising that more iterations do not correct weak input assumptions.</p></details>
           <details><summary>Which distribution should I choose?</summary><p>Choose a distribution that matches the available evidence and the shape of the uncertainty. Use the distribution helper above the inputs and document the reason for each choice.</p></details>
-          <details><summary>What does P90 mean?</summary><p>P90 is the value at or below which 90% of simulated outcomes fall. For cost or duration it can be a conservative planning value; for profit, a lower percentile such as P10 may better describe downside exposure.</p></details>
+          <details><summary>What does P90 mean?</summary><p>P90 is the value at or below which 90% of simulated outcomes fall. For cost or lead-time outcomes it can be a conservative planning value; for profit, a lower percentile such as P10 may better describe downside exposure.</p></details>
           <details><summary>Is the driver analysis a sensitivity analysis?</summary><p>The tool currently uses Pearson correlation to rank linear relationships between sampled inputs and the simulated outcome. It is a useful driver screen, but it is not a complete global sensitivity analysis.</p></details>
           <details><summary>Are my inputs uploaded?</summary><p>No. The current simulation, scenario comparison, and exports are processed locally in your browser.</p></details>
         </section>

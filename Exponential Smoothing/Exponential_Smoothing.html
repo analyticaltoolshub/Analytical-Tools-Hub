@@ -112,6 +112,29 @@
                 <section class="panel data-import-panel" id="forecast-input">
                     <h2>1. Input Data / Data Import</h2>
 
+                    <div class="forecast-import-guidance" role="note" aria-labelledby="forecast-import-guidance-title">
+                        <div class="forecast-import-guidance-heading">
+                            <h3 id="forecast-import-guidance-title">Prepare your demand-history file</h3>
+                            <p>Upload an Excel or CSV file with a header row and one row for each historical period, ordered from oldest to newest.</p>
+                        </div>
+                        <dl class="forecast-import-column-guide">
+                            <div>
+                                <dt>Period or Date</dt>
+                                <dd>Recommended for readability and checking sequence. Keep periods regular, such as one row per week or month.</dd>
+                            </div>
+                            <div>
+                                <dt>Demand Value</dt>
+                                <dd>A required numeric column containing demand, sales, units, quantity, or volume for each period.</dd>
+                            </div>
+                            <div>
+                                <dt>History Length</dt>
+                                <dd>At least 2 numeric observations are required. Use enough complete seasonal cycles when applying Holt-Winters seasonality.</dd>
+                            </div>
+                        </dl>
+                        <p class="forecast-import-example"><strong>Example row:</strong> 2026-01 | 850</p>
+                        <p class="forecast-import-next-step"><strong>What ATH does next:</strong> Upload the file and map the numeric demand column. ATH reads valid values in row order, places them into Quick Manual Entry for review, and applies the smoothing method and parameters you select.</p>
+                    </div>
+
                     <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Upload Excel or CSV demand data file">
                         <svg class="upload-icon" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
