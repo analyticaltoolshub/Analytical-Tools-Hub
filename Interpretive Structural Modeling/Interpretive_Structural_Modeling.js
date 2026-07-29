@@ -3,18 +3,19 @@ const MAX_FACTORS = 12;
 const VALID_SYMBOLS = new Set(["V", "A", "X", "O"]);
 
 const multiLevelDemonstration = {
-  title: "Illustrative supply-chain resilience hierarchy",
-  description: "A synthetic teaching example showing how directional expert judgements can produce a multi-level ISM structure. Review every relationship before adapting it to a real decision.",
+  title: "Electronics manufacturer supply continuity barriers",
+  description: "Illustrative completed response for a multi-site electronics manufacturer that depends on specialised components and contract suppliers. The model examines organisational and network conditions that can delay disruption response and service recovery. Its relationships are synthetic teaching judgements, not validated evidence; review every factor and relationship before using the structure in practice.",
+  scope: "Use this completed example to inspect a multi-level hierarchy and the full analysis workflow. It is not a reusable industry benchmark.",
   factors: [
-    ["F1", "Weak risk governance", "Risk ownership, escalation, and response responsibilities are unclear."],
-    ["F2", "Fragmented risk data", "Operational and supplier risk information is dispersed across disconnected systems."],
-    ["F3", "Limited supplier collaboration", "Suppliers are not consistently involved in risk sensing and continuity planning."],
-    ["F4", "Slow risk escalation", "Disruption signals do not reach accountable decision-makers quickly enough."],
-    ["F5", "Poor end-to-end visibility", "Material, capacity, and shipment status is not visible across supply tiers."],
-    ["F6", "Insufficient buffer capacity", "Inventory, production, transport, or labour buffers cannot absorb disruption."],
-    ["F7", "Untested continuity plans", "Response plans have not been exercised against realistic disruption scenarios."],
-    ["F8", "Delayed disruption response", "Containment and recovery actions begin too late to limit operational impact."],
-    ["F9", "Extended recovery time", "The supply chain takes longer than required to restore stable service."]
+    ["F1", "Fragmented risk ownership", "Business units and sites do not share clear accountability for prevention, escalation, and recovery decisions, which delays coordinated action."],
+    ["F2", "Delayed supplier risk data", "Capacity, material, and shipment exceptions arrive late or through disconnected channels, reducing the time available to respond."],
+    ["F3", "Limited sub-tier visibility", "Critical dependencies below direct suppliers are not mapped, so hidden concentration and disruption exposure remain unidentified."],
+    ["F4", "Weak supplier contingency alignment", "Critical suppliers do not routinely align continuity plans, escalation contacts, and recovery priorities with the manufacturer."],
+    ["F5", "Slow disruption escalation", "Confirmed disruption signals do not reach accountable decision-makers within defined response times."],
+    ["F6", "Constrained alternate capacity", "Approved suppliers, production lines, and logistics routes cannot provide enough short-notice replacement capacity."],
+    ["F7", "Untested recovery playbooks", "Cross-functional continuity procedures have not been exercised against realistic component, site, or transport disruption scenarios."],
+    ["F8", "Delayed containment action", "Allocation, substitution, rerouting, and customer-priority decisions begin too late to contain service impact."],
+    ["F9", "Prolonged service recovery", "Production and customer service take longer than the agreed recovery objective to return to stable performance."]
   ],
   directLinks: [
     ["F1", "F3"],
@@ -36,211 +37,226 @@ const multiLevelDemonstration = {
 
 const problemTemplates = {
   "supplier-selection": {
-    title: "Supplier selection barriers",
-    description: "Explore barriers that may prevent a robust and transparent supplier selection process.",
+    title: "Supplier selection decision barriers",
+    description: "Identify the organisational, information, and evaluation barriers that can weaken a sourcing team's selection of a supplier for a material, service, or outsourced capability. Use the model to explore why evidence is incomplete, stakeholders reach different conclusions, or short-term price dominates total value and risk.",
+    scope: "Use for barriers within the supplier evaluation and award process. Use the Kraljic template or tool for portfolio positioning, and the AHP tool when the objective is to rank named supplier alternatives.",
     factors: [
-      ["F1", "Incomplete supplier data", "Limited or inconsistent evidence about supplier capability and performance."],
-      ["F2", "Unclear evaluation criteria", "Decision criteria are ambiguous, overlapping, or not agreed."],
-      ["F3", "Stakeholder goal conflict", "Functions place different priorities on cost, quality, delivery, and risk."],
-      ["F4", "Weak total-cost visibility", "Landed, lifecycle, and switching costs are not fully understood."],
-      ["F5", "Limited risk assessment", "Financial, geopolitical, capacity, and continuity risks are insufficiently assessed."],
-      ["F6", "Supplier capacity uncertainty", "Available capacity and scalability are difficult to verify."],
-      ["F7", "Poor cross-functional governance", "Roles, approvals, and decision ownership are fragmented."],
-      ["F8", "Short-term price focus", "Immediate price receives more weight than resilience and long-term value."]
+      ["F1", "Incomplete supplier evidence", "Audited evidence on capability, quality, delivery, financial health, and compliance is incomplete or inconsistent, weakening comparison between bidders."],
+      ["F2", "Ambiguous requirements", "Technical, service, volume, and compliance requirements are not sufficiently specific, so suppliers respond to different interpretations."],
+      ["F3", "Misaligned evaluation criteria", "Procurement, operations, quality, finance, and engineering do not agree on criteria or priorities, producing inconsistent scoring."],
+      ["F4", "Incomplete total-cost analysis", "Price is visible but logistics, quality failure, inventory, transition, tooling, and exit costs are not consistently included."],
+      ["F5", "Weak supplier due diligence", "Financial, capacity, continuity, cyber, geopolitical, and compliance exposures are not examined to a depth proportionate to the award."],
+      ["F6", "Unverified capacity capability", "Quoted capacity, ramp-up capability, bottlenecks, and surge flexibility have not been validated against expected demand."],
+      ["F7", "Unclear decision governance", "Accountability for evaluation, challenge, approval, and conflict resolution is unclear, slowing or distorting the award decision."],
+      ["F8", "Short-term price bias", "Unit price is given disproportionate influence over quality, resilience, service, innovation, and lifecycle value."]
     ]
   },
   resilience: {
     title: "Supply-chain resilience barriers",
-    description: "Structure the organisational and network barriers that can limit preparation, response, and recovery.",
+    description: "Examine the organisational and network conditions that reduce the ability to anticipate disruptions, absorb operational impact, respond quickly, and restore supply. Use this template for resilience capability improvement rather than for cataloguing individual risk events.",
+    scope: "Focuses on preparedness, response, and recovery capability. Use Supply-chain risk exposure drivers when the question concerns the sources of disruption exposure.",
     factors: [
-      ["F1", "Limited end-to-end visibility", "Critical material, capacity, and shipment status is not visible across tiers."],
-      ["F2", "Single-source dependency", "Critical supply relies on one source or one geographic region."],
-      ["F3", "Weak risk governance", "Risk ownership, escalation, and response responsibilities are unclear."],
-      ["F4", "Insufficient buffer capacity", "Inventory, production, transport, or labour buffers are inadequate."],
-      ["F5", "Poor supplier collaboration", "Suppliers are not involved in risk sensing or continuity planning."],
-      ["F6", "Fragmented data", "Risk and operational data is dispersed across incompatible systems."],
-      ["F7", "Slow decision escalation", "Signals do not reach decision-makers quickly enough during disruption."],
-      ["F8", "Untested continuity plans", "Response plans have not been exercised against realistic scenarios."],
-      ["F9", "Limited recovery funding", "Financial resources for mitigation and recovery are constrained."]
+      ["F1", "Limited multi-tier visibility", "Critical materials, sub-tier dependencies, capacity, and shipment status are not visible early enough to support preventive action."],
+      ["F2", "Concentrated supply dependency", "Critical supply depends on one supplier, site, technology, route, or geographic region, limiting viable alternatives during disruption."],
+      ["F3", "Weak resilience governance", "Risk ownership, escalation thresholds, decision rights, and recovery priorities are not clearly assigned across functions."],
+      ["F4", "Insufficient operational buffers", "Inventory, capacity, labour, tooling, or transport buffers are too small or poorly positioned to absorb disruption."],
+      ["F5", "Limited supplier continuity collaboration", "Critical suppliers do not routinely share risk signals, continuity plans, recovery assumptions, or escalation contacts."],
+      ["F6", "Fragmented risk information", "Supplier, logistics, demand, and operational risk data is dispersed across systems and cannot be combined into a timely view."],
+      ["F7", "Slow disruption escalation", "Warning signals and confirmed exceptions do not reach accountable decision-makers within defined response times."],
+      ["F8", "Untested continuity arrangements", "Response plans, alternate sources, substitutions, and recovery procedures have not been exercised under realistic conditions."],
+      ["F9", "Constrained recovery resources", "Funding, people, technical support, and emergency procurement authority are unavailable when recovery actions must begin."]
     ]
   },
   sustainable: {
     title: "Sustainable supply-chain implementation barriers",
-    description: "Explore barriers to embedding environmental and social considerations across supply-chain decisions.",
+    description: "Explore why environmental and social objectives are not consistently embedded across product design, sourcing, manufacturing, logistics, supplier development, and performance management. Use the model to identify system-wide implementation barriers rather than evaluate one procurement event.",
+    scope: "Covers end-to-end environmental and social implementation. Use Green procurement barriers for the narrower sourcing-policy and supplier-selection process.",
     factors: [
-      ["F1", "Limited leadership commitment", "Sustainability is not consistently reflected in priorities and decisions."],
-      ["F2", "Unclear sustainability metrics", "Targets and performance measures are incomplete or inconsistent."],
-      ["F3", "Supplier capability gaps", "Suppliers lack knowledge, technology, or resources to meet requirements."],
-      ["F4", "High transition cost", "Implementation requires investment with uncertain short-term returns."],
-      ["F5", "Weak traceability", "Material origin and environmental or social impacts cannot be verified."],
-      ["F6", "Conflicting commercial priorities", "Cost and service pressures override sustainability objectives."],
-      ["F7", "Regulatory complexity", "Requirements differ across products, markets, and jurisdictions."],
-      ["F8", "Limited cross-functional ownership", "Responsibility is dispersed across procurement, operations, and compliance."],
-      ["F9", "Data quality limitations", "Emissions, waste, and supplier performance data is incomplete."]
+      ["F1", "Weak executive sponsorship", "Leaders do not translate sustainability commitments into operating priorities, investment decisions, or accountable performance objectives."],
+      ["F2", "Inconsistent performance measures", "Environmental and social targets, boundaries, baselines, and calculation methods differ across functions and suppliers."],
+      ["F3", "Limited supplier transition capability", "Suppliers lack the skills, technology, finance, or process maturity needed to meet new environmental and social requirements."],
+      ["F4", "Constrained transition investment", "Capital and operating funds for cleaner technology, traceability, redesign, and supplier development compete with short-term priorities."],
+      ["F5", "Insufficient value-chain traceability", "Material origin, labour conditions, emissions, and environmental impacts cannot be reliably traced across supply tiers."],
+      ["F6", "Short-term commercial pressure", "Price, margin, availability, and delivery targets repeatedly take precedence over longer-term sustainability outcomes."],
+      ["F7", "Complex compliance landscape", "Different product, customer, reporting, and jurisdictional requirements create uncertainty and duplicated implementation effort."],
+      ["F8", "Fragmented functional accountability", "Procurement, design, operations, logistics, finance, and compliance do not share clear ownership for end-to-end outcomes."],
+      ["F9", "Unreliable sustainability data", "Supplier, emissions, waste, energy, and social-performance data is incomplete, inconsistent, or difficult to verify."]
     ]
   },
   digital: {
     title: "Digital supply-chain adoption barriers",
-    description: "Structure the barriers that can slow adoption of connected planning, visibility, and automation.",
+    description: "Identify barriers to adopting connected planning, control-tower visibility, master-data integration, workflow automation, and digital collaboration across the supply network. Use this template for enterprise and inter-organisational information flows rather than shop-floor automation.",
+    scope: "Covers planning, visibility, data integration, and partner connectivity across the supply chain. Use Industry 4.0 adoption challenges for connected manufacturing assets and factory automation.",
     factors: [
-      ["F1", "Legacy system constraints", "Existing platforms are difficult to integrate or extend."],
-      ["F2", "Poor master data quality", "Product, supplier, inventory, and location data is unreliable."],
-      ["F3", "Skills shortage", "Teams lack digital, analytical, or implementation capability."],
-      ["F4", "Unclear business case", "Expected benefits, costs, and decision ownership are not defined."],
-      ["F5", "Cybersecurity concerns", "Connected systems increase perceived security and privacy exposure."],
-      ["F6", "Resistance to process change", "Users and managers prefer established workflows."],
-      ["F7", "Supplier integration gaps", "Trading partners have incompatible systems or limited digital maturity."],
-      ["F8", "Fragmented governance", "Technology standards and data ownership are unclear."],
-      ["F9", "Insufficient implementation funding", "Investment competes with other operational priorities."]
+      ["F1", "Legacy application constraints", "Planning and execution systems lack modern interfaces or require costly custom integration, limiting reliable data exchange."],
+      ["F2", "Unreliable master data", "Product, supplier, customer, inventory, location, and lead-time records are incomplete or governed inconsistently."],
+      ["F3", "Limited digital capability", "Teams lack the process, data, analytics, integration, and change skills needed to design and sustain the new way of working."],
+      ["F4", "Unclear operational value case", "Target decisions, users, benefits, process changes, ownership, and adoption measures are not defined before technology selection."],
+      ["F5", "Data-sharing security concerns", "Cybersecurity, privacy, access, and commercial confidentiality concerns restrict internal and partner data exchange."],
+      ["F6", "Resistance to workflow change", "Users continue spreadsheets and local workarounds because roles, incentives, controls, or usability needs are not addressed."],
+      ["F7", "Partner connectivity gaps", "Suppliers, customers, and logistics partners use incompatible standards or lack the capability to exchange timely structured data."],
+      ["F8", "Fragmented data governance", "Ownership, definitions, standards, access rights, and issue-resolution responsibilities are unclear across functions."],
+      ["F9", "Insufficient programme funding", "Funding does not cover integration, cleansing, training, process redesign, support, and benefits realisation beyond software purchase."]
     ]
   },
   circular: {
     title: "Circular supply-chain barriers",
-    description: "Explore barriers to product recovery, reuse, remanufacturing, and closed-loop material flows.",
+    description: "Explore the system-wide barriers to designing products and networks for reuse, repair, refurbishment, remanufacturing, recycling, and closed-loop material flows. Use the model when the decision spans product design, commercial models, forward supply, recovery operations, and secondary markets.",
+    scope: "Covers the wider circular operating model. Use Reverse logistics barriers when the focus is specifically the collection, inspection, routing, and disposition of returns.",
     factors: [
-      ["F1", "Product design limitations", "Products are not designed for disassembly, repair, or material recovery."],
-      ["F2", "Uncertain return volumes", "Timing, quantity, and condition of returned products are difficult to predict."],
-      ["F3", "Weak reverse logistics network", "Collection, consolidation, and recovery channels are insufficient."],
-      ["F4", "Limited secondary-market demand", "Demand for recovered materials or remanufactured products is uncertain."],
-      ["F5", "Quality variability of returns", "Returned items have inconsistent condition and recoverable value."],
-      ["F6", "High recovery cost", "Inspection, transport, sorting, and processing costs reduce viability."],
-      ["F7", "Unclear ownership incentives", "Partners lack aligned responsibilities and value-sharing mechanisms."],
-      ["F8", "Regulatory and standards gaps", "Definitions, liability, and quality standards are unclear."],
-      ["F9", "Limited traceability", "Material composition and product history are not reliably available."]
+      ["F1", "Non-circular product design", "Products and packaging are not designed for durability, modular repair, disassembly, reuse, or economical material recovery."],
+      ["F2", "Unpredictable recovery supply", "The timing, volume, location, ownership, and condition of products available for recovery cannot be planned reliably."],
+      ["F3", "Insufficient recovery network", "Collection, consolidation, inspection, repair, remanufacturing, and recycling capacity is unavailable or poorly located."],
+      ["F4", "Uncertain secondary-market demand", "Demand, price, warranty expectations, and customer acceptance for recovered products and materials are unstable."],
+      ["F5", "Variable recovered-product quality", "Returned products and recovered materials have inconsistent condition, specification, contamination, and remaining useful life."],
+      ["F6", "Unfavourable recovery economics", "Collection, inspection, transport, processing, yield loss, and remarketing costs exceed expected retained value."],
+      ["F7", "Misaligned partner incentives", "Manufacturers, customers, service partners, recyclers, and retailers do not share responsibilities, costs, and recovered value fairly."],
+      ["F8", "Unclear circular standards", "Definitions, quality grades, liability, warranty, waste status, and recycled-content rules are inconsistent or uncertain."],
+      ["F9", "Limited product traceability", "Material composition, component history, ownership, repair records, and recovery status are not reliably available."]
     ]
   },
   "green-procurement": {
     title: "Green procurement barriers",
-    description: "Structure barriers to incorporating environmental requirements into sourcing and supplier management.",
+    description: "Identify barriers that prevent procurement teams from incorporating environmental requirements into specifications, tender evaluation, supplier approval, contracting, and performance review. Use the template for the sourcing process rather than for an organisation-wide sustainability transformation.",
+    scope: "Focuses on environmental criteria in procurement and supplier management. Use Sustainable supply-chain implementation barriers for broader environmental and social change across the value chain.",
     factors: [
-      ["F1", "Unclear environmental criteria", "Specifications and evaluation measures are not sufficiently defined."],
-      ["F2", "Limited supplier information", "Reliable environmental performance data is unavailable."],
-      ["F3", "Higher perceived purchase cost", "Greener options are assumed to cost more at the point of purchase."],
-      ["F4", "Weak lifecycle-cost analysis", "Use, maintenance, disposal, and externality costs are not considered."],
-      ["F5", "Limited internal expertise", "Buyers lack environmental assessment knowledge."],
-      ["F6", "Supplier market constraints", "Few qualified suppliers can meet technical and environmental needs."],
-      ["F7", "Low management priority", "Environmental performance has limited influence on sourcing decisions."],
-      ["F8", "Verification difficulty", "Claims and certifications are difficult to validate consistently."]
+      ["F1", "Ambiguous environmental specifications", "Tender requirements do not define measurable environmental attributes, evidence standards, thresholds, or acceptable alternatives."],
+      ["F2", "Incomplete supplier environmental data", "Comparable evidence on emissions, materials, energy, waste, certifications, and improvement performance is unavailable or inconsistent."],
+      ["F3", "Purchase-price bias", "Evaluation focuses on acquisition price and discounts environmental benefits or costs that occur during use and end-of-life."],
+      ["F4", "Weak lifecycle-cost capability", "Buyers cannot consistently evaluate energy, maintenance, consumables, disposal, carbon, and residual-value implications."],
+      ["F5", "Limited buyer expertise", "Category teams lack the technical knowledge to set environmental requirements, assess evidence, and challenge unsupported claims."],
+      ["F6", "Constrained qualified supply market", "Few suppliers can meet technical, commercial, service, and environmental requirements at the required scale."],
+      ["F7", "Low environmental decision weight", "Environmental performance is included in policy but receives insufficient weighting in approvals, evaluation, and supplier reviews."],
+      ["F8", "Weak claim verification", "Certifications, product declarations, recycled-content claims, and supplier-reported data cannot be validated consistently."]
     ]
   },
   "industry-4": {
     title: "Industry 4.0 adoption challenges",
-    description: "Explore challenges affecting connected production, automation, and data-driven operations.",
+    description: "Examine barriers to adopting connected production equipment, industrial internet of things, advanced automation, real-time process data, digital twins, and cyber-physical control in manufacturing operations. Use this template for factory and production technology transformation.",
+    scope: "Focuses on connected manufacturing assets, operational technology, and shop-floor transformation. Use Digital supply-chain adoption barriers for planning systems, visibility, enterprise data, and partner connectivity.",
     factors: [
-      ["F1", "Legacy equipment integration", "Existing machines lack compatible interfaces or connectivity."],
-      ["F2", "Capital investment constraints", "Technology, infrastructure, and implementation costs are substantial."],
-      ["F3", "Workforce capability gaps", "Digital, automation, and data skills are insufficient."],
-      ["F4", "Cyber-physical security risk", "Connected assets create new operational security concerns."],
-      ["F5", "Data interoperability gaps", "Systems use inconsistent formats, definitions, and protocols."],
-      ["F6", "Uncertain return on investment", "Benefits and implementation timeframes are difficult to quantify."],
-      ["F7", "Organisational resistance", "Roles, routines, and decision rights are disrupted by automation."],
-      ["F8", "Lack of implementation roadmap", "Technology initiatives are not sequenced around operational priorities."],
-      ["F9", "Supplier technology mismatch", "Equipment and service partners have uneven technical maturity."]
+      ["F1", "Legacy equipment connectivity gaps", "Machines and control systems lack supported interfaces, sensors, or data access needed for reliable integration."],
+      ["F2", "Constrained capital investment", "Funding is insufficient for equipment, connectivity, cybersecurity, integration, commissioning, training, and lifecycle support."],
+      ["F3", "Operational technology skills gap", "Engineering, maintenance, operations, and IT teams lack the combined automation, data, and cyber capability required."],
+      ["F4", "Cyber-physical security exposure", "Connected operational assets increase the risk that cyber incidents affect safety, quality, availability, or production continuity."],
+      ["F5", "Industrial interoperability gaps", "Machines, sensors, historians, manufacturing systems, and enterprise applications use incompatible protocols and data models."],
+      ["F6", "Uncertain operational return", "Benefits such as uptime, yield, flexibility, energy reduction, and labour productivity are not baselined or measured credibly."],
+      ["F7", "Workforce adoption resistance", "Employees resist changed roles, monitoring, decision authority, or standard work because impacts and safeguards are unclear."],
+      ["F8", "Fragmented transformation roadmap", "Use cases are selected as isolated technology pilots rather than sequenced around plant constraints and business priorities."],
+      ["F9", "Vendor ecosystem dependency", "Proprietary platforms, uneven supplier maturity, and limited support options create integration and lock-in risks."]
     ]
   },
   blockchain: {
     title: "Blockchain adoption in supply chains",
-    description: "Structure barriers affecting distributed-ledger use for traceability, transactions, and trust.",
+    description: "Assess barriers to using a distributed ledger where multiple organisations need a shared, auditable transaction or traceability record without relying on one party's database. Use this template only after confirming that the use case genuinely requires multi-party governance and shared record integrity.",
+    scope: "Focuses on distributed-ledger adoption for a defined multi-party use case. It is not a general digitalisation template and does not assume blockchain is the preferred solution.",
     factors: [
-      ["F1", "Unclear use-case value", "Blockchain is proposed without a decision problem that needs shared records."],
-      ["F2", "Partner participation gaps", "Network value is limited when key trading partners do not participate."],
-      ["F3", "Data accuracy at source", "Immutable records cannot correct inaccurate or fraudulent input data."],
-      ["F4", "Integration complexity", "Ledger solutions must connect with existing operational systems."],
-      ["F5", "Governance uncertainty", "Rules for access, validation, ownership, and dispute handling are unclear."],
-      ["F6", "Scalability and performance concerns", "Transaction speed and cost may not fit operational volumes."],
-      ["F7", "Regulatory uncertainty", "Legal recognition, privacy, and cross-border requirements are evolving."],
-      ["F8", "Skills and vendor dependency", "Specialist capability is scarce and may create technology lock-in."],
-      ["F9", "Confidentiality concerns", "Partners may resist sharing commercially sensitive information."]
+      ["F1", "Unproven distributed-ledger need", "The use case does not demonstrate why a shared ledger is preferable to governed integration, a trusted database, or existing traceability standards."],
+      ["F2", "Insufficient network participation", "Critical suppliers, customers, logistics providers, regulators, or certifiers will not join, reducing record completeness and network value."],
+      ["F3", "Unreliable source data", "Identifiers, sensor readings, certificates, and manual events may be inaccurate before entry, and immutability does not make them truthful."],
+      ["F4", "Complex legacy integration", "The ledger cannot create value unless it connects reliably with ERP, warehouse, transport, product, identity, and partner systems."],
+      ["F5", "Unresolved consortium governance", "Participants have not agreed access, validation, funding, data ownership, onboarding, upgrades, liability, or dispute resolution."],
+      ["F6", "Inadequate transaction performance", "Throughput, latency, storage, availability, and transaction cost may not meet operational volume and response-time requirements."],
+      ["F7", "Legal and regulatory uncertainty", "Privacy, cross-border data, electronic records, competition, sector, and contractual requirements are not resolved for all participants."],
+      ["F8", "Specialist capability dependency", "Scarce internal knowledge and reliance on a small vendor ecosystem create implementation, support, and lock-in exposure."],
+      ["F9", "Commercial confidentiality constraints", "Participants will not expose sensitive pricing, volumes, formulations, customer data, or supplier relationships at the required detail."]
     ]
   },
   risk: {
-    title: "Supply-chain risk factors",
-    description: "Explore how external, supplier, operational, and information risks may influence one another.",
+    title: "Supply-chain risk exposure drivers",
+    description: "Explore how structural exposure drivers across suppliers, demand, capacity, logistics, quality, geopolitics, and information flows may reinforce one another before a disruption occurs. The template focuses on underlying conditions that increase likelihood or impact, not on mixing causes with outcomes such as stockouts or lost sales.",
+    scope: "Use to structure sources of disruption exposure. Use Supply-chain resilience barriers when the objective is to improve preparedness, response, and recovery capability.",
     factors: [
-      ["F1", "Supplier financial instability", "A critical supplier may be unable to sustain operations or investment."],
-      ["F2", "Demand volatility", "Customer demand changes materially in volume, timing, or mix."],
-      ["F3", "Lead-time variability", "Replenishment timing is inconsistent or difficult to predict."],
-      ["F4", "Capacity constraints", "Internal or external capacity cannot respond to required volumes."],
-      ["F5", "Logistics disruption", "Transport, port, route, or carrier interruption affects flow."],
-      ["F6", "Geopolitical exposure", "Trade, conflict, sanctions, or policy changes threaten supply."],
-      ["F7", "Quality failure", "Defects or non-conformance interrupt usable supply."],
-      ["F8", "Information delay", "Risk signals and operational changes are not communicated promptly."],
-      ["F9", "Inventory imbalance", "Stock is insufficient, excessive, or positioned in the wrong location."]
+      ["F1", "Supplier concentration exposure", "Critical requirements depend on too few approved suppliers, sites, technologies, or ownership groups, limiting substitution options."],
+      ["F2", "Supplier financial fragility", "A critical supplier has weak liquidity, profitability, credit access, or investment capacity, increasing continuity exposure."],
+      ["F3", "Demand volatility exposure", "Demand volume, timing, mix, or customer priority changes beyond the range supported by current planning assumptions."],
+      ["F4", "Lead-time variability exposure", "Supplier production, border, transport, and receiving times fluctuate materially, reducing replenishment predictability."],
+      ["F5", "Capacity inflexibility", "Internal and external capacity cannot change volume, mix, shift pattern, tooling, or routing quickly enough to absorb variation."],
+      ["F6", "Logistics network concentration", "Critical flows depend on a small number of ports, routes, carriers, hubs, or transport modes with limited alternatives."],
+      ["F7", "Geopolitical and trade exposure", "Supply depends on jurisdictions vulnerable to conflict, sanctions, tariffs, export controls, policy shifts, or border restrictions."],
+      ["F8", "Supplier quality-control weakness", "Process control, traceability, change management, or corrective-action capability is insufficient to prevent supply interruption."],
+      ["F9", "Risk information latency", "Material changes in supplier, demand, logistics, quality, or external conditions are detected or communicated too late for preventive action."]
     ]
   },
   outsourcing: {
     title: "Logistics outsourcing barriers",
-    description: "Structure barriers to selecting, governing, and integrating outsourced logistics services.",
+    description: "Identify barriers to designing, selecting, transitioning, governing, and improving an outsourced warehousing, transport, fulfilment, or lead-logistics arrangement. Use the model to examine why the organisation may struggle to transfer operations without losing service control, data visibility, or commercial flexibility.",
+    scope: "Covers the outsourcing lifecycle and provider operating model. Use AHP to rank named logistics providers when the criteria and alternatives are already defined.",
     factors: [
-      ["F1", "Unclear service requirements", "Scope, service levels, and exception responsibilities are ambiguous."],
-      ["F2", "Loss of operational control", "The organisation has less direct influence over daily execution."],
-      ["F3", "Provider capability uncertainty", "Capacity, technology, geographic, or sector capability is difficult to verify."],
-      ["F4", "Data integration difficulty", "Systems and operational data do not connect reliably."],
-      ["F5", "Hidden transition cost", "Migration, dual running, training, and exit costs are underestimated."],
-      ["F6", "Weak performance governance", "KPIs, review routines, and corrective-action processes are inadequate."],
-      ["F7", "Commercial dependency", "Switching barriers and provider concentration reduce flexibility."],
-      ["F8", "Cultural and process mismatch", "Working practices and decision expectations are not aligned."],
-      ["F9", "Data security concerns", "Sensitive customer and operational data is handled by a third party."]
+      ["F1", "Ambiguous service scope", "Activities, volumes, service levels, exception ownership, interfaces, and change responsibilities are not defined precisely enough for delivery or pricing."],
+      ["F2", "Reduced operational control", "Decision rights, escalation access, and direct influence over labour, capacity, priorities, and daily execution become weaker after transfer."],
+      ["F3", "Unverified provider capability", "Sector knowledge, site capacity, network reach, technology, labour resilience, and peak capability are not validated against realistic requirements."],
+      ["F4", "Data integration difficulty", "Order, inventory, transport, billing, master-data, and event interfaces cannot exchange complete and timely information reliably."],
+      ["F5", "Underestimated transition cost", "Migration, dual running, inventory transfer, systems integration, training, redundancy, stabilisation, and exit costs are omitted or understated."],
+      ["F6", "Weak performance governance", "KPIs, data definitions, review cadence, root-cause ownership, service credits, and continuous-improvement processes are insufficient."],
+      ["F7", "Provider dependency exposure", "Concentration, proprietary processes, data portability limits, and high switching costs reduce leverage and exit flexibility."],
+      ["F8", "Operating-model misalignment", "The client and provider differ in planning routines, decision speed, risk appetite, communication, and continuous-improvement expectations."],
+      ["F9", "Third-party data exposure", "Customer, employee, pricing, shipment, and operational data is accessed or stored outside the organisation without adequate controls."]
     ]
   },
   "last-mile": {
     title: "Last-mile delivery challenges",
-    description: "Explore interconnected challenges affecting cost, service, capacity, and delivery reliability.",
+    description: "Explore operational conditions that drive last-mile cost, capacity pressure, delivery reliability, and customer experience across a defined service region. The factors are framed as controllable or observable drivers, rather than outcomes such as the failed-delivery rate itself.",
+    scope: "Use for parcel, retail, grocery, service-parts, or direct-to-customer delivery networks. Adapt factors to the service promise, geography, fleet model, and delivery channel.",
     factors: [
-      ["F1", "Delivery density variation", "Stops are dispersed or unevenly concentrated across service areas."],
-      ["F2", "Customer availability uncertainty", "Recipients may not be present or able to accept delivery."],
-      ["F3", "Traffic and access constraints", "Congestion, parking, and restricted access reduce productivity."],
-      ["F4", "Demand peak volatility", "Daily and seasonal peaks exceed normal route capacity."],
-      ["F5", "Address and instruction quality", "Incomplete location data causes delay and failed attempts."],
-      ["F6", "Limited route visibility", "Dispatchers lack timely status and exception information."],
-      ["F7", "Driver capacity constraints", "Recruitment, retention, and scheduling limit available delivery capacity."],
-      ["F8", "High failed-delivery rate", "Repeated attempts increase cost and reduce customer satisfaction."],
-      ["F9", "Sustainability pressure", "Emissions and congestion targets constrain delivery choices."]
+      ["F1", "Low delivery density", "Stops are dispersed across the service area, increasing distance, travel time, vehicle use, and cost per successful delivery."],
+      ["F2", "Recipient availability uncertainty", "The likelihood that a recipient or secure delivery option is available is unknown, increasing the risk of an unsuccessful first attempt."],
+      ["F3", "Urban access constraints", "Congestion, parking limits, restricted zones, building access, and loading rules reduce route productivity and schedule reliability."],
+      ["F4", "Peak-volume volatility", "Daily, weekly, promotional, and seasonal volume peaks exceed normal route, depot, vehicle, or labour capacity."],
+      ["F5", "Poor address and instruction data", "Incomplete addresses, access codes, contact details, geocodes, or delivery instructions create avoidable search time and exceptions."],
+      ["F6", "Limited execution visibility", "Dispatchers and customers lack timely vehicle, stop, capacity, and exception status needed to adjust plans or expectations."],
+      ["F7", "Constrained driver capacity", "Recruitment, retention, skills, legal hours, scheduling, and subcontractor availability limit reliable delivery capacity."],
+      ["F8", "Rigid delivery-window design", "Narrow or poorly allocated delivery windows create route inefficiency and increase the chance that actual arrival does not match customer availability."],
+      ["F9", "Emissions operating constraints", "Emission zones, carbon targets, noise restrictions, and fleet-transition requirements constrain vehicle and route choices."]
     ]
   },
   inventory: {
     title: "Inventory management barriers",
-    description: "Structure barriers affecting inventory availability, working capital, and replenishment control.",
+    description: "Identify the planning, data, policy, supplier, and governance barriers that prevent inventory from meeting service requirements at an appropriate working-capital level. Use the model to understand why replenishment controls perform poorly across a portfolio, not to calculate one item's stock parameters.",
+    scope: "Covers system-level inventory management barriers. Use ABC Analysis, EOQ, or Safety Stock and Reorder Point for item-level quantitative decisions.",
     factors: [
-      ["F1", "Poor demand visibility", "Future demand and demand drivers are not sufficiently understood."],
-      ["F2", "Inaccurate inventory records", "System stock differs from physical stock or usable availability."],
-      ["F3", "Long supplier lead times", "Replenishment requires extended planning and commitment."],
-      ["F4", "Lead-time variability", "Actual replenishment timing differs materially from assumptions."],
-      ["F5", "Weak item segmentation", "Different SKU behaviours use the same planning policy."],
-      ["F6", "Unclear service-level targets", "Availability expectations are not defined by item or customer."],
-      ["F7", "Parameter maintenance gaps", "Safety stock, reorder points, and order quantities are not reviewed."],
-      ["F8", "Supplier reliability issues", "Quantity, timing, or quality performance is inconsistent."],
-      ["F9", "Fragmented planning ownership", "Purchasing, planning, sales, and operations use conflicting priorities."]
+      ["F1", "Limited demand visibility", "Future demand, promotions, product changes, customer priorities, and demand drivers are not visible at the level needed for replenishment."],
+      ["F2", "Inaccurate inventory records", "System balances differ from physical, available, quality-approved, or correctly located stock, causing false planning signals."],
+      ["F3", "Extended replenishment lead time", "Long sourcing, production, transport, inspection, and approval times require earlier commitment and more exposure to forecast error."],
+      ["F4", "Unstable replenishment lead time", "Actual replenishment time varies materially from the planning parameter, making reorder timing and safety stock unreliable."],
+      ["F5", "Weak item segmentation", "Items with different value, demand variability, criticality, lifecycle, and lead-time characteristics use the same planning policy."],
+      ["F6", "Undefined service targets", "Availability, fill-rate, response-time, and customer-priority targets are not set by item segment or business need."],
+      ["F7", "Outdated planning parameters", "Safety stock, reorder points, order quantities, lead times, pack sizes, and review rules are not recalculated when conditions change."],
+      ["F8", "Unreliable supplier performance", "Confirmed quantity, delivery timing, quality, and communication performance differs repeatedly from planning assumptions."],
+      ["F9", "Fragmented inventory accountability", "Sales, planning, procurement, operations, finance, and service teams optimise conflicting objectives without shared policy ownership."]
     ]
   },
   "reverse-logistics": {
     title: "Reverse logistics barriers",
-    description: "Explore barriers affecting returns collection, disposition, recovery, and value retention.",
+    description: "Examine operational barriers affecting product returns from authorisation and collection through inspection, disposition, repair, resale, recycling, and final credit. Use the model to improve the reverse flow and value-recovery process for an existing return stream.",
+    scope: "Focuses on execution of returns and recovery flows. Use Circular supply-chain barriers when the question includes product design, commercial models, forward supply, and secondary markets.",
     factors: [
-      ["F1", "Uncertain return flows", "Return timing, volume, product mix, and condition are unpredictable."],
-      ["F2", "Weak return authorisation", "Eligibility, routing, and disposition decisions are inconsistent."],
-      ["F3", "Limited collection network", "Convenient and economical return channels are unavailable."],
-      ["F4", "Slow inspection and grading", "Returned items wait too long for condition and value assessment."],
-      ["F5", "Poor disposition rules", "Repair, resale, recycling, and disposal choices are unclear."],
-      ["F6", "System visibility gaps", "Return status and recoverable inventory are not visible."],
-      ["F7", "High processing cost", "Transport, handling, testing, and recovery costs erode value."],
-      ["F8", "Partner coordination gaps", "Retailers, carriers, repairers, and recyclers use fragmented processes."],
-      ["F9", "Limited secondary demand", "Recovered products or materials lack reliable markets."]
+      ["F1", "Unpredictable return flow", "Return timing, volume, location, product mix, reason, and condition vary, making labour, transport, and recovery capacity difficult to plan."],
+      ["F2", "Inconsistent return authorisation", "Eligibility, evidence, customer instruction, routing, credit, and exception decisions differ across channels and teams."],
+      ["F3", "Insufficient collection coverage", "Customers lack convenient, economical, and traceable channels for returning products to the correct recovery location."],
+      ["F4", "Delayed inspection and grading", "Returned items wait too long for identity, condition, fault, warranty, safety, and recoverable-value assessment."],
+      ["F5", "Ambiguous disposition rules", "Repair, restock, refurbish, return-to-vendor, harvest, recycle, donate, and dispose decisions are not consistently defined."],
+      ["F6", "Limited return-status visibility", "Customers and operations cannot see authorisation, movement, inspection, disposition, credit, or recovered-inventory status."],
+      ["F7", "High reverse-processing cost", "Collection, transport, handling, inspection, repair, administration, and write-off costs consume recoverable value."],
+      ["F8", "Fragmented partner coordination", "Retailers, carriers, warehouses, repairers, suppliers, recyclers, and finance teams use disconnected handoffs and data."],
+      ["F9", "Uncertain recovered-value demand", "Demand, price, warranty acceptance, and channel access for repaired products, parts, and recovered materials are unstable."]
     ]
   },
   "cold-chain": {
     title: "Cold-chain implementation barriers",
-    description: "Structure barriers to maintaining temperature-controlled product integrity across the network.",
+    description: "Identify barriers to maintaining product temperature, traceability, remaining shelf life, and compliant handling from origin through storage, transport, handovers, and final receipt. Use the model for a defined product family, temperature range, lane, and regulatory context.",
+    scope: "Covers temperature-controlled product integrity and continuity. Define the product, required temperature range, lane, handovers, and excursion rules before confirming relationships.",
     factors: [
-      ["F1", "Infrastructure gaps", "Temperature-controlled storage and transport capacity is insufficient."],
-      ["F2", "High operating cost", "Energy, equipment, maintenance, and specialist transport increase cost."],
-      ["F3", "Temperature visibility gaps", "Conditions are not monitored continuously across custody transfers."],
-      ["F4", "Handling discipline variation", "People and partners apply procedures inconsistently."],
-      ["F5", "Equipment reliability risk", "Refrigeration and monitoring equipment can fail in operation."],
-      ["F6", "Limited partner capability", "Suppliers, carriers, and facilities have uneven cold-chain maturity."],
-      ["F7", "Regulatory complexity", "Product and market requirements create compliance burden."],
-      ["F8", "Weak exception response", "Temperature excursions are not escalated or contained quickly."],
-      ["F9", "Demand and shelf-life uncertainty", "Volatility and perishability increase expiry and shortage risk."]
+      ["F1", "Insufficient controlled infrastructure", "Qualified cold rooms, staging areas, vehicles, containers, power backup, and handling capacity are unavailable at required nodes and volumes."],
+      ["F2", "Inadequate thermal packaging", "Packaging configuration and coolant duration are not validated for product, lane, season, delays, and worst-case exposure."],
+      ["F3", "Incomplete temperature monitoring", "Temperature is not measured, associated with the shipment, and retained across storage, transport, handover, and receipt."],
+      ["F4", "Inconsistent handling compliance", "Preconditioning, loading, door-open time, segregation, handover, and receiving procedures vary between people, shifts, and partners."],
+      ["F5", "Unreliable refrigeration equipment", "Refrigeration, sensors, alarms, power, and backup systems are not maintained or proven sufficiently for continuous operation."],
+      ["F6", "Uneven partner cold-chain capability", "Suppliers, carriers, hubs, customs agents, and receiving sites differ in qualification, training, equipment, and control maturity."],
+      ["F7", "Excessive lane exposure time", "Long transit, customs delay, multiple handovers, dwell time, and weak contingency routing consume thermal protection and shelf life."],
+      ["F8", "Slow excursion response", "Alarms, quarantine, product assessment, escalation, rerouting, and replacement decisions do not occur within defined response times."],
+      ["F9", "Volatile demand", "Demand changes beyond forecast and replenishment assumptions, increasing expiry, emergency shipment, and availability risk."],
+      ["F10", "Limited remaining shelf life", "Product arrives with insufficient usable life because production age, transit time, release delay, or stock rotation is not controlled."]
     ]
   }
 };
@@ -391,6 +407,8 @@ if (typeof document !== "undefined") {
     problemTitle: document.getElementById("problemTitle"),
     problemDescription: document.getElementById("problemDescription"),
     suggestedFactorsNote: document.getElementById("suggestedFactorsNote"),
+    templateScopeNote: document.getElementById("templateScopeNote"),
+    templateScopeText: document.getElementById("templateScopeText"),
     setupError: document.getElementById("setupError"),
     addFactorButton: document.getElementById("addFactorButton"),
     factorList: document.getElementById("factorList"),
@@ -534,6 +552,8 @@ if (typeof document !== "undefined") {
       elements.problemTitle.value = "";
       elements.problemDescription.value = "";
       elements.suggestedFactorsNote.hidden = true;
+      elements.templateScopeNote.hidden = true;
+      elements.templateScopeText.textContent = "";
       factors = [makeFactor("F1"), makeFactor("F2")];
     } else {
       const template = problemTemplates[templateKey];
@@ -541,6 +561,8 @@ if (typeof document !== "undefined") {
       elements.problemTitle.value = template.title;
       elements.problemDescription.value = template.description;
       elements.suggestedFactorsNote.hidden = false;
+      elements.templateScopeText.textContent = template.scope;
+      elements.templateScopeNote.hidden = false;
       factors = template.factors.map(([code, name, description]) => makeFactor(code, name, description));
     }
     relationships = new Map();
@@ -559,9 +581,9 @@ if (typeof document !== "undefined") {
           Factor code
           <input type="text" maxlength="12" value="${escapeHtml(factor.code)}" data-factor-field="code" aria-label="Factor ${index + 1} code">
         </label>
-        <label class="factor-field">
+        <label class="factor-field factor-name">
           Factor name
-          <input type="text" maxlength="100" value="${escapeHtml(factor.name)}" data-factor-field="name" aria-label="Factor ${index + 1} name">
+          <textarea rows="2" maxlength="100" data-factor-field="name" aria-label="Factor ${index + 1} name">${escapeHtml(factor.name)}</textarea>
         </label>
         <label class="factor-field factor-description">
           Description
@@ -610,7 +632,8 @@ if (typeof document !== "undefined") {
       problem: {
         template: activeTemplateKey,
         title: elements.problemTitle.value.trim(),
-        description: elements.problemDescription.value.trim()
+        description: elements.problemDescription.value.trim(),
+        scope: elements.templateScopeNote.hidden ? "" : elements.templateScopeText.textContent.trim()
       },
       factors: factors.map(({ id, code, name, description }) => ({ id, code, name, description })),
       relationshipScale: {
@@ -661,6 +684,11 @@ if (typeof document !== "undefined") {
     elements.problemTitle.value = data.problem.title.slice(0, 120);
     elements.problemDescription.value = String(data.problem.description || "").slice(0, 600);
     elements.suggestedFactorsNote.hidden = activeTemplateKey === "custom";
+    const templateScope = activeTemplateKey in problemTemplates
+      ? problemTemplates[activeTemplateKey].scope
+      : String(data.problem.scope || "").slice(0, 400);
+    elements.templateScopeText.textContent = templateScope;
+    elements.templateScopeNote.hidden = !templateScope;
     factors = data.factors.map((factor) => ({
       id: factor.id.slice(0, 160),
       code: factor.code.slice(0, 12),
@@ -1273,6 +1301,8 @@ if (typeof document !== "undefined") {
     elements.problemTitle.value = multiLevelDemonstration.title;
     elements.problemDescription.value = multiLevelDemonstration.description;
     elements.suggestedFactorsNote.hidden = false;
+    elements.templateScopeText.textContent = multiLevelDemonstration.scope;
+    elements.templateScopeNote.hidden = false;
     factors = multiLevelDemonstration.factors.map(([code, name, description]) =>
       makeFactor(code, name, description)
     );
@@ -1320,6 +1350,7 @@ if (typeof document !== "undefined") {
     rows.push(["Interpretive Structural Modeling Model"]);
     rows.push(["Problem", elements.problemTitle.value.trim()]);
     rows.push(["Description", elements.problemDescription.value.trim()]);
+    rows.push(["Template scope", elements.templateScopeNote.hidden ? "" : elements.templateScopeText.textContent.trim()]);
     rows.push([]);
     rows.push(["Factors"]);
     rows.push(["Code", "Name", "Description", "Level", "Driving Power", "Dependence Power", "MICMAC Classification"]);

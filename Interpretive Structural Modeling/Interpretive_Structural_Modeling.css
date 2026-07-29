@@ -368,9 +368,14 @@
   height: 44px;
 }
 
+.factor-name textarea,
 .factor-description textarea {
   min-height: 72px;
   line-height: 1.4;
+}
+
+.factor-name textarea {
+  resize: none;
 }
 
 .survey-factor-note {
@@ -418,6 +423,28 @@
   font-size: .9rem;
 }
 
+.template-scope-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: .4rem .75rem;
+  align-items: start;
+  margin-top: .75rem;
+  padding: .8rem 1rem;
+  border-left: 3px solid var(--blue-600);
+  color: var(--text-secondary);
+  background: var(--surface);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.template-scope-note strong {
+  color: var(--navy-950);
+}
+
+.template-scope-note span {
+  min-width: 0;
+}
+
 .error-message {
   min-height: 1.4rem;
   margin-top: .75rem;
@@ -454,11 +481,26 @@
   gap: .75rem;
 }
 
+.factor-review-warning {
+  margin-top: 1rem;
+  padding: .75rem 1rem;
+  border: 1px solid #fedf89;
+  border-radius: 8px;
+  color: #93370d;
+  background: #fffaeb;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.factor-review-warning strong {
+  color: #7a2e0e;
+}
+
 .factor-row {
   display: grid;
   grid-template-columns: 82px minmax(180px, .8fr) minmax(260px, 1.5fr) auto;
   gap: .75rem;
-  align-items: end;
+  align-items: start;
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -468,6 +510,7 @@
 .factor-actions {
   display: flex;
   gap: .4rem;
+  align-self: end;
 }
 
 .factor-actions button {
@@ -933,6 +976,10 @@ body.ism-page .matrix-tabs button[aria-selected="true"] {
     grid-template-columns: 1fr;
     gap: .75rem;
     margin-top: .75rem;
+  }
+
+  .template-scope-note {
+    grid-template-columns: 1fr;
   }
 
   .template-actions button,

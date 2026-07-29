@@ -141,21 +141,29 @@
               Sample template
               <select id="problemSelect">
                 <option value="custom">Blank custom model</option>
-                <optgroup label="Supply-chain sample templates">
+                <optgroup label="Sourcing and supplier management">
                   <option value="supplier-selection">Supplier selection barriers</option>
+                  <option value="outsourcing">Logistics outsourcing barriers</option>
+                </optgroup>
+                <optgroup label="Risk and resilience">
                   <option value="resilience">Supply-chain resilience barriers</option>
+                  <option value="risk">Supply-chain risk exposure drivers</option>
+                  <option value="cold-chain">Cold-chain implementation barriers</option>
+                </optgroup>
+                <optgroup label="Sustainability and circularity">
                   <option value="sustainable">Sustainable supply-chain implementation barriers</option>
-                  <option value="digital">Digital supply-chain adoption barriers</option>
                   <option value="circular">Circular supply-chain barriers</option>
                   <option value="green-procurement">Green procurement barriers</option>
+                  <option value="reverse-logistics">Reverse logistics barriers</option>
+                </optgroup>
+                <optgroup label="Digital and manufacturing">
+                  <option value="digital">Digital supply-chain adoption barriers</option>
                   <option value="industry-4">Industry 4.0 adoption challenges</option>
                   <option value="blockchain">Blockchain adoption in supply chains</option>
-                  <option value="risk">Supply-chain risk factors</option>
-                  <option value="outsourcing">Logistics outsourcing barriers</option>
-                  <option value="last-mile">Last-mile delivery challenges</option>
+                </optgroup>
+                <optgroup label="Planning and logistics operations">
                   <option value="inventory">Inventory management barriers</option>
-                  <option value="reverse-logistics">Reverse logistics barriers</option>
-                  <option value="cold-chain">Cold-chain implementation barriers</option>
+                  <option value="last-mile">Last-mile delivery challenges</option>
                 </optgroup>
               </select>
             </label>
@@ -181,17 +189,26 @@
             <span>Supply-chain templates are optional examples. Their factors are not universal, exhaustive, or validated for every organisation.</span>
           </div>
 
+          <div class="template-scope-note" id="templateScopeNote" hidden>
+            <strong>Template scope</strong>
+            <span id="templateScopeText"></span>
+          </div>
+
           <div class="design-subsection" id="factor-editor">
             <div class="section-header">
             <div>
               <h3>Review and Edit Factors</h3>
-              <p>Use 2–12 clearly defined factors at a comparable level of abstraction. Reordering factors resets existing pairwise judgements.</p>
+              <p>Use 2–12 clearly defined factors at a similar level of detail. If you load a sample template, review, rename, add, remove, or reorder its factors to match your organisation or research context before starting the Expert Survey. Reordering factors after relationships have been entered will clear those judgements.</p>
             </div>
             <button id="addFactorButton" type="button">Add Factor</button>
             </div>
 
             <div id="factorError" class="error-message" role="alert"></div>
             <div id="factorList" class="factor-list"></div>
+
+            <div class="factor-review-warning" role="note">
+              <strong>Important:</strong> Complete the factor review before collecting expert judgements.
+            </div>
 
             <div class="action-row">
               <button id="exportQuestionnaireButton" class="secondary-button" type="button">Export Questionnaire JSON</button>
@@ -278,7 +295,7 @@
               <button id="loadSampleResponseButton" type="button">Load Sample Response</button>
             </div>
           </div>
-          <p class="sample-data-note"><strong>Sample response:</strong> Loads synthetic resilience factors and completed pairwise judgements that produce a five-level hierarchy. Review the matrices before generating results; the example is not validated evidence.</p>
+          <p class="sample-data-note"><strong>Sample response:</strong> Loads an illustrative electronics manufacturing supply-continuity scenario with completed pairwise judgements and a multi-level hierarchy. Review the matrices before generating results; the relationships are synthetic teaching judgements, not validated evidence.</p>
           <div id="analysisError" class="error-message" role="alert"></div>
 
           <div id="analysisWorkspace" hidden>

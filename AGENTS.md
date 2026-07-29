@@ -410,6 +410,19 @@ Available tools should be represented consistently:
   response unless a documented aggregation method is added and validated.
 - Treat predefined supply-chain factors as illustrative starting points, not universal
   or validated factors. Users must be able to edit, reorder, add, and remove them.
+- Keep each template factor as one clearly assessable construct at a comparable level
+  of abstraction. Do not combine multiple conditions in one factor or mix underlying
+  drivers, capabilities, events, and business outcomes in the same factor set unless
+  the model purpose explicitly requires and explains that structure.
+- Write factor descriptions as an observable operating condition plus its practical
+  consequence. Avoid academic shorthand, vague labels, and descriptions that merely
+  repeat the factor name.
+- Give every predefined template a clear scope note explaining its intended use and
+  how it differs from adjacent templates. Group template choices by practical domain
+  when the list is long.
+- Use completed sample responses as concrete industry teaching scenarios with
+  synthetic relationships. Identify the context and state that the sample is not a
+  validated benchmark.
 - Never infer pairwise relationships automatically. The user must define or confirm
   every `V`, `A`, `X`, or `O` judgement.
 - Build the initial reachability matrix directly from confirmed SSIM judgements, then
