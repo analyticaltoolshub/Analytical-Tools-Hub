@@ -12,6 +12,7 @@ Website: https://analyticaltoolshub.com/
 - Gantt Chart Planner
 - Break-Even Analysis
 - Economic Order Quantity
+- Newsvendor Model Optimizer
 - Safety Stock & Reorder Point
 - Analytic Hierarchy Process
 - Monte Carlo Risk Simulation

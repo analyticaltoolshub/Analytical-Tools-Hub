@@ -1107,31 +1107,13 @@ h3 {
 
 .problem-list {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 18px;
-  max-height: 360px;
-  overflow-y: auto;
-  padding-right: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(31, 111, 235, .45) var(--surface-alt);
-}
-
-.problem-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.problem-list::-webkit-scrollbar-track {
-  background: var(--surface-alt);
-  border-radius: 999px;
-}
-
-.problem-list::-webkit-scrollbar-thumb {
-  background: rgba(31, 111, 235, .45);
-  border-radius: 999px;
 }
 
 .problem-list button {
-  min-height: 38px;
+  min-height: 44px;
   text-align: left;
   border: 1px solid var(--border);
   border-radius: 7px;
@@ -1140,6 +1122,15 @@ h3 {
   padding: 8px 10px;
   font-weight: 650;
   cursor: pointer;
+}
+
+.discovery-action,
+.problem-browser-button {
+  margin-top: 18px;
+}
+
+.problem-browser-button {
+  min-height: 44px;
 }
 
 .category-grid {
@@ -1460,12 +1451,23 @@ h3 {
   margin-bottom: 14px;
 }
 
-.tool-interface-top button {
+.tool-interface-labels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.tool-interface-labels span {
+  display: inline-flex;
   min-height: 34px;
+  align-items: center;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--surface);
-  padding-inline: 11px;
+  padding: 6px 11px;
+  color: var(--text-secondary);
+  font-size: 13px;
   font-weight: 750;
 }
 
@@ -1943,6 +1945,8 @@ h3 {
 .search-dialog {
   position: relative;
   width: min(720px, calc(100% - 32px));
+  max-height: calc(100vh - 128px);
+  overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, .2);
   border-radius: 14px;
   background: #fff;
@@ -1987,6 +1991,64 @@ h3 {
   display: grid;
   gap: 8px;
   margin-top: 14px;
+}
+
+.problem-directory {
+  display: grid;
+  gap: 18px;
+}
+
+.problem-directory-intro {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.problem-directory-group {
+  display: grid;
+  gap: 10px;
+}
+
+.problem-directory-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.problem-directory-heading h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.problem-directory-heading span {
+  flex: 0 0 auto;
+  font-size: 12px;
+}
+
+.problem-directory-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.problem-directory-list button {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px 12px;
+  color: var(--navy-800);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.problem-directory-list button:hover {
+  border-color: rgba(31, 111, 235, .4);
+  background: var(--blue-100);
 }
 
 .search-suggestions a,
@@ -2162,6 +2224,23 @@ h3 {
 
   .button {
     width: 100%;
+  }
+
+  .problem-directory-list {
+    grid-template-columns: 1fr;
+  }
+
+  .problem-list {
+    grid-template-columns: 1fr;
+  }
+
+  .search-modal,
+  .legal-modal {
+    padding-top: 24px;
+  }
+
+  .search-dialog {
+    max-height: calc(100vh - 48px);
   }
 
   .preview-evidence-grid,

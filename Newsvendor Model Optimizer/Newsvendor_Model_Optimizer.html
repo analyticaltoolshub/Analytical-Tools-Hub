@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsvendor Model Optimizer | Analytical Tools Hub</title>
+  <meta name="description" content="Calculate an optimal single-period order quantity under uncertain demand, compare current and optimized policies, and review expected profit and stockout risk.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Newsvendor Model Optimizer | Analytical Tools Hub">
+  <meta property="og:description" content="Optimize a single-period inventory decision using demand uncertainty, underage and overage costs, pack-size adjustment, and expected-profit analysis.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Newsvendor Model Optimizer | Analytical Tools Hub">
+  <meta name="twitter:description" content="Find a profit-balanced single-period order quantity under uncertain demand in your browser.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Newsvendor_Model_Optimizer.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html#software",
+          "name": "Newsvendor Model Optimizer",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html",
+          "description": "A browser-based single-period inventory optimizer supporting Normal, Uniform, Triangular, Poisson, and empirical demand.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": [
+            "Critical-ratio calculation",
+            "Optimal single-period order quantity",
+            "Five demand distribution options",
+            "CSV demand-history import",
+            "Pack-size adjustment",
+            "Operational constraint handling",
+            "Demand data-quality diagnostics",
+            "Demand-model comparison",
+            "Bootstrap recommendation stability",
+            "Current-versus-optimized comparison",
+            "Demand and expected-profit charts",
+            "Expert-adjusted demand scenario"
+          ],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://analyticaltoolshub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Newsvendor Model Optimizer", "item": "https://analyticaltoolshub.com/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="newsvendor-page">
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text">
+          <strong>Newsvendor Model Optimizer</strong>
+          <span>Single-period inventory workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="tool-hero" aria-labelledby="newsvendor-page-title">
+      <span class="tool-badge">Inventory and Supply Chain</span>
+      <h1 id="newsvendor-page-title">Newsvendor Model Optimizer</h1>
+      <p>Balance the cost of ordering too little against the cost of ordering too much for a single selling period with uncertain demand.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based calculation</span>
+        <span>Five demand models</span>
+        <span>CSV processed locally</span>
+      </div>
+    </section>
+
+    <section class="panel content-section" aria-labelledby="decision-guide-heading">
+      <h2 id="decision-guide-heading">Why use this tool?</h2>
+      <div class="guidance-grid">
+        <div class="guidance-card">
+          <span>Decision Supported</span>
+          <p>Use this tool for one-time or perishable inventory decisions where demand is uncertain and unsold units lose value after the selling period.</p>
+        </div>
+        <div class="guidance-card">
+          <span>What It Tells You</span>
+          <p>It estimates the profit-balanced order quantity, implied service level, stockout probability, expected sales, leftovers, lost sales, and expected profit.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Example Input</span>
+          <p>Load the sample to review weekly demand, selling and purchase prices, salvage value, shortage cost, disposal cost, pack size, and a current order quantity.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Sample Output Interpretation</span>
+          <p>The result explains whether additional availability is worth the extra overstock exposure and compares the optimized policy with the current quantity.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="newsvendor-layout">
+      <div class="newsvendor-content">
+        <section class="panel" id="demand-inputs">
+          <div class="section-header">
+            <div>
+              <h2>1. Demand Model</h2>
+              <p>Choose a demand distribution and enter the uncertainty expected during one selling or replenishment period.</p>
+            </div>
+            <div class="editor-actions">
+              <button id="loadSampleButton" type="button">Load Sample</button>
+              <button class="reset" id="resetButton" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="privacy-note" role="note">
+            Demand history and calculations remain in your browser and are not uploaded to a server.
+          </div>
+
+          <div class="input-grid demand-grid">
+            <label>
+              <span>Demand Distribution</span>
+              <select id="distribution">
+                <option value="normal">Normal</option>
+                <option value="uniform">Uniform</option>
+                <option value="triangular">Triangular</option>
+                <option value="poisson">Poisson</option>
+                <option value="empirical">Empirical demand history</option>
+              </select>
+            </label>
+            <label>
+              <span>Mean Demand</span>
+              <input id="meanDemand" type="number" min="0" step="0.01" placeholder="500">
+            </label>
+            <label>
+              <span>Demand Standard Deviation</span>
+              <input id="demandStdDev" type="number" min="0" step="0.01" placeholder="110">
+            </label>
+          </div>
+
+          <p class="distribution-help" id="distributionHelp">Normal demand is symmetric around the mean. Negative demand is excluded by using a zero lower bound in the numerical evaluation.</p>
+
+          <div class="empirical-panel hidden" id="empiricalPanel">
+            <div class="import-guidance">
+              <h3>Prepare your demand-history file</h3>
+              <p>Upload a CSV with one observed demand quantity per row. The first numeric column is used; a header row is optional.</p>
+              <div class="example-row"><strong>Example column:</strong> Demand<br>482<br>515<br>447</div>
+              <p><strong>What ATH does next:</strong> The tool calculates the empirical mean and standard deviation and uses the observed demand values directly when estimating expected outcomes.</p>
+            </div>
+            <div class="empirical-entry-grid">
+              <label class="file-field">
+                <span>Demand-history CSV</span>
+                <input id="demandFile" type="file" accept=".csv,text/csv">
+              </label>
+              <label>
+                <span>Or enter demand observations</span>
+                <textarea id="empiricalValues" rows="5" placeholder="482, 515, 447, 536, 498"></textarea>
+              </label>
+            </div>
+            <label class="history-type-field">
+              <span>What do these observations represent?</span>
+              <select id="historyType">
+                <option value="demand">Observed demand, including lost demand where known</option>
+                <option value="sales-complete">Recorded sales with no known stockouts</option>
+                <option value="sales-censored">Recorded sales that may include stockout periods</option>
+              </select>
+            </label>
+            <p class="field-status" id="empiricalStatus" aria-live="polite">No empirical observations loaded.</p>
+            <section class="data-diagnostics hidden" id="dataDiagnostics" aria-labelledby="data-diagnostics-title">
+              <div class="subsection-heading">
+                <h3 id="data-diagnostics-title">Demand Data Quality Check</h3>
+                <span class="status-badge" id="dataQualityStatus">Review needed</span>
+              </div>
+              <div class="diagnostic-grid">
+                <article><span>Observations</span><strong id="diagnosticCount">0</strong></article>
+                <article><span>Median</span><strong id="diagnosticMedian">0</strong></article>
+                <article><span>Coefficient of Variation</span><strong id="diagnosticCv">0%</strong></article>
+                <article><span>Skewness</span><strong id="diagnosticSkewness">0</strong></article>
+                <article><span>Zero-demand Periods</span><strong id="diagnosticZeros">0</strong></article>
+                <article><span>Potential Outliers</span><strong id="diagnosticOutliers">0</strong></article>
+              </div>
+              <ul class="diagnostic-messages" id="diagnosticMessages" aria-live="polite"></ul>
+            </section>
+          </div>
+
+          <details class="expert-adjustment" id="expertAdjustmentPanel">
+            <summary>Optional expert-adjusted demand</summary>
+            <p>Blend the baseline demand estimate with a documented expert estimate. This is a scenario adjustment, not evidence that the expert estimate is more accurate.</p>
+            <div class="input-grid expert-grid">
+              <label>
+                <span>Expert Mean Demand</span>
+                <input id="expertMean" type="number" min="0" step="0.01" placeholder="540">
+              </label>
+              <label>
+                <span>Expert Standard Deviation</span>
+                <input id="expertStdDev" type="number" min="0" step="0.01" placeholder="100">
+              </label>
+              <label>
+                <span>Historical / Baseline Weight</span>
+                <input id="historicalWeight" type="number" min="0" max="100" step="1" value="70">
+                <small>The expert estimate receives the remaining weight.</small>
+              </label>
+            </div>
+          </details>
+        </section>
+
+        <section class="panel" id="cost-inputs">
+          <div class="section-header">
+            <div>
+              <h2>2. Economics and Order Constraints</h2>
+              <p>Use values for the same item, currency, and decision period as the demand model.</p>
+            </div>
+          </div>
+          <div class="input-grid economics-grid">
+            <label><span>Selling Price per Unit</span><input id="sellingPrice" type="number" min="0" step="0.01" placeholder="38"></label>
+            <label><span>Unit Purchase Cost</span><input id="unitCost" type="number" min="0" step="0.01" placeholder="22"></label>
+            <label><span>Salvage Value per Unsold Unit</span><input id="salvageValue" type="number" min="0" step="0.01" placeholder="12"></label>
+            <label><span>Additional Shortage Cost per Unit</span><input id="shortageCost" type="number" min="0" step="0.01" value="0"></label>
+            <label><span>Holding / Disposal Cost per Unsold Unit</span><input id="holdingCost" type="number" min="0" step="0.01" value="0"></label>
+            <label><span>Current Order Quantity</span><input id="currentOrderQty" type="number" min="0" step="1" placeholder="450"></label>
+            <label><span>Pack Size</span><input id="packSize" type="number" min="1" step="1" value="1"></label>
+            <label>
+              <span>Pack Adjustment</span>
+              <select id="roundingMethod">
+                <option value="profit">Choose the more profitable adjacent pack</option>
+                <option value="nearest">Round to nearest pack</option>
+                <option value="up">Round up to pack</option>
+                <option value="down">Round down to pack</option>
+              </select>
+            </label>
+            <label><span>Currency Symbol</span><input id="currencySymbol" type="text" maxlength="4" value="&pound;" aria-label="Currency symbol"></label>
+          </div>
+
+          <details class="constraint-panel" id="constraintPanel">
+            <summary>Operational constraints</summary>
+            <p>Optional limits are applied after the theoretical Newsvendor quantity. Leave a field blank when it does not apply.</p>
+            <div class="input-grid constraint-grid">
+              <label><span>Minimum Order Quantity</span><input id="minimumOrderQty" type="number" min="0" step="1" placeholder="No minimum"></label>
+              <label><span>Maximum Order Quantity</span><input id="maximumOrderQty" type="number" min="0" step="1" placeholder="No maximum"></label>
+              <label><span>Storage Capacity</span><input id="storageCapacity" type="number" min="0" step="1" placeholder="No capacity limit"></label>
+              <label><span>Available Purchase Budget</span><input id="purchaseBudget" type="number" min="0" step="0.01" placeholder="No budget limit"></label>
+              <label>
+                <span>Minimum Service Level</span>
+                <input id="minimumServiceLevel" type="number" min="0" max="99.9" step="0.1" placeholder="No minimum">
+                <small>Cycle service probability, not fill rate.</small>
+              </label>
+            </div>
+          </details>
+
+          <div class="input-guidance-grid" aria-label="Newsvendor cost guidance">
+            <article><h3>Salvage Value</h3><p>Cash recovered from an unsold unit through markdown, return, reuse, or disposal proceeds. Enter zero when there is no recovery.</p></article>
+            <article><h3>Shortage Cost</h3><p>An additional penalty beyond the lost unit margin, such as expediting, contractual penalties, or measurable loss of goodwill.</p></article>
+            <article><h3>Holding / Disposal Cost</h3><p>Additional end-of-period cost for an unsold unit, such as storage, destruction, return handling, or write-off processing.</p></article>
+          </div>
+
+          <div class="error" id="errorMessage" role="alert"></div>
+          <div class="actions"><button id="calculateButton" type="button">Optimize Order Quantity</button></div>
+        </section>
+
+        <section class="panel hidden" id="results">
+          <div class="results-header">
+            <div><h2>3. Results and Interpretation</h2><p>Review the optimized policy before using scenario planning.</p></div>
+            <button id="exportCsvButton" type="button">Export Results CSV</button>
+          </div>
+          <div class="summary-grid">
+            <article><span>Recommended Order Quantity</span><strong id="optimalQuantity">0</strong></article>
+            <article><span>Expected Profit</span><strong id="expectedProfit">&pound;0</strong></article>
+            <article><span>Service Level</span><strong id="serviceLevel">0%</strong></article>
+            <article><span>Stockout Probability</span><strong id="stockoutProbability">0%</strong></article>
+          </div>
+
+          <div class="cost-logic-grid">
+            <article><span>Underage Cost</span><strong id="underageCost">&pound;0</strong><small>Cost of ordering one unit too few</small></article>
+            <article><span>Overage Cost</span><strong id="overageCost">&pound;0</strong><small>Cost of ordering one unit too many</small></article>
+            <article><span>Critical Ratio</span><strong id="criticalRatio">0%</strong><small>Target demand quantile before pack adjustment</small></article>
+            <article><span>Unrounded Quantile</span><strong id="rawOptimalQuantity">0</strong><small>Distribution quantile before practical rounding</small></article>
+            <article><span>Unconstrained Pack Quantity</span><strong id="unconstrainedQuantity">0</strong><small>Practical quantity before operational limits</small></article>
+            <article><span>Constraint Status</span><strong id="constraintStatus">None</strong><small id="constraintDetail">No operational limit changed the result</small></article>
+          </div>
+
+          <div class="interpretation" id="interpretation" aria-live="polite"></div>
+
+          <h3 class="subsection-title">Expected outcomes at the optimized quantity</h3>
+          <div class="outcome-grid">
+            <article><span>Expected Sales</span><strong id="expectedSales">0</strong></article>
+            <article><span>Expected Leftovers</span><strong id="expectedLeftovers">0</strong></article>
+            <article><span>Expected Lost Sales</span><strong id="expectedLostSales">0</strong></article>
+            <article><span>Expected Revenue</span><strong id="expectedRevenue">&pound;0</strong></article>
+          </div>
+
+          <div class="comparison-wrap">
+            <h3>Current versus optimized</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Policy</th><th>Order Quantity</th><th>Expected Profit</th><th>Service Level</th><th>Expected Sales</th><th>Leftovers</th><th>Lost Sales</th></tr></thead>
+                <tbody id="comparisonBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <section class="decision-confidence" aria-labelledby="confidence-heading">
+            <div class="subsection-heading">
+              <div>
+                <h3 id="confidence-heading">Decision Confidence and Robustness</h3>
+                <p>Check whether the recommendation remains practical when demand assumptions or historical samples change.</p>
+              </div>
+              <span class="status-badge" id="robustnessStatus">Reviewing assumptions</span>
+            </div>
+
+            <div class="confidence-summary-grid">
+              <article><span>Near-Optimal Range</span><strong id="nearOptimalRange">0</strong><small>Quantities within 1% of maximum feasible expected profit</small></article>
+              <article><span>Current Policy Opportunity Loss</span><strong id="currentOpportunityLoss">Not available</strong><small>Expected profit left on the table</small></article>
+              <article><span>Model Recommendation Range</span><strong id="modelRange">0</strong><small>Spread across suitable demand models</small></article>
+              <article><span>Bootstrap Stability</span><strong id="bootstrapRange">Needs history</strong><small id="bootstrapDetail">Available with empirical demand history</small></article>
+            </div>
+
+            <div class="model-comparison-wrap">
+              <h3>Demand Model Comparison</h3>
+              <p>Alternative models use the same demand moments and economics. This is a robustness comparison, not automatic proof of best fit.</p>
+              <div class="table-wrap">
+                <table class="model-comparison-table">
+                  <thead><tr><th>Demand Model</th><th>Recommended<br>Quantity</th><th>Expected Profit</th><th>Service Level</th><th>Stockout<br>Probability</th><th>Assessment</th></tr></thead>
+                  <tbody id="modelComparisonBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="confidence-interpretation" id="confidenceInterpretation" aria-live="polite"></div>
+          </section>
+        </section>
+
+        <section class="panel hidden" id="charts">
+          <div class="section-header">
+            <div>
+              <h2>4. Distribution and Opportunity-Loss Views</h2>
+              <p>Inspect the demand model, near-optimal order range, and profit lost when ordering away from the recommendation.</p>
+            </div>
+            <button class="scenario-toggle" id="scenarioToggle" type="button" aria-pressed="false">
+              <span class="scenario-toggle-text">Scenario Planning</span>
+              <span class="scenario-switch" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div class="scenario-controls hidden" id="scenarioControls">
+            <label for="scenarioQuantity">Test order quantity</label>
+            <input id="scenarioQuantity" type="range" min="0" max="1000" step="1" value="0">
+            <div class="scenario-readout" aria-live="polite">
+              <span><strong id="scenarioQtyValue">0</strong> units</span>
+              <span>Expected profit <strong id="scenarioProfit">&pound;0</strong></span>
+              <span>Stockout probability <strong id="scenarioStockout">0%</strong></span>
+            </div>
+          </div>
+
+          <div class="chart-stack">
+            <article class="chart-card">
+              <h3>Demand Distribution</h3>
+              <div class="chart-stage"><canvas id="demandChart" width="960" height="420" aria-label="Demand distribution with optimized and current order quantities"></canvas></div>
+              <p id="demandChartSummary" class="chart-summary"></p>
+            </article>
+            <article class="chart-card">
+              <h3>Expected Profit and Opportunity Loss</h3>
+              <div class="chart-stage"><canvas id="profitChart" width="960" height="420" aria-label="Expected profit across order quantities"></canvas></div>
+              <p id="profitChartSummary" class="chart-summary"></p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="method-routing">
+          <h2>Is Newsvendor the Right Method?</h2>
+          <p>Choose the method that matches the timing and structure of the inventory decision.</p>
+          <div class="method-routing-grid">
+            <a class="method-route current-method" href="#demand-inputs"><strong>Newsvendor</strong><span>One order for one uncertain selling period.</span></a>
+            <a class="method-route" href="../Economic%20Order%20Quantity/Economic_Order_Quantity.html"><strong>Economic Order Quantity</strong><span>Repeated ordering with reasonably stable demand.</span></a>
+            <a class="method-route" href="../Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html"><strong>Safety Stock &amp; Reorder Point</strong><span>Ongoing replenishment under demand or lead-time uncertainty.</span></a>
+            <a class="method-route" href="../Exponential%20Smoothing/Exponential_Smoothing.html"><strong>Exponential Smoothing</strong><span>Estimate future demand before setting an inventory policy.</span></a>
+            <a class="method-route" href="../Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html"><strong>Monte Carlo Simulation</strong><span>Explore uncertain outcomes from a selected or custom formula.</span></a>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="about-newsvendor">
+          <h2>About the Newsvendor Model</h2>
+          <p>The Newsvendor model supports a single-period inventory decision when demand is uncertain and there is one meaningful opportunity to order before demand is known. Typical applications include seasonal products, event stock, fresh food, fashion, spare parts for a planned shutdown, and other short-life or one-time purchasing decisions.</p>
+          <p>It is not a continuous-replenishment model. Use EOQ for repeated stable-demand ordering and Safety Stock &amp; Reorder Point when inventory can be replenished during an ongoing operating cycle.</p>
+        </section>
+
+        <section class="panel content-section" id="guidance">
+          <h2>Guidance</h2>
+          <ol class="method-list">
+            <li>Define demand for one decision period and select a distribution supported by evidence.</li>
+            <li>Enter economic inputs without double-counting lost margin, salvage recovery, or disposal costs.</li>
+            <li>Review the underage cost, overage cost, and critical ratio before accepting the quantity.</li>
+            <li>Apply pack-size constraints and compare the optimized quantity with the current policy.</li>
+            <li>Use scenario planning to understand how much expected profit changes around the recommendation.</li>
+            <li>Compare demand models and the bootstrap range before relying on a precise quantity from limited history.</li>
+          </ol>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card methodology-formula-card">
+              <span>Formula Logic</span>
+              <div class="ath-formula-list" aria-label="Newsvendor formulas">
+                <p><strong>Underage cost</strong><br><var>C</var><sub>u</sub> = selling price - unit cost + additional shortage cost</p>
+                <p><strong>Overage cost</strong><br><var>C</var><sub>o</sub> = unit cost - salvage value + holding/disposal cost</p>
+                <p><strong>Critical ratio</strong><br><var>CR</var> = <var>C</var><sub>u</sub> / (<var>C</var><sub>u</sub> + <var>C</var><sub>o</sub>)</p>
+                <p><strong>Unrounded optimum</strong><br><var>Q</var>* = <var>F</var><sup>-1</sup>(<var>CR</var>), where <var>F</var> is the demand cumulative distribution</p>
+                <p><strong>Sales, leftovers, and lost sales</strong><br>Sales = min(<var>D</var>, <var>Q</var>); leftovers = max(<var>Q</var> - <var>D</var>, 0); lost sales = max(<var>D</var> - <var>Q</var>, 0)</p>
+                <p><strong>Expected profit</strong><br><var>E</var>[&pi;(<var>Q</var>)] = <var>pE</var>[sales] + <var>vE</var>[leftovers] - <var>cQ</var> - <var>hE</var>[leftovers] - <var>kE</var>[lost sales]</p>
+                <p><strong>Service level</strong><br><var>Pr</var>(<var>D</var> &le; <var>Q</var>) = <var>F</var>(<var>Q</var>); stockout probability = 1 - <var>F</var>(<var>Q</var>)</p>
+                <p><strong>Expert-adjusted moments</strong><br>&mu; = <var>w</var>&mu;<sub>h</sub> + (1 - <var>w</var>)&mu;<sub>e</sub>; variance includes within-estimate variance and the difference between each estimate and the blended mean</p>
+                <p><strong>Near-optimal range</strong><br>Feasible pack quantities where expected profit is at least 99% of the maximum feasible expected profit</p>
+                <p><strong>Bootstrap stability</strong><br>Repeated resamples of empirical history produce a distribution of recommended pack quantities; the displayed range uses its 10th and 90th percentiles</p>
+              </div>
+            </div>
+            <div class="guidance-card"><span>Assumptions</span><p>There is one order opportunity, demand belongs to one decision period, unit economics are constant, and unsold units have a known end-of-period value or cost.</p></div>
+            <div class="guidance-card"><span>Distribution Treatment</span><p>Normal, Uniform, and symmetric Triangular models use mean and standard deviation. Poisson uses its mean rate. Empirical analysis uses the uploaded observations directly.</p></div>
+            <div class="guidance-card"><span>Limitations</span><p>The model does not include multiple replenishments, capacity interactions, substitution, demand learning during the period, price optimization, or risk preferences beyond expected profit.</p></div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details><summary>When should I use the Newsvendor model?</summary><p>Use it when one order must cover one uncertain selling period and leftover inventory has reduced value or creates a disposal cost.</p></details>
+          <details><summary>Why is the optimal service level not automatically 95%?</summary><p>The model balances shortage and overage economics. A higher shortage cost raises the critical ratio; a higher overage cost lowers it.</p></details>
+          <details><summary>Does salvage value mean the normal selling price?</summary><p>No. It is the amount recovered from each unsold unit after the regular selling opportunity, such as markdown revenue, return credit, or reuse value.</p></details>
+          <details><summary>Which distribution should I choose?</summary><p>Use Normal for roughly symmetric continuous demand, Uniform when only a credible range is known, Triangular for a symmetric peaked range derived from mean and variability, Poisson for integer event counts, and empirical demand when sufficient relevant history is available.</p></details>
+          <details><summary>How does expert adjustment work?</summary><p>The tool blends baseline and expert means and variances using the selected weight. The adjustment should be documented and tested as a scenario rather than treated as objective evidence.</p></details>
+          <details><summary>How is this different from Monte Carlo simulation?</summary><p>The Newsvendor model solves one defined decision: how much to order for a single uncertain period. It uses demand and inventory economics to calculate a profit-balanced quantity. Monte Carlo simulation is broader: it samples uncertain inputs in a selected or custom formula to estimate an outcome distribution and target probability, but it does not inherently optimize an order quantity.</p></details>
+          <details><summary>Are uploaded demand values sent anywhere?</summary><p>No. The current tool parses the CSV and performs all calculations locally in your browser.</p></details>
+        </section>
+      </div>
+
+      <aside class="newsvendor-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Newsvendor Model Optimizer page sections">
+          <a href="#demand-inputs">Demand Model</a>
+          <a href="#cost-inputs">Economics</a>
+          <a href="#results">Results</a>
+          <a href="#charts">Charts</a>
+          <a href="#method-routing">Choose a Method</a>
+          <a href="#about-newsvendor">About</a>
+          <a href="#guidance">Guidance</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <script src="Newsvendor_Model_Optimizer.js"></script>
+</body>
+</html>

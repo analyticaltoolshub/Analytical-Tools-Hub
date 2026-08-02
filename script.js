@@ -44,7 +44,7 @@ const problems = [
     href: 'ABC%20Analysis/ABC_Analysis.html'
   },
   {
-    title: 'Which items should carry the highest safety stock priority?',
+    title: 'Which inventory segments should receive safety-stock review priority?',
     detail: 'Recommended tool: ABC Analysis',
     href: 'ABC%20Analysis/ABC_Analysis.html'
   },
@@ -54,17 +54,17 @@ const problems = [
     href: 'ABC%20Analysis/ABC_Analysis.html'
   },
   {
-    title: 'Which products are at the highest risk of stockouts?',
+    title: 'How can I reduce stockout risk using safety stock and reorder points?',
+    detail: 'Recommended tool: Safety Stock & Reorder Point',
+    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+  },
+  {
+    title: 'Which inventory segments should be reviewed for possible overstock?',
     detail: 'Recommended tool: ABC Analysis',
     href: 'ABC%20Analysis/ABC_Analysis.html'
   },
   {
-    title: 'Which products are overstocked relative to their importance and demand pattern?',
-    detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
-  },
-  {
-    title: 'Which SKUs should have the highest service level targets?',
+    title: 'Which high-value SKUs may justify higher service-level targets?',
     detail: 'Recommended tool: ABC Analysis',
     href: 'ABC%20Analysis/ABC_Analysis.html'
   },
@@ -85,8 +85,8 @@ const problems = [
   },
   {
     title: 'Which products require stronger supplier management or dual sourcing?',
-    detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    detail: 'Recommended tool: Kraljic Matrix',
+    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
   },
   {
     title: 'Which SKUs should be prioritized during inventory shortages?',
@@ -147,6 +147,56 @@ const problems = [
     title: 'How does changing ordering cost or holding cost affect order quantity?',
     detail: 'Recommended tool: Economic Order Quantity',
     href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+  },
+  {
+    title: 'How many units should I order for one uncertain selling period?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'What order quantity maximizes expected profit when demand is uncertain?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'How much seasonal or perishable inventory should I buy before demand is known?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'How should shortage cost and leftover cost affect my order quantity?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'What service level is economically justified for a single-period item?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'How does pack size change the best single-period order quantity?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'How does my current order quantity compare with the Newsvendor optimum?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'What are the expected sales, leftovers, and lost sales for my order quantity?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'How can I combine historical demand with an expert demand estimate?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+  },
+  {
+    title: 'How much event, fashion, fresh-food, or end-of-life stock should I order?',
+    detail: 'Recommended tool: Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'How much buffer stock should I keep?',
@@ -319,11 +369,6 @@ const problems = [
     href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
   },
   {
-    title: 'How likely is my project to finish before the deadline?',
-    detail: 'Recommended tool: Monte Carlo Risk Simulation',
-    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
-  },
-  {
     title: 'What is the risk of stockout when demand and replenishment are uncertain?',
     detail: 'Recommended tool: Monte Carlo Risk Simulation',
     href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
@@ -455,8 +500,69 @@ const problems = [
   }
 ];
 
+const problemGroups = [
+  {
+    title: 'Inventory Prioritisation',
+    hrefs: ['ABC%20Analysis/ABC_Analysis.html']
+  },
+  {
+    title: 'Ordering and Replenishment',
+    hrefs: [
+      'Economic%20Order%20Quantity/Economic_Order_Quantity.html',
+      'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html',
+      'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+    ]
+  },
+  {
+    title: 'Forecasting',
+    hrefs: ['Exponential%20Smoothing/Exponential_Smoothing.html']
+  },
+  {
+    title: 'Procurement',
+    hrefs: ['Kraljic%20Matrix/Kraljic_Matrix.html']
+  },
+  {
+    title: 'Finance',
+    hrefs: ['Break%20Even%20Analysis/Break_Even_Analysis.html']
+  },
+  {
+    title: 'Project Planning',
+    hrefs: ['Gantt%20Chart/Gantt_Chart.html']
+  },
+  {
+    title: 'Multi-Criteria Decisions',
+    hrefs: ['Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html']
+  },
+  {
+    title: 'Risk and Uncertainty',
+    hrefs: ['Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html']
+  },
+  {
+    title: 'Structural Analysis',
+    hrefs: ['Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html']
+  }
+];
+
+const featuredProblemTitles = [
+  'Which inventory items need the most control?',
+  'How much stock should I order for a stable-demand item?',
+  'How many units should I order for one uncertain selling period?',
+  'How much buffer stock should I keep?',
+  'How can I forecast seasonal demand?',
+  'Which purchasing categories need strategic supplier attention?',
+  'How can I plan project tasks over time?',
+  'How many units do I need to sell to break even?',
+  'Which option should I choose when several criteria matter?',
+  'What is the probability of achieving a target profit when demand and costs are uncertain?',
+  'Which factors are foundational drivers and which are dependent outcomes?'
+];
+
+const featuredProblems = featuredProblemTitles
+  .map((title) => problems.find((problem) => problem.title === title))
+  .filter(Boolean);
+
 const categories = [
-  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '4 tools available', icon: 'boxes' },
+  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '5 tools available', icon: 'boxes' },
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
   { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Expanding soon', icon: 'settings' },
   { title: 'Statistics', benefit: 'Analyze distributions, uncertainty, samples, and probability-driven outcomes.', count: '1 tool available', icon: 'compare' },
@@ -485,6 +591,16 @@ const tools = [
     output: 'EOQ, cost curve, and reorder point',
     cta: 'Open Economic Order Quantity',
     href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html',
+    categories: ['Inventory and Supply Chain']
+  },
+  {
+    name: 'Newsvendor Model Optimizer',
+    description: 'Optimize a single-period order quantity by balancing shortage and leftover costs under uncertain demand.',
+    category: 'Inventory Management',
+    input: 'Demand distribution, prices, costs, and pack size',
+    output: 'Optimal quantity, expected outcomes, profit comparison, and charts',
+    cta: 'Open Newsvendor Model Optimizer',
+    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html',
     categories: ['Inventory and Supply Chain']
   },
   {
@@ -726,7 +842,7 @@ const decisionPreviewMethods = {
       ['Provider C', '0.24']
     ],
     interpretation: 'Provider B ranks highest under the current expert judgements. The consistency ratio is within acceptable guidance, so the result is suitable for decision review.',
-    status: 'Decision confidence: High',
+    status: 'Judgement consistency: Acceptable',
     summary: 'Illustrative AHP decision workflow for selecting a 3PL provider using criteria weights, consistency review, and ranked alternatives.'
   },
   abc: {
@@ -836,9 +952,14 @@ function initRenderedContent() {
     </article>
   `);
 
-  renderCards('[data-render="problems"]', problems, (problem) => `
+  renderCards('[data-render="featured-problems"]', featuredProblems, (problem) => `
     <button type="button" data-problem="${problem.title}">${problem.title}</button>
   `);
+
+  document.querySelectorAll('[data-problem-browser-open]').forEach((button) => {
+    button.textContent = `View all ${problems.length} problems`;
+    button.setAttribute('aria-label', `View all ${problems.length} business problems`);
+  });
 
   renderCards('[data-render="categories"]', categories, (item) => `
     <article class="category-card">
@@ -1241,10 +1362,57 @@ function renderSearchResults(query = '') {
   renderSearchItems(results, 'No exact match yet. Try a method, category, or practical question.');
 }
 
+function renderProblemDirectory() {
+  const target = document.querySelector('[data-search-results]');
+  if (!target) return;
+
+  const directory = document.createElement('div');
+  directory.className = 'problem-directory';
+
+  const introduction = document.createElement('p');
+  introduction.className = 'problem-directory-intro';
+  introduction.textContent = 'Browse practical questions by decision area, or type above to search the complete library.';
+  directory.append(introduction);
+
+  problemGroups.forEach((group) => {
+    const groupProblems = problems.filter((problem) => group.hrefs.includes(problem.href));
+    if (!groupProblems.length) return;
+
+    const section = document.createElement('section');
+    section.className = 'problem-directory-group';
+
+    const heading = document.createElement('h3');
+    heading.textContent = group.title;
+
+    const count = document.createElement('span');
+    count.textContent = `${groupProblems.length} ${groupProblems.length === 1 ? 'question' : 'questions'}`;
+
+    const headingRow = document.createElement('div');
+    headingRow.className = 'problem-directory-heading';
+    headingRow.append(heading, count);
+
+    const list = document.createElement('div');
+    list.className = 'problem-directory-list';
+    groupProblems.forEach((problem) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.problem = problem.title;
+      button.textContent = problem.title;
+      list.append(button);
+    });
+
+    section.append(headingRow, list);
+    directory.append(section);
+  });
+
+  target.replaceChildren(directory);
+}
+
 function initSearch() {
   const modal = document.querySelector('[data-search-modal]');
   const input = document.querySelector('[data-search-input]');
   const openButtons = document.querySelectorAll('[data-search-open]');
+  const problemBrowserButtons = document.querySelectorAll('[data-problem-browser-open]');
   const closeButtons = document.querySelectorAll('[data-search-close]');
   if (!modal || !input) return;
 
@@ -1266,12 +1434,21 @@ function initSearch() {
     window.setTimeout(() => input.focus(), 0);
   };
 
+  const openProblemBrowser = () => {
+    input.value = '';
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+    renderProblemDirectory();
+    window.setTimeout(() => input.focus(), 0);
+  };
+
   const closeSearch = () => {
     modal.hidden = true;
     document.body.classList.remove('modal-open');
   };
 
   openButtons.forEach((button) => button.addEventListener('click', openSearch));
+  problemBrowserButtons.forEach((button) => button.addEventListener('click', openProblemBrowser));
   closeButtons.forEach((button) => button.addEventListener('click', closeSearch));
   input.addEventListener('input', () => renderSearchResults(input.value));
   document.querySelector('[data-search-results]')?.addEventListener('click', (event) => {
@@ -1299,6 +1476,12 @@ function initSearch() {
     if (!category) return;
     openCategorySearch(category.dataset.categorySearch);
   });
+
+  const sharedQuery = new URLSearchParams(window.location.search).get('q')?.trim();
+  if (sharedQuery) {
+    input.value = sharedQuery;
+    openSearch();
+  }
 }
 
 function initNewsletter() {

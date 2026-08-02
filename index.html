@@ -41,7 +41,7 @@
             "publisher": { "@id": "https://analyticaltoolshub.com/#organization" },
             "potentialAction": {
               "@type": "SearchAction",
-              "target": "https://analyticaltoolshub.com/search?q={search_term_string}",
+              "target": "https://analyticaltoolshub.com/?q={search_term_string}",
               "query-input": "required name=search_term_string"
             }
           },
@@ -215,7 +215,7 @@
                       <span><strong>Provider C</strong>0.24</span>
                     </div>
                     <p>Provider B ranks highest under the current expert judgements. The consistency ratio is within acceptable guidance, so the result is suitable for decision review.</p>
-                    <strong class="preview-confidence">Decision confidence: High</strong>
+                    <strong class="preview-confidence">Judgement consistency: Acceptable</strong>
                   </article>
                   <p class="sr-only">Illustrative example showing an AHP decision workflow from question to method, analysis, and decision result.</p>
                 </div>
@@ -328,103 +328,20 @@
             <article>
               <h3>Browse by Category</h3>
               <p>For users who know their professional area.</p>
+              <a class="card-link discovery-action" href="#categories">Browse categories</a>
             </article>
             <article>
               <h3>Search by Method</h3>
               <p>Find available methods such as ABC analysis, exponential smoothing, Kraljic Matrix, and Gantt planning.</p>
+              <button class="card-link card-link-button discovery-action" type="button" data-search-open>Search methods</button>
             </article>
             <article class="problem-card">
               <h3>Start With a Problem</h3>
               <p>Use plain-language questions when you know the challenge but not the method.</p>
-              <div class="problem-list" data-render="problems">
-                <button type="button" data-problem="Which inventory items need the most control?">Which inventory items need the most control?</button>
-                <button type="button" data-problem="Which products contribute the most to inventory value or revenue?">Which products contribute the most to inventory value or revenue?</button>
-                <button type="button" data-problem="Which products have the most stable demand patterns?">Which products have the most stable demand patterns?</button>
-                <button type="button" data-problem="Which products have highly variable or unpredictable demand?">Which products have highly variable or unpredictable demand?</button>
-                <button type="button" data-problem="Which SKUs require the highest management attention?">Which SKUs require the highest management attention?</button>
-                <button type="button" data-problem="Which items should carry the highest safety stock priority?">Which items should carry the highest safety stock priority?</button>
-                <button type="button" data-problem="Which items can operate with lower inventory buffers?">Which items can operate with lower inventory buffers?</button>
-                <button type="button" data-problem="Which products are at the highest risk of stockouts?">Which products are at the highest risk of stockouts?</button>
-                <button type="button" data-problem="Which products are overstocked relative to their importance and demand pattern?">Which products are overstocked relative to their importance and demand pattern?</button>
-                <button type="button" data-problem="Which SKUs should have the highest service level targets?">Which SKUs should have the highest service level targets?</button>
-                <button type="button" data-problem="Which products require more accurate forecasting and planning?">Which products require more accurate forecasting and planning?</button>
-                <button type="button" data-problem="Which items should be reviewed more frequently for replenishment?">Which items should be reviewed more frequently for replenishment?</button>
-                <button type="button" data-problem="Which SKUs should be candidates for make-to-order rather than make-to-stock?">Which SKUs should be candidates for make-to-order rather than make-to-stock?</button>
-                <button type="button" data-problem="Which products require stronger supplier management or dual sourcing?">Which products require stronger supplier management or dual sourcing?</button>
-                <button type="button" data-problem="Which SKUs should be prioritized during inventory shortages?">Which SKUs should be prioritized during inventory shortages?</button>
-                <button type="button" data-problem="Which low-value, highly volatile items should be rationalized or discontinued?">Which low-value, highly volatile items should be rationalized or discontinued?</button>
-                <button type="button" data-problem="How should inventory policies differ across product categories?">How should inventory policies differ across product categories?</button>
-                <button type="button" data-problem="Where should working capital be invested to maximize inventory performance?">Where should working capital be invested to maximize inventory performance?</button>
-                <button type="button" data-problem="Which inventory segments represent the greatest business and planning risk?">Which inventory segments represent the greatest business and planning risk?</button>
-                <button type="button" data-problem="How should warehouse space and resources be allocated across SKUs?">How should warehouse space and resources be allocated across SKUs?</button>
-                <button type="button" data-problem="What is the recommended inventory strategy for each ABC-XYZ segment?">What is the recommended inventory strategy for each ABC-XYZ segment?</button>
-                <button type="button" data-problem="How much stock should I order for a stable-demand item?">How much stock should I order for a stable-demand item?</button>
-                <button type="button" data-problem="What order quantity balances ordering cost and holding cost?">What order quantity balances ordering cost and holding cost?</button>
-                <button type="button" data-problem="How often should I place replenishment orders for a stable item?">How often should I place replenishment orders for a stable item?</button>
-                <button type="button" data-problem="Is my current order quantity costing more than the EOQ?">Is my current order quantity costing more than the EOQ?</button>
-                <button type="button" data-problem="How does changing ordering cost or holding cost affect order quantity?">How does changing ordering cost or holding cost affect order quantity?</button>
-                <button type="button" data-problem="How much buffer stock should I keep?">How much buffer stock should I keep?</button>
-                <button type="button" data-problem="When should I reorder inventory?">When should I reorder inventory?</button>
-                <button type="button" data-problem="What reorder point should I use when demand and lead time vary?">What reorder point should I use when demand and lead time vary?</button>
-                <button type="button" data-problem="How does service level change my safety stock requirement?">How does service level change my safety stock requirement?</button>
-                <button type="button" data-problem="Is my current inventory position below the reorder point?">Is my current inventory position below the reorder point?</button>
-                <button type="button" data-problem="How many days of coverage do I have before I need to reorder?">How many days of coverage do I have before I need to reorder?</button>
-                <button type="button" data-problem="How can I forecast seasonal demand?">How can I forecast seasonal demand?</button>
-                <button type="button" data-problem="How can I forecast demand when there is a trend?">How can I forecast demand when there is a trend?</button>
-                <button type="button" data-problem="What is the next-period forecast from recent demand history?">What is the next-period forecast from recent demand history?</button>
-                <button type="button" data-problem="Which smoothing method fits my demand pattern best?">Which smoothing method fits my demand pattern best?</button>
-                <button type="button" data-problem="How accurate is my forecast using MAE?">How accurate is my forecast using MAE?</button>
-                <button type="button" data-problem="Which purchasing categories need strategic supplier attention?">Which purchasing categories need strategic supplier attention?</button>
-                <button type="button" data-problem="Which spend categories are high impact and high supply risk?">Which spend categories are high impact and high supply risk?</button>
-                <button type="button" data-problem="Which categories should use leverage, strategic, bottleneck, or routine sourcing strategies?">Which categories should use leverage, strategic, bottleneck, or routine sourcing strategies?</button>
-                <button type="button" data-problem="Which suppliers or categories create the highest procurement risk?">Which suppliers or categories create the highest procurement risk?</button>
-                <button type="button" data-problem="Where should procurement focus negotiation effort and supplier relationships?">Where should procurement focus negotiation effort and supplier relationships?</button>
-                <button type="button" data-problem="How can I plan project tasks over time?">How can I plan project tasks over time?</button>
-                <button type="button" data-problem="How can I create a timeline for project tasks and milestones?">How can I create a timeline for project tasks and milestones?</button>
-                <button type="button" data-problem="How can I see project progress across weeks and months?">How can I see project progress across weeks and months?</button>
-                <button type="button" data-problem="How can I save and reload a project plan as JSON?">How can I save and reload a project plan as JSON?</button>
-                <button type="button" data-problem="How many units do I need to sell to break even?">How many units do I need to sell to break even?</button>
-                <button type="button" data-problem="What sales volume is needed to reach a target profit?">What sales volume is needed to reach a target profit?</button>
-                <button type="button" data-problem="How much margin of safety do I have at expected sales?">How much margin of safety do I have at expected sales?</button>
-                <button type="button" data-problem="How do price, fixed cost, and variable cost affect profitability?">How do price, fixed cost, and variable cost affect profitability?</button>
-                <button type="button" data-problem="What revenue do I need to cover fixed and variable costs?">What revenue do I need to cover fixed and variable costs?</button>
-                <button type="button" data-problem="Which option should I choose when several criteria matter?">Which option should I choose when several criteria matter?</button>
-                <button type="button" data-problem="Which supplier is the best fit across cost, quality, delivery, and risk?">Which supplier is the best fit across cost, quality, delivery, and risk?</button>
-                <button type="button" data-problem="Which 3PL partner should I select for service coverage and logistics performance?">Which 3PL partner should I select for service coverage and logistics performance?</button>
-                <button type="button" data-problem="Which warehouse location is strongest across cost, access, labour, and customer proximity?">Which warehouse location is strongest across cost, access, labour, and customer proximity?</button>
-                <button type="button" data-problem="Which transport mode should I choose when cost, speed, reliability, and emissions matter?">Which transport mode should I choose when cost, speed, reliability, and emissions matter?</button>
-                <button type="button" data-problem="Which inventory policy is best when service level, working capital, and stockout risk conflict?">Which inventory policy is best when service level, working capital, and stockout risk conflict?</button>
-                <button type="button" data-problem="What is the probability of achieving a target profit when demand and costs are uncertain?">What is the probability of achieving a target profit when demand and costs are uncertain?</button>
-                <button type="button" data-problem="What project budget gives me an 80% or 90% confidence level?">What project budget gives me an 80% or 90% confidence level?</button>
-                <button type="button" data-problem="Which uncertain input has the strongest relationship with my result?">Which uncertain input has the strongest relationship with my result?</button>
-                <button type="button" data-problem="How likely is my project to finish before the deadline?">How likely is my project to finish before the deadline?</button>
-                <button type="button" data-problem="What is the risk of stockout when demand and replenishment are uncertain?">What is the risk of stockout when demand and replenishment are uncertain?</button>
-                <button type="button" data-problem="How can I model best case, likely case, and worst case expert estimates?">How can I model best case, likely case, and worst case expert estimates?</button>
-                <button type="button" data-problem="How can I structure relationships among complex factors?">How can I structure relationships among complex factors?</button>
-                <button type="button" data-problem="Which factors are foundational drivers and which are dependent outcomes?">Which factors are foundational drivers and which are dependent outcomes?</button>
-                <button type="button" data-problem="How can I turn expert relationship judgements into a structural hierarchy?">How can I turn expert relationship judgements into a structural hierarchy?</button>
-                <button type="button" data-problem="Which supply-chain barriers have the strongest driving power?">Which supply-chain barriers have the strongest driving power?</button>
-                <button type="button" data-problem="How do supply-chain resilience barriers influence one another?">How do supply-chain resilience barriers influence one another?</button>
-                <button type="button" data-problem="Which factors form the foundation of a supply-chain implementation hierarchy?">Which factors form the foundation of a supply-chain implementation hierarchy?</button>
-                <button type="button" data-problem="Which barriers are dependent outcomes rather than root drivers?">Which barriers are dependent outcomes rather than root drivers?</button>
-                <button type="button" data-problem="How can I structure expert judgements about relationships among supply-chain factors?">How can I structure expert judgements about relationships among supply-chain factors?</button>
-                <button type="button" data-problem="Which digital or sustainable supply-chain barriers need early management attention?">Which digital or sustainable supply-chain barriers need early management attention?</button>
-                <button type="button" data-problem="How can I build an ISM hierarchy from expert-defined V, A, X, and O relationships?">How can I build an ISM hierarchy from expert-defined V, A, X, and O relationships?</button>
-                <button type="button" data-problem="Which supply-chain factors are autonomous, dependent, linkage, or driving factors?">Which supply-chain factors are autonomous, dependent, linkage, or driving factors?</button>
-                <button type="button" data-problem="Which supplier selection barriers influence the rest of the evaluation process?">Which supplier selection barriers influence the rest of the evaluation process?</button>
-                <button type="button" data-problem="What are the foundational barriers to sustainable supply-chain implementation?">What are the foundational barriers to sustainable supply-chain implementation?</button>
-                <button type="button" data-problem="How are digital supply-chain adoption barriers structurally connected?">How are digital supply-chain adoption barriers structurally connected?</button>
-                <button type="button" data-problem="Which circular supply-chain barriers should be addressed first?">Which circular supply-chain barriers should be addressed first?</button>
-                <button type="button" data-problem="Which green procurement barriers drive other implementation difficulties?">Which green procurement barriers drive other implementation difficulties?</button>
-                <button type="button" data-problem="How do Industry 4.0 adoption challenges influence one another?">How do Industry 4.0 adoption challenges influence one another?</button>
-                <button type="button" data-problem="Which blockchain adoption barriers sit at the base of the supply-chain hierarchy?">Which blockchain adoption barriers sit at the base of the supply-chain hierarchy?</button>
-                <button type="button" data-problem="How are supply-chain risk factors linked through direct and transitive relationships?">How are supply-chain risk factors linked through direct and transitive relationships?</button>
-                <button type="button" data-problem="Which logistics outsourcing barriers require early management action?">Which logistics outsourcing barriers require early management action?</button>
-                <button type="button" data-problem="What drives last-mile delivery challenges in our operating context?">What drives last-mile delivery challenges in our operating context?</button>
-                <button type="button" data-problem="Which inventory management barriers are root drivers and which are outcomes?">Which inventory management barriers are root drivers and which are outcomes?</button>
-                <button type="button" data-problem="How should reverse logistics barriers be arranged in an implementation hierarchy?">How should reverse logistics barriers be arranged in an implementation hierarchy?</button>
-                <button type="button" data-problem="Which cold-chain implementation barriers have the greatest driving power?">Which cold-chain implementation barriers have the greatest driving power?</button>
-              </div>
+              <div class="problem-list" data-render="featured-problems" aria-label="Featured business problems"></div>
+              <button class="card-link card-link-button problem-browser-button" type="button" data-problem-browser-open>
+                View all problems
+              </button>
             </article>
           </div>
         </div>
@@ -442,7 +359,7 @@
             <article class="category-card">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
               <h3>Inventory and Supply Chain</h3>
-              <span class="card-meta">4 tools available</span>
+              <span class="card-meta">5 tools available</span>
               <p>Optimize stock, service levels, purchasing, and supplier decisions.</p>
               <button class="card-link card-link-button" type="button" data-category-search="Inventory and Supply Chain" aria-label="Explore Inventory and Supply Chain category">Explore category</button>
             </article>
@@ -529,6 +446,12 @@
               <a class="card-link" href="Economic%20Order%20Quantity/Economic_Order_Quantity.html" aria-label="Open Economic Order Quantity">Open Economic Order Quantity</a>
             </article>
             <article class="tool-card">
+              <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>Newsvendor Model Optimizer</h3></div><button class="bookmark-button" type="button" aria-label="Save Newsvendor Model Optimizer"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
+              <p>Optimize a single-period order quantity by balancing shortage and leftover costs under uncertain demand.</p>
+              <div class="tool-meta"><span><strong>Input:</strong> Demand distribution, prices, costs, and pack size</span><span><strong>Output:</strong> Optimal quantity, expected outcomes, profit comparison, and charts</span></div>
+              <a class="card-link" href="Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html" aria-label="Open Newsvendor Model Optimizer">Open Newsvendor Model Optimizer</a>
+            </article>
+            <article class="tool-card">
               <div class="tool-card-header"><div><span class="card-meta">Inventory Management</span><h3>Safety Stock &amp; Reorder Point</h3></div><button class="bookmark-button" type="button" aria-label="Save Safety Stock and Reorder Point"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z"/></svg></button></div>
               <p>Estimate buffer stock and replenishment trigger levels under demand and lead time uncertainty.</p>
               <div class="tool-meta"><span><strong>Input:</strong> Demand variability, lead time, service level</span><span><strong>Output:</strong> Safety stock, reorder point, and stock action</span></div>
@@ -582,6 +505,7 @@
             <span>All tools:</span>
             <a href="ABC%20Analysis/ABC_Analysis.html">ABC Analysis</a>
             <a href="Economic%20Order%20Quantity/Economic_Order_Quantity.html">EOQ</a>
+            <a href="Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html">Newsvendor Optimizer</a>
             <a href="Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html">Safety Stock &amp; Reorder Point</a>
             <a href="Exponential%20Smoothing/Exponential_Smoothing.html">Exponential Smoothing</a>
             <a href="Kraljic%20Matrix/Kraljic_Matrix.html">Kraljic Matrix</a>
@@ -612,7 +536,9 @@
           <div class="tool-interface abc-workflow-preview" aria-label="Analytic Hierarchy Process workflow preview">
             <div class="tool-interface-top">
               <strong>Analytic Hierarchy Process</strong>
-              <div><button>Export JSON</button><button>Import Responses</button></div>
+              <div class="tool-interface-labels" aria-label="AHP workflow capabilities">
+                <span>Questionnaire JSON</span><span>Expert responses</span>
+              </div>
             </div>
             <div class="abc-workflow-steps" aria-label="Analytic Hierarchy Process workflow steps">
               <div><span>1</span><strong>Decision Setup</strong><p>Goal, criteria, alternatives</p></div>

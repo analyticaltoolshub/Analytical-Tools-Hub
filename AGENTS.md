@@ -58,6 +58,7 @@ The same folder/file pattern is used for:
 - `Safety Stock & Reorder Point`
 - `Analytic Hierarchy Process`
 - `Interpretive Structural Modeling`
+- `Newsvendor Model Optimizer`
 
 `Monte Carlo Risk Simulation` follows the same static tool-page pattern but also uses
 `monte-carlo-worker.js` for background simulation.
@@ -327,6 +328,7 @@ Available tools should be represented consistently:
 - Analytic Hierarchy Process
 - Monte Carlo Risk Simulation
 - Interpretive Structural Modeling
+- Newsvendor Model Optimizer
 
 ## Current Tool-Specific Rules
 
@@ -439,6 +441,29 @@ Available tools should be represented consistently:
   causality. Do not present a hierarchy as objectively validated evidence.
 - Validate imported model JSON and keep the editable workflow limited to 12 factors
   unless performance and mobile usability are deliberately redesigned and tested.
+
+### Newsvendor Model Optimizer
+
+- Present the tool as a single-period inventory optimizer, not a continuous
+  replenishment model or a general-purpose simulation engine.
+- Use the standard marginal-cost logic: underage cost equals lost unit margin plus
+  any additional shortage penalty; overage cost equals unit cost minus salvage value
+  plus any additional holding or disposal cost. Avoid double-counting these effects.
+- Calculate the critical ratio as `Cu / (Cu + Co)` and obtain the unrounded quantity
+  from the selected demand distribution's inverse cumulative probability.
+- Keep Normal, Uniform, Triangular, Poisson, and empirical demand assumptions explicit.
+  Uploaded empirical history must remain local and be validated before calculation.
+- Show pack-size rounding separately from the theoretical optimum and explain which
+  practical pack quantity was selected.
+- Keep expert-adjusted demand optional, disclose its weight, and describe it as a
+  scenario adjustment rather than validated evidence.
+- Pair expected profit, service level, stockout probability, expected sales,
+  leftovers, and lost sales with plain-language interpretation. Do not describe the
+  economically optimal service level as a universal service target.
+- Distinguish Newsvendor from Monte Carlo simulation: Newsvendor optimizes one order
+  quantity using a fixed inventory-economic model; Monte Carlo explores the outcome
+  distribution of a user-selected or custom formula and does not inherently optimize
+  an inventory decision.
 
 ## SEO Requirements
 
