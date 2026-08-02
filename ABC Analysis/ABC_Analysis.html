@@ -596,10 +596,20 @@
         <section id="abc-methodology" class="themed-card p-6 rounded-xl shadow-xs border border-gray-700 space-y-4">
             <h2 class="text-lg font-semibold">Methodology, Assumptions, and Limitations</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="abc-content-card">
-                    <span>Formula</span>
-                    <p>ABC value is either the supplied consumption value or quantity used x unit cost for the chosen analysis period. In ABC + XYZ mode, quantity is the sum of entered monthly quantities. XYZ coefficient of variation equals monthly standard deviation divided by average monthly quantity.</p>
-                </div>
+          <div class="abc-content-card methodology-formula-card">
+            <span>Formula Logic</span>
+            <div class="ath-formula-list" aria-label="ABC and XYZ formulas">
+              <p><strong>Notation</strong><br><var>q</var><sub>it</sub> = quantity for item <var>i</var> in month <var>t</var>, <var>c</var><sub>i</sub> = unit cost, <var>v</var><sub>i</sub> = item consumption value, <var>V</var> = total consumption value</p>
+              <p><strong>Consumption value</strong><br><var>v</var><sub>i</sub> = <var>c</var><sub>i</sub> &times; &sum;<sub>t=1</sub><sup>m</sup> <var>q</var><sub>it</sub>, or the directly supplied value in ABC-only mode</p>
+              <p><strong>Value share</strong><br><var>p</var><sub>i</sub> = <var>v</var><sub>i</sub> / <var>V</var>, where <var>V</var> = &sum;<sub>i=1</sub><sup>n</sup> <var>v</var><sub>i</sub></p>
+              <p><strong>Cumulative share</strong><br><var>C</var><sub>i</sub> = &sum;<sub>k=1</sub><sup>i</sup> <var>p</var><sub>k</sub>, after sorting items from highest to lowest consumption value</p>
+              <p><strong>ABC classification</strong><br>A when <var>C</var><sub>i</sub> &le; <var>T</var><sub>A</sub>; B through <var>T</var><sub>B</sub>; C above <var>T</var><sub>B</sub>. The item that crosses the B boundary remains in B.</p>
+              <p><strong>Monthly mean</strong><br><var>x&#772;</var><sub>i</sub> = (1 / <var>m</var>) &sum;<sub>t=1</sub><sup>m</sup> <var>q</var><sub>it</sub></p>
+              <p><strong>Population standard deviation</strong><br>&sigma;<sub>i</sub> = &radic;[(1 / <var>m</var>) &sum;<sub>t=1</sub><sup>m</sup> (<var>q</var><sub>it</sub> - <var>x&#772;</var><sub>i</sub>)<sup>2</sup>]</p>
+              <p><strong>XYZ variability</strong><br><var>CV</var><sub>i</sub> = &sigma;<sub>i</sub> / <var>x&#772;</var><sub>i</sub>. X when <var>CV</var> &le; <var>T</var><sub>X</sub>; Y through <var>T</var><sub>Y</sub>; Z above <var>T</var><sub>Y</sub>.</p>
+            </div>
+            <p class="ath-formula-note">The combined segment joins the independently calculated classes, for example A + Z = AZ. Blank months are ignored; entered zero values remain part of the variability calculation.</p>
+          </div>
                 <div class="abc-content-card">
                     <span>Assumptions</span>
                     <p>ABC assumes consumption value is the right prioritisation measure. XYZ assumes monthly usage, sales, consumption, or demand quantities are a useful signal of predictability.</p>

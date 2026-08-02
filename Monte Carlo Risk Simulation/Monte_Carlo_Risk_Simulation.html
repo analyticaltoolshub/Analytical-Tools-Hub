@@ -402,14 +402,21 @@
         <section class="panel content-section" id="methodology">
           <h2>Methodology, Assumptions, and Limitations</h2>
           <div class="guidance-grid">
-            <div class="guidance-card">
-              <span>Calculation Logic</span>
-              <p>Each iteration samples one value from every input distribution, evaluates the defined formula, and records the resulting outcome.</p>
+          <div class="guidance-card methodology-formula-card">
+            <span>Formula Logic</span>
+            <div class="ath-formula-list" aria-label="Monte Carlo simulation formulas">
+              <p><strong>Simulation outcome</strong><br>For iteration <var>r</var>, sample each uncertain input <var>x</var><sub>jr</sub> from its selected distribution and calculate <var>y</var><sub>r</sub> = <var>f</var>(<var>x</var><sub>1r</sub>, ..., <var>x</var><sub>kr</sub>)</p>
+              <p><strong>Uniform sample</strong><br><var>x</var> = <var>a</var> + <var>u</var>(<var>b</var> - <var>a</var>), where <var>u</var> is a seeded random value from 0 to 1</p>
+              <p><strong>Triangular sample</strong><br>Uses minimum <var>a</var>, most likely value <var>c</var>, maximum <var>b</var>, and inverse-transform sampling on the two sides of the mode</p>
+              <p><strong>Normal and lognormal</strong><br>Normal samples use mean &mu; and standard deviation &sigma;; lognormal samples use exp(<var>Z</var>) where <var>Z</var> is sampled from the specified underlying normal distribution</p>
+              <p><strong>Fixed and discrete samples</strong><br>A fixed input returns its stated value. A discrete input selects one listed value according to its normalised probability weight.</p>
+              <p><strong>Sample mean</strong><br><var>y&#772;</var> = (1 / <var>N</var>) &sum;<sub>r=1</sub><sup>N</sup> <var>y</var><sub>r</sub></p>
+              <p><strong>Percentile</strong><br><var>P</var><sub>p</sub> is the interpolated value at position <var>p</var>(<var>N</var> - 1) in the sorted simulated outcomes</p>
+              <p><strong>Target probability</strong><br><var>Pr</var>(target met) = count of simulated outcomes meeting the target / <var>N</var></p>
+              <p><strong>Driver correlation</strong><br><var>r</var><sub>xy</sub> = cov(<var>x</var>, <var>y</var>) / (&sigma;<sub>x</sub>&sigma;<sub>y</sub>), used to screen linear input-outcome relationships</p>
             </div>
-            <div class="guidance-card">
-              <span>Percentile Logic</span>
-              <p>P50 is the median. P80, P90, and P95 are values at or below which 80%, 90%, and 95% of simulated outcomes fall.</p>
-            </div>
+            <p class="ath-formula-note">The seed makes an unchanged sample scenario reproducible. Correlation ranks association, not causation, and may understate nonlinear or interaction effects.</p>
+          </div>
             <div class="guidance-card">
               <span>Assumptions</span>
               <p>The selected distributions, parameters, formula, target, and independence between variables are assumed to represent the decision adequately.</p>

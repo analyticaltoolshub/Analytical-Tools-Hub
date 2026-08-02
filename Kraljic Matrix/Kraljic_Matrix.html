@@ -252,7 +252,7 @@
               <div class="risk-stage-heading">
                 <div>
                   <h4 id="risk-scoring-title">2. Score each item-supplier relationship</h4>
-                  <p>Move each slider from very low to very high risk, then save before continuing to the next supplier relationship.</p>
+                  <p>Move each slider from very low to very high risk, then select Save Category Scores. The tool stores the factor ratings, marks the relationship as Scores saved, and opens the next relationship. The final Supply Risk is calculated after you choose a weighting method.</p>
                 </div>
                 <span id="riskCategoryProgress" class="risk-progress-pill">0 of 0 assessed</span>
               </div>
@@ -431,10 +431,20 @@
         <section class="panel content-section" id="methodology">
           <h2>Methodology, Assumptions, and Limitations</h2>
           <div class="guidance-grid">
-            <div class="guidance-card">
-              <span>Method Logic</span>
-              <p>The tool aggregates annual spend by item-supplier combination, converts relative spend into a profit impact score, and combines it with a weighted average of the selected 1-5 supply-risk factor scores.</p>
+          <div class="guidance-card methodology-formula-card">
+            <span>Formula Logic</span>
+            <div class="ath-formula-list" aria-label="Kraljic Matrix scoring formulas">
+              <p><strong>Notation</strong><br><var>A</var><sub>i</sub> = annual spend for item-supplier relationship <var>i</var>, <var>s</var><sub>ij</sub> = risk score for factor <var>j</var>, <var>w</var><sub>j</sub> = factor weight</p>
+              <p><strong>Spend aggregation</strong><br><var>A</var><sub>i</sub> = sum of imported annual-spend rows with the same item/category and supplier</p>
+              <p><strong>Normalised spend</strong><br><var>N</var><sub>i</sub> = (<var>A</var><sub>i</sub> - <var>A</var><sub>min</sub>) / (<var>A</var><sub>max</sub> - <var>A</var><sub>min</sub>)</p>
+              <p><strong>Profit-impact score</strong><br><var>I</var><sub>i</sub> = round(4<var>N</var><sub>i</sub>) + 1, constrained to 1-5. If all spends are equal, every relationship receives 3.</p>
+              <p><strong>Weight requirement</strong><br>&sum;<sub>j=1</sub><sup>k</sup> <var>w</var><sub>j</sub> = 1, equivalent to 100%</p>
+              <p><strong>Supply-risk score</strong><br><var>R</var><sub>i</sub> = &sum;<sub>j=1</sub><sup>k</sup> <var>w</var><sub>j</sub><var>s</var><sub>ij</sub>, where each factor score is from 1 to 5</p>
+              <p><strong>High/low split</strong><br>Profit impact is high when <var>I</var><sub>i</sub> &gt; 2. Supply risk is high when <var>R</var><sub>i</sub> &gt; 2.</p>
+              <p><strong>Quadrants</strong><br>High impact/high risk = Strategic; high/low = Leverage; low/high = Bottleneck; low/low = Non-Critical</p>
             </div>
+            <p class="ath-formula-note">Profit impact is relative to the imported dataset, not an absolute measure of profitability. Adding or removing records can therefore change the impact score of existing relationships.</p>
+          </div>
             <div class="guidance-card">
               <span>Required Inputs</span>
               <p>Import item or category, supplier, and annual spend fields. Then select relevant supply-risk factors and score them using current market knowledge, supplier evidence, and operational judgement.</p>

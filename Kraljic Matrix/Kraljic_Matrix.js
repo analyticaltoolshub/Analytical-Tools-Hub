@@ -1171,8 +1171,12 @@ function populateCategoryRiskSelector() {
   items.forEach(item => {
     const option = document.createElement("option");
     option.value = item.id;
-    const riskStatus = isValidRisk(item.risk) ? ` - Risk ${item.risk.toFixed(2)}` : " - Risk not set";
-    option.textContent = `${getItemLabel(item)} (${formatCurrency(item.annualSpend)})${riskStatus}`;
+    const riskStatus = isValidRisk(item.risk)
+      ? ` - Risk ${item.risk.toFixed(2)}`
+      : hasCompleteCategoryScores(item)
+        ? " - Scores saved"
+        : " - Risk not set";
+    option.textContent = `${getItemLabel(item)}${riskStatus}`;
     categorySelect.appendChild(option);
   });
 

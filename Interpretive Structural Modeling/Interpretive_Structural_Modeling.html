@@ -419,22 +419,20 @@
         <section class="panel content-section" id="methodology">
           <h2>Methodology, Assumptions, and Limitations</h2>
           <div class="guidance-grid">
-            <div class="guidance-card">
-              <span>SSIM Conversion</span>
-              <p>V creates i→j, A creates j→i, X creates both directions, and O creates neither direction. Diagonal values are set to 1.</p>
+          <div class="guidance-card methodology-formula-card">
+            <span>Algorithm Logic</span>
+            <div class="ath-formula-list" aria-label="Interpretive Structural Modeling algorithm logic">
+              <p><strong>SSIM conversion</strong><br>V: <var>r</var><sub>ij</sub> = 1, <var>r</var><sub>ji</sub> = 0; A: 0, 1; X: 1, 1; O: 0, 0. Every diagonal value <var>r</var><sub>ii</sub> = 1.</p>
+              <p><strong>Transitive closure</strong><br>If <var>r</var><sub>ij</sub> = 1 and <var>r</var><sub>jk</sub> = 1, the final matrix sets <var>r</var><sub>ik</sub> = 1. Added links are displayed as 1*.</p>
+              <p><strong>Reachability set</strong><br><var>R</var>(<var>i</var>) = {<var>j</var> | <var>r</var><sub>ij</sub> = 1}: factors that factor <var>i</var> can reach, including itself</p>
+              <p><strong>Antecedent set</strong><br><var>A</var>(<var>i</var>) = {<var>j</var> | <var>r</var><sub>ji</sub> = 1}: factors that can reach factor <var>i</var>, including itself</p>
+              <p><strong>Intersection set</strong><br><var>I</var>(<var>i</var>) = <var>R</var>(<var>i</var>) &cap; <var>A</var>(<var>i</var>)</p>
+              <p><strong>Level partitioning</strong><br>Factors where <var>R</var>(<var>i</var>) = <var>I</var>(<var>i</var>) form the current top level, are removed, and the test repeats.</p>
+              <p><strong>Driving and dependence</strong><br>Driving power = final-matrix row total; dependence power = final-matrix column total</p>
+              <p><strong>MICMAC-style classes</strong><br>Driving and dependence are marked high or low against their model averages, producing Autonomous, Dependent, Linkage, and Independent/Driving groups.</p>
             </div>
-            <div class="guidance-card">
-              <span>Transitivity</span>
-              <p>If factor i reaches factor j and factor j reaches factor k, the final matrix adds an inferred i→k relationship. These links are marked separately as 1*.</p>
-            </div>
-            <div class="guidance-card">
-              <span>Level Partitioning</span>
-              <p>Factors whose reachability set equals their reachability/antecedent intersection form the current top level, then the process repeats with the remaining factors.</p>
-            </div>
-            <div class="guidance-card">
-              <span>MICMAC-Style View</span>
-              <p>Driving and dependence power come from final-matrix row and column totals. This tool uses the model averages as transparent high/low classification boundaries.</p>
-            </div>
+            <p class="ath-formula-note">The hierarchy is produced from confirmed expert relationships. Transitive links are logical implications of those judgements; they are not additional observed evidence.</p>
+          </div>
             <div class="guidance-card">
               <span>Assumptions</span>
               <p>Experts understand the problem context, factor definitions are distinct, and the selected directional relationships are meaningful for that context.</p>

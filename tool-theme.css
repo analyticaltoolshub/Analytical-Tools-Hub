@@ -595,6 +595,42 @@ body.ism-page main.container > .panel {
   line-height: 1.65 !important;
 }
 
+.methodology-formula-card {
+  grid-column: 1 / -1;
+}
+
+.ath-formula-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+}
+
+.ath-formula-list p {
+  margin: 0 !important;
+  padding: .8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-primary) !important;
+  line-height: 1.55 !important;
+}
+
+.ath-formula-list strong,
+.ath-formula-list var {
+  color: var(--navy-950);
+}
+
+.ath-formula-list var {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.ath-formula-note {
+  margin-top: .75rem !important;
+  color: var(--text-secondary) !important;
+}
+
 body.abc-page section[aria-labelledby="decision-guide-heading"] > .grid {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 1rem !important;
@@ -1044,6 +1080,10 @@ tbody tr:hover td,
 }
 
 @media (max-width: 760px) {
+  .ath-formula-list {
+    grid-template-columns: 1fr;
+  }
+
   .table-wrap::before,
   .manual-table-wrap::before,
   .max-h-60::before {

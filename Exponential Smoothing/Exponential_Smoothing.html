@@ -300,10 +300,20 @@
                 <section class="panel content-section" id="methodology">
                     <h2>Methodology, Assumptions, and Limitations</h2>
                     <div class="guidance-grid">
-                        <div class="guidance-card">
-                            <span>Formula Logic</span>
-                            <p>Simple exponential smoothing blends the latest demand with the previous forecast. Holt's method adds a trend component, while Holt-Winters adds a repeating seasonal component.</p>
-                        </div>
+          <div class="guidance-card methodology-formula-card">
+            <span>Formula Logic</span>
+            <div class="ath-formula-list" aria-label="Exponential smoothing formulas">
+              <p><strong>Notation</strong><br><var>y</var><sub>t</sub> = observed demand, <var>l</var><sub>t</sub> = level, <var>b</var><sub>t</sub> = trend, <var>s</var><sub>t</sub> = seasonal factor, <var>m</var> = season length</p>
+              <p><strong>Simple smoothing</strong><br><var>F</var><sub>t+1</sub> = &alpha;<var>y</var><sub>t</sub> + (1 - &alpha;)<var>F</var><sub>t</sub></p>
+              <p><strong>Holt level</strong><br><var>l</var><sub>t</sub> = &alpha;<var>y</var><sub>t</sub> + (1 - &alpha;)(<var>l</var><sub>t-1</sub> + <var>b</var><sub>t-1</sub>)</p>
+              <p><strong>Holt trend</strong><br><var>b</var><sub>t</sub> = &beta;(<var>l</var><sub>t</sub> - <var>l</var><sub>t-1</sub>) + (1 - &beta;)<var>b</var><sub>t-1</sub></p>
+              <p><strong>Additive Holt-Winters</strong><br><var>l</var><sub>t</sub> = &alpha;(<var>y</var><sub>t</sub> - <var>s</var><sub>t-m</sub>) + (1 - &alpha;)(<var>l</var><sub>t-1</sub> + <var>b</var><sub>t-1</sub>)</p>
+              <p><strong>Multiplicative Holt-Winters</strong><br><var>l</var><sub>t</sub> = &alpha;(<var>y</var><sub>t</sub> / <var>s</var><sub>t-m</sub>) + (1 - &alpha;)(<var>l</var><sub>t-1</sub> + <var>b</var><sub>t-1</sub>)</p>
+              <p><strong>Seasonal update</strong><br>Additive: <var>s</var><sub>t</sub> = &gamma;(<var>y</var><sub>t</sub> - <var>l</var><sub>t</sub>) + (1 - &gamma;)<var>s</var><sub>t-m</sub>; multiplicative uses <var>y</var><sub>t</sub> / <var>l</var><sub>t</sub></p>
+              <p><strong>Mean absolute error</strong><br><var>MAE</var> = (1 / (<var>n</var> - 1)) &sum;<sub>t=2</sub><sup>n</sup> |<var>y</var><sub>t</sub> - <var>F</var><sub>t</sub>|</p>
+            </div>
+            <p class="ath-formula-note">The implementation produces a one-period-ahead forecast. Holt-Winters initialises level and seasonality from the first complete season and trend from the first two complete seasons.</p>
+          </div>
                         <div class="guidance-card">
                             <span>Required Inputs</span>
                             <p>The tool needs a clean numeric demand series in chronological order. Holt-Winters requires enough history to represent at least two full seasonal cycles.</p>

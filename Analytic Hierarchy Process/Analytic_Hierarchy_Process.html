@@ -273,8 +273,62 @@
               <div id="alternativeRanking" class="ranking-list"></div>
             </div>
             <div class="result-card result-card-wide">
-              <h3>Consistency Review</h3>
-              <div id="consistencyPanel" class="consistency-list"></div>
+              <h3>Pairwise Comparison Calculations</h3>
+              <p class="result-card-intro">Trace the calculation from the aggregated pairwise judgements through geometric-mean priorities and consistency checks.</p>
+              <div id="pairwiseCalculations" class="pairwise-calculations"></div>
+            </div>
+            <div class="result-card result-card-wide">
+              <h3>Decision Matrix and Weighted Calculation</h3>
+              <p class="result-card-intro">The final matrix combines each alternative's local priority under every criterion with the criterion weights.</p>
+              <div id="decisionMatrix" class="decision-matrix-wrap"></div>
+            </div>
+            <div class="result-card result-card-wide sensitivity-card">
+              <div class="sensitivity-header">
+                <div>
+                  <h3>Scenario Planning: Test Weight Sensitivity</h3>
+                  <p class="result-card-intro">Test whether the preferred alternative changes when one criterion receives more or less importance.</p>
+                </div>
+                <button class="scenario-toggle" id="sensitivityToggle" type="button" aria-pressed="false" aria-controls="sensitivityPanel">
+                  <span class="scenario-toggle-text">Scenario Planning</span>
+                  <span class="scenario-switch" aria-hidden="true"></span>
+                </button>
+              </div>
+
+              <div id="sensitivityPanel" class="sensitivity-panel hidden">
+                <p class="scenario-note">This scenario temporarily overrides one criterion weight and proportionally rebalances the others. It does not change the original pairwise judgements, decision matrix, or consistency ratios.</p>
+
+                <div class="sensitivity-controls">
+                  <label>
+                    Criterion to test
+                    <select id="sensitivityCriterion"></select>
+                  </label>
+                  <label>
+                    Scenario weight: <strong id="sensitivityWeightValue">0%</strong>
+                    <input id="sensitivityWeight" type="range" min="0" max="100" step="0.1" value="0">
+                    <span class="range-scale" aria-hidden="true"><span>0%</span><span>100%</span></span>
+                  </label>
+                  <button id="resetSensitivityButton" class="secondary-button" type="button">Reset to Baseline</button>
+                </div>
+
+                <div id="sensitivityWeightComparison" class="sensitivity-weight-comparison"></div>
+
+                <div class="sensitivity-output-grid">
+                  <div class="sensitivity-chart-card">
+                    <h4>Alternative Priority Across the Weight Range</h4>
+                    <div class="sensitivity-chart-scroll" tabindex="0" role="region" aria-label="Scrollable AHP sensitivity chart">
+                      <svg id="sensitivityChart" class="sensitivity-chart" viewBox="0 0 760 340" role="img"></svg>
+                    </div>
+                    <div id="sensitivityLegend" class="sensitivity-legend"></div>
+                    <p id="sensitivityChartSummary" class="sr-only"></p>
+                  </div>
+                  <div class="sensitivity-ranking-card">
+                    <h4>Scenario Ranking</h4>
+                    <div id="sensitivityRanking" class="ranking-list"></div>
+                  </div>
+                </div>
+
+                <div id="sensitivityInterpretation" class="sensitivity-interpretation" aria-live="polite"></div>
+              </div>
             </div>
           </div>
         </section>
@@ -292,19 +346,34 @@
             <li>The expert imports the questionnaire, answers each pairwise question, and exports the completed response JSON.</li>
             <li>Load one or more completed response files into the analysis section and calculate the ranking.</li>
             <li>Review consistency ratios before using the ranking to support a decision.</li>
+            <li>Optionally turn on Scenario Planning after calculation to test whether changes in criterion importance alter the preferred alternative.</li>
           </ol>
         </section>
 
         <section class="panel content-section" id="methodology">
           <h2>Methodology, Assumptions, and Limitations</h2>
           <div class="guidance-grid">
-            <div class="guidance-card">
-              <span>Formula</span>
-              <p>The tool builds reciprocal pairwise matrices, estimates priorities using the geometric mean method, and combines alternative weights using the weighted sum of criterion priorities.</p>
+            <div class="guidance-card guidance-card-wide">
+              <span>Formula Logic</span>
+              <div class="formula-list" aria-label="Analytic Hierarchy Process formulas">
+                <p><strong>Notation</strong><br><var>E</var> = number of experts, <var>n</var> = number of compared elements, <var>a</var><sub>ij</sub><sup>(e)</sup> = expert <var>e</var>'s judgement comparing element <var>i</var> with element <var>j</var>, <var>w</var><sub>i</sub> = priority weight</p>
+                <p><strong>Reciprocal pairwise matrix</strong><br><var>a</var><sub>ji</sub> = 1 / <var>a</var><sub>ij</sub>, &nbsp; <var>a</var><sub>ii</sub> = 1</p>
+                <p><strong>Multiple-expert aggregation</strong><br><var>A</var><sub>ij</sub> = (&prod;<sub>e=1</sub><sup>E</sup> <var>a</var><sub>ij</sub><sup>(e)</sup>)<sup>1/E</sup></p>
+                <p><strong>Row geometric mean</strong><br><var>GM</var><sub>i</sub> = (&prod;<sub>j=1</sub><sup>n</sup> <var>A</var><sub>ij</sub>)<sup>1/n</sup></p>
+                <p><strong>Normalised priority weight</strong><br><var>w</var><sub>i</sub> = <var>GM</var><sub>i</sub> / &sum;<sub>k=1</sub><sup>n</sup> <var>GM</var><sub>k</sub></p>
+                <p><strong>Final alternative priority</strong><br><var>S</var><sub>a</sub> = &sum;<sub>i=1</sub><sup>n</sup> <var>w</var><sub>i</sub> &times; <var>p</var><sub>ai</sub>, where <var>p</var><sub>ai</sub> is alternative <var>a</var>'s local priority under criterion <var>i</var></p>
+                <p><strong>Sensitivity scenario</strong><br><var>w</var>&prime;<sub>k</sub> = <var>s</var>, &nbsp; <var>w</var>&prime;<sub>j</sub> = <var>w</var><sub>j</sub> &times; (1 - <var>s</var>) / (1 - <var>w</var><sub>k</sub>)</p>
+              </div>
             </div>
             <div class="guidance-card">
               <span>Consistency Ratio</span>
-              <p>CR = CI / RI, where CI = (&lambda;<sub>max</sub> - n) / (n - 1). A ratio around 0.10 or lower is often treated as acceptable guidance.</p>
+              <div class="formula-list compact-formula-list" aria-label="AHP consistency formulas">
+                <p><strong>Consistency vector</strong><br>(<var>Aw</var>)<sub>i</sub> / <var>w</var><sub>i</sub></p>
+                <p><strong>Principal value</strong><br>&lambda;<sub>max</sub> = (1 / <var>n</var>) &sum;<sub>i=1</sub><sup>n</sup> ((<var>Aw</var>)<sub>i</sub> / <var>w</var><sub>i</sub>)</p>
+                <p><strong>Consistency index</strong><br><var>CI</var> = (&lambda;<sub>max</sub> - <var>n</var>) / (<var>n</var> - 1)</p>
+                <p><strong>Consistency ratio</strong><br><var>CR</var> = <var>CI</var> / <var>RI</var></p>
+              </div>
+              <p class="formula-guidance"><var>RI</var> is Saaty's random index for a matrix of size <var>n</var>. A CR around 0.10 or lower is commonly used as review guidance, not proof that the judgement is objectively correct.</p>
             </div>
             <div class="guidance-card">
               <span>Saaty Scale</span>

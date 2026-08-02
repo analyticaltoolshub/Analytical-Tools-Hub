@@ -378,6 +378,10 @@ Available tools should be represented consistently:
 - Report criterion weights, ranked alternatives, and consistency ratios with plain
   interpretation. A consistency ratio around `0.10` or lower is guidance, not proof
   that a judgement is objectively correct.
+- Keep weight-sensitivity scenario planning optional and downstream of the original
+  AHP calculation. Vary one criterion at a time, proportionally rebalance the other
+  criterion weights to 100%, and never overwrite the pairwise judgements, original
+  priorities, or consistency ratios with scenario values.
 - Preserve the questionnaire design -> expert response -> analysis JSON workflow.
 - Treat imported JSON as untrusted input and validate schema, required fields, ranges,
   and compatibility before rendering or calculating.
