@@ -956,11 +956,6 @@ function initRenderedContent() {
     <button type="button" data-problem="${problem.title}">${problem.title}</button>
   `);
 
-  document.querySelectorAll('[data-problem-browser-open]').forEach((button) => {
-    button.textContent = `View all ${problems.length} problems`;
-    button.setAttribute('aria-label', `View all ${problems.length} business problems`);
-  });
-
   renderCards('[data-render="categories"]', categories, (item) => `
     <article class="category-card">
       ${icons[item.icon]}
