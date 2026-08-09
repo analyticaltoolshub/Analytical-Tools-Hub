@@ -1,0 +1,13 @@
+{
+  "name": "analytical-tools-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static browser-based analytical and decision-support tools.",
+  "scripts": {
+    "test": "node --test",
+    "check": "npm test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

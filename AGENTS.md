@@ -500,6 +500,11 @@ Maintain WCAG-minded implementation:
 - Do not rely on color alone for chart/status meaning.
 - Canvas charts should have adjacent text summaries or chart summaries.
 - Tables/previews must not overflow mobile viewports without a deliberate scroll container.
+- Wide tables, matrices, timelines, questionnaires, and dynamically revealed columns
+  must never increase the width of the page or its content grid. Set nested grid and
+  flex children to `min-width: 0`, and keep wide content inside a deliberate
+  `overflow-x: auto` container. Test default and expanded states on desktop, tablet,
+  and mobile, and confirm that no page-level horizontal scrollbar appears.
 - Test charts at phone and tablet widths. Canvas and SVG dimensions must respond to
   their container, preserve readable labels, and avoid clipped legends, axes, or
   tooltips.
@@ -534,15 +539,26 @@ Do not:
 
 ## Testing and Verification
 
-There is currently no automated test suite.
+ATH has a dependency-free Node test suite. Run it with:
+
+`npm test`
+
+Calculation functions covered by automated tests live in `calculation-core/`. The
+browser UI and Node tests must call the same production function; do not duplicate a
+formula only inside a test. When changing a covered formula, update or add an
+independently verified reference case. When adding a new quantitative tool, extract
+its calculation engine into a browser-and-Node compatible core module and add tests
+for a hand-calculated example, a realistic sample, a boundary case, and invalid input
+before treating the tool as calculation-verified.
 
 Before finishing changes:
 
-1. Run `git diff --check` on changed files.
-2. Run a local static server when visual/interactive behavior matters:
+1. Run `npm test` for calculation or JavaScript changes.
+2. Run `git diff --check` on changed files.
+3. Run a local static server when visual/interactive behavior matters:
    - `python -m http.server 8000`
    - Open `http://localhost:8000`
-3. Manually test affected flows:
+4. Manually test affected flows:
    - sample data
    - manual input
    - validation/error states
@@ -554,9 +570,9 @@ Before finishing changes:
    - local-storage restoration and malformed-storage fallback if persistence changed
    - keyboard operation and announced state for custom sliders, tabs, filters, and toggles
    - keyboard navigation for dialogs/menus
-4. If Node is available, run a syntax check for changed JS:
+5. If Node is available, run a syntax check for changed JS:
    - `node --check path/to/file.js`
-5. For calculation changes, verify at least:
+6. For calculation changes, verify at least:
    - one known hand-calculated or independently calculated example
    - boundary and invalid-input cases
    - reset and rerun behaviour

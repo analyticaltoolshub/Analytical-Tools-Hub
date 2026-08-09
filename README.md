@@ -26,6 +26,16 @@ python -m http.server 8000
 
 Then open `http://localhost:8000`.
 
+## Test Changes
+
+Install Node.js 20 or newer once, then run before pushing calculation changes:
+
+```bash
+npm test
+```
+
+The test suite has no third-party packages. GitHub Actions runs the same checks on pushes and pull requests.
+
 ## Contact
 
 Contact, feedback, and update-interest emails currently use:

@@ -824,6 +824,35 @@ html {
   margin-bottom: 10px;
 }
 
+/* Keep the wide ABC + XYZ month table inside the tool column. */
+.abc-page main,
+.abc-page main > .grid,
+.abc-page #abc-tool,
+.abc-page #abc-tool > .themed-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.abc-page main > .grid,
+.abc-page #abc-tool {
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.abc-page #abc-tool > .themed-card {
+  width: 100%;
+}
+
+.abc-page #manual-entry .max-h-60 {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 .abc-page #manual-search {
   color: #e5e7eb !important;
   background: rgba(255, 255, 255, 0.03) !important;
