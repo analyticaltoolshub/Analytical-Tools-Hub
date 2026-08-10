@@ -539,9 +539,12 @@ Do not:
 
 ## Testing and Verification
 
-ATH has a dependency-free Node test suite. Run it with:
+ATH has Node calculation/repository tests and Playwright browser smoke tests. Install
+dependencies with `npm ci`, then run:
 
 `npm test`
+
+`npm run test:browser`
 
 Calculation functions covered by automated tests live in `calculation-core/`. The
 browser UI and Node tests must call the same production function; do not duplicate a
@@ -551,14 +554,22 @@ its calculation engine into a browser-and-Node compatible core module and add te
 for a hand-calculated example, a realistic sample, a boundary case, and invalid input
 before treating the tool as calculation-verified.
 
+Every live tool page must be listed in `tests/browser/tools.smoke.spec.cjs`. Its smoke
+case should load the page, exercise a stable sample or primary action where practical,
+fail on uncaught browser errors, and verify that dynamic content does not create
+page-level horizontal overflow at desktop or phone width. Keep wide tables and charts
+inside their own scroll containers; never weaken the overflow assertion to conceal a
+layout defect.
+
 Before finishing changes:
 
 1. Run `npm test` for calculation or JavaScript changes.
-2. Run `git diff --check` on changed files.
-3. Run a local static server when visual/interactive behavior matters:
+2. Run `npm run test:browser` for tool workflow, layout, or interaction changes.
+3. Run `git diff --check` on changed files.
+4. Run a local static server when visual/interactive behavior matters:
    - `python -m http.server 8000`
    - Open `http://localhost:8000`
-4. Manually test affected flows:
+5. Manually test affected flows:
    - sample data
    - manual input
    - validation/error states
@@ -570,9 +581,9 @@ Before finishing changes:
    - local-storage restoration and malformed-storage fallback if persistence changed
    - keyboard operation and announced state for custom sliders, tabs, filters, and toggles
    - keyboard navigation for dialogs/menus
-5. If Node is available, run a syntax check for changed JS:
+6. If Node is available, run a syntax check for changed JS:
    - `node --check path/to/file.js`
-6. For calculation changes, verify at least:
+7. For calculation changes, verify at least:
    - one known hand-calculated or independently calculated example
    - boundary and invalid-input cases
    - reset and rerun behaviour

@@ -1250,13 +1250,28 @@ function createPairwiseCalculation(title, labels, result, open = false) {
 
   const summary = document.createElement("summary");
   const summaryTitle = document.createElement("span");
+  summaryTitle.className = "calculation-summary-title";
   summaryTitle.textContent = title;
+
+  const summaryMeta = document.createElement("span");
+  summaryMeta.className = "calculation-summary-meta";
   const summaryStatus = document.createElement("span");
   summaryStatus.className = result.cr <= 0.1 ? "status-good" : "status-review";
   summaryStatus.textContent = result.cr <= 0.1
     ? `CR ${result.cr.toFixed(3)} - within guidance`
     : `CR ${result.cr.toFixed(3)} - review required`;
-  summary.append(summaryTitle, summaryStatus);
+
+  const disclosure = document.createElement("span");
+  disclosure.className = "calculation-disclosure";
+  disclosure.setAttribute("aria-hidden", "true");
+  const disclosureLabel = document.createElement("span");
+  disclosureLabel.className = "calculation-disclosure-label";
+  const disclosureIcon = document.createElement("span");
+  disclosureIcon.className = "calculation-disclosure-icon";
+  disclosure.append(disclosureLabel, disclosureIcon);
+
+  summaryMeta.append(summaryStatus, disclosure);
+  summary.append(summaryTitle, summaryMeta);
   detail.appendChild(summary);
 
   const region = document.createElement("div");

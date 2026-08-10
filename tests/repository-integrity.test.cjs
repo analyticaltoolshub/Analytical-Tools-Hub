@@ -67,6 +67,12 @@ test("production pages load the tested calculation modules before their UI scrip
     "Safety Stock & Reorder Point/Safety_Stock_Reorder_Point.html": ["../calculation-core/safety-stock.js", "Safety_Stock_Reorder_Point.js"],
     "Exponential Smoothing/Exponential_Smoothing.html": ["../calculation-core/exponential-smoothing.js", "Exponential_Smoothing.js"],
     "Analytic Hierarchy Process/Analytic_Hierarchy_Process.html": ["../calculation-core/ahp.js", "Analytic_Hierarchy_Process.js"],
+    "ABC Analysis/ABC_Analysis.html": ["../calculation-core/abc.js", "ABC_Analysis.js"],
+    "Gantt Chart/Gantt_Chart.html": ["../calculation-core/gantt.js", "Gantt_Chart.js"],
+    "Interpretive Structural Modeling/Interpretive_Structural_Modeling.html": ["../calculation-core/ism.js", "Interpretive_Structural_Modeling.js"],
+    "Kraljic Matrix/Kraljic_Matrix.html": ["../calculation-core/kraljic.js", "Kraljic_Matrix.js"],
+    "Monte Carlo Risk Simulation/Monte_Carlo_Risk_Simulation.html": ["../calculation-core/monte-carlo.js", "monte-carlo.js"],
+    "Newsvendor Model Optimizer/Newsvendor_Model_Optimizer.html": ["../calculation-core/newsvendor.js", "Newsvendor_Model_Optimizer.js"],
   };
 
   Object.entries(expected).forEach(([relativePage, scripts]) => {

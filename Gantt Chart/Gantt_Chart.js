@@ -21,16 +21,11 @@ function clearError() {
 }
 
 function formatDate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return ATHGantt.formatDate(date);
 }
 
 function addDays(dateInput, amount) {
-  const date = new Date(dateInput);
-  date.setDate(date.getDate() + amount);
-  return date;
+  return ATHGantt.addDays(dateInput, amount);
 }
 
 function getNextMonday() {
@@ -89,29 +84,19 @@ function getSamplePlan(sampleKey) {
 }
 
 function days(startDate, endDate) {
-  return Math.floor((endDate - startDate) / 86400000);
+  return ATHGantt.daysBetween(startDate, endDate);
 }
 
 function getWeek(dateInput) {
-  const date = new Date(dateInput);
-  date.setHours(0, 0, 0, 0);
-  date.setDate(date.getDate() + 4 - (date.getDay() || 7));
-
-  const yearStart = new Date(date.getFullYear(), 0, 1);
-  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return ATHGantt.getWeek(dateInput);
 }
 
 function getWeekStart(dateInput) {
-  const date = new Date(dateInput);
-  date.setHours(0, 0, 0, 0);
-  date.setDate(date.getDate() - date.getDay());
-  return date;
+  return ATHGantt.getWeekStart(dateInput);
 }
 
 function getWeekEnd(dateInput) {
-  const date = getWeekStart(dateInput);
-  date.setDate(date.getDate() + 6);
-  return date;
+  return ATHGantt.getWeekEnd(dateInput);
 }
 
 function getValidatedTasks() {

@@ -1051,19 +1051,71 @@ button:disabled {
 }
 
 .calculation-detail summary {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
   min-height: 48px;
   padding: 12px 14px;
   color: var(--text-primary);
   font-weight: 800;
   cursor: pointer;
-  list-style-position: inside;
+  list-style: none;
+}
+
+.calculation-detail summary::-webkit-details-marker {
+  display: none;
+}
+
+.calculation-summary-title {
+  min-width: 0;
+}
+
+.calculation-summary-meta,
+.calculation-disclosure {
+  display: inline-flex;
+  align-items: center;
+}
+
+.calculation-summary-meta {
+  justify-content: flex-end;
+  gap: 18px;
+}
+
+.calculation-disclosure {
+  gap: 8px;
+  color: var(--blue-600);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.calculation-disclosure-label::before {
+  content: "View matrix";
+}
+
+.calculation-detail[open] .calculation-disclosure-label::before {
+  content: "Hide matrix";
+}
+
+.calculation-disclosure-icon {
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.calculation-detail[open] .calculation-disclosure-icon {
+  transform: translateY(2px) rotate(225deg);
 }
 
 .calculation-detail summary:hover {
+  background: var(--surface);
+}
+
+.calculation-detail[open] > summary {
+  border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
 
@@ -1350,7 +1402,13 @@ button:disabled {
   }
 
   .calculation-detail summary {
+    grid-template-columns: 1fr;
     align-items: flex-start;
+  }
+
+  .calculation-summary-meta {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .calculation-metrics {
@@ -1374,7 +1432,8 @@ button:disabled {
 
 @media (prefers-reduced-motion: reduce) {
   .scenario-switch,
-  .scenario-switch::after {
+  .scenario-switch::after,
+  .calculation-disclosure-icon {
     transition: none;
   }
 }

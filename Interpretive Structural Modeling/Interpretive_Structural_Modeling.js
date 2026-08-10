@@ -261,143 +261,13 @@ const problemTemplates = {
   }
 };
 
-function cloneMatrix(matrix) {
-  return matrix.map((row) => row.slice());
-}
-
-function relationshipKey(leftId, rightId) {
-  return `${leftId}::${rightId}`;
-}
-
-function buildInitialMatrix(factors, relationships) {
-  const size = factors.length;
-  const matrix = Array.from({ length: size }, (_, row) =>
-    Array.from({ length: size }, (_, column) => (row === column ? 1 : 0))
-  );
-
-  for (let i = 0; i < size; i += 1) {
-    for (let j = i + 1; j < size; j += 1) {
-      const symbol = relationships.get(relationshipKey(factors[i].id, factors[j].id));
-      if (symbol === "V" || symbol === "X") matrix[i][j] = 1;
-      if (symbol === "A" || symbol === "X") matrix[j][i] = 1;
-    }
-  }
-
-  return matrix;
-}
-
-function applyTransitivity(initialMatrix) {
-  const finalMatrix = cloneMatrix(initialMatrix);
-  const size = finalMatrix.length;
-
-  for (let via = 0; via < size; via += 1) {
-    for (let from = 0; from < size; from += 1) {
-      if (!finalMatrix[from][via]) continue;
-      for (let to = 0; to < size; to += 1) {
-        if (finalMatrix[via][to]) finalMatrix[from][to] = 1;
-      }
-    }
-  }
-
-  const transitive = finalMatrix.map((row, i) =>
-    row.map((value, j) => Boolean(value && !initialMatrix[i][j] && i !== j))
-  );
-  return { finalMatrix, transitive };
-}
+const { relationshipKey } = ATHIsm;
 
 function setFromIndexes(indexes, factors) {
   return indexes.map((index) => factors[index].code);
 }
 
-function partitionLevels(finalMatrix, factors) {
-  const remaining = new Set(factors.map((_, index) => index));
-  const partitions = [];
-  const levels = [];
-  let level = 1;
-
-  while (remaining.size) {
-    const currentIndexes = Array.from(remaining);
-    const assigned = [];
-
-    currentIndexes.forEach((factorIndex) => {
-      const reachability = currentIndexes.filter((index) => finalMatrix[factorIndex][index] === 1);
-      const antecedent = currentIndexes.filter((index) => finalMatrix[index][factorIndex] === 1);
-      const antecedentSet = new Set(antecedent);
-      const intersection = reachability.filter((index) => antecedentSet.has(index));
-      const isAssigned = reachability.length === intersection.length &&
-        reachability.every((index) => antecedentSet.has(index));
-
-      partitions.push({
-        factorIndex,
-        level: isAssigned ? level : null,
-        iteration: level,
-        reachability,
-        antecedent,
-        intersection,
-        assigned: isAssigned
-      });
-      if (isAssigned) assigned.push(factorIndex);
-    });
-
-    if (!assigned.length) {
-      currentIndexes.forEach((factorIndex) => assigned.push(factorIndex));
-    }
-
-    levels.push(assigned);
-    assigned.forEach((index) => remaining.delete(index));
-    level += 1;
-  }
-
-  const factorLevels = Array(factors.length).fill(0);
-  levels.forEach((indexes, levelIndex) => {
-    indexes.forEach((factorIndex) => {
-      factorLevels[factorIndex] = levelIndex + 1;
-    });
-  });
-
-  return { levels, factorLevels, partitions };
-}
-
-function calculatePowers(finalMatrix) {
-  const size = finalMatrix.length;
-  const driving = finalMatrix.map((row) => row.reduce((sum, value) => sum + value, 0));
-  const dependence = Array.from({ length: size }, (_, column) =>
-    finalMatrix.reduce((sum, row) => sum + row[column], 0)
-  );
-  return { driving, dependence };
-}
-
-function classifyMicmac(driving, dependence) {
-  const averageDriving = driving.reduce((sum, value) => sum + value, 0) / driving.length;
-  const averageDependence = dependence.reduce((sum, value) => sum + value, 0) / dependence.length;
-  const classifications = driving.map((drive, index) => {
-    const highDriving = drive >= averageDriving;
-    const highDependence = dependence[index] >= averageDependence;
-    if (!highDriving && !highDependence) return "Autonomous";
-    if (!highDriving && highDependence) return "Dependent";
-    if (highDriving && highDependence) return "Linkage";
-    return "Independent/driving";
-  });
-  return { averageDriving, averageDependence, classifications };
-}
-
-function analyzeModel(factors, relationships) {
-  const initialMatrix = buildInitialMatrix(factors, relationships);
-  const { finalMatrix, transitive } = applyTransitivity(initialMatrix);
-  const partition = partitionLevels(finalMatrix, factors);
-  const powers = calculatePowers(finalMatrix);
-  const micmac = classifyMicmac(powers.driving, powers.dependence);
-  return { initialMatrix, finalMatrix, transitive, ...partition, ...powers, ...micmac };
-}
-
-globalThis.ISMCore = {
-  buildInitialMatrix,
-  applyTransitivity,
-  partitionLevels,
-  calculatePowers,
-  classifyMicmac,
-  analyzeModel
-};
+globalThis.ISMCore = ATHIsm;
 
 if (typeof document !== "undefined") {
   const elements = {
@@ -1529,7 +1399,7 @@ if (typeof document !== "undefined") {
     setActionMessage(elements.surveyActionMessage);
     setError(elements.analysisError);
     const ssim = buildSsimMatrix();
-    const initial = buildInitialMatrix(factors, relationships);
+    const initial = ATHIsm.buildInitialMatrix(factors, relationships);
     elements.ssimTable.innerHTML = renderMatrix(ssim, { ssim: true });
     elements.initialMatrixTable.innerHTML = renderMatrix(initial);
     elements.analysisWorkspace.hidden = false;
@@ -1601,7 +1471,7 @@ if (typeof document !== "undefined") {
   });
 
   elements.generateResultsButton.addEventListener("click", () => {
-    results = analyzeModel(factors, relationships);
+    results = ATHIsm.analyzeModel(factors, relationships);
     renderResults();
   });
 

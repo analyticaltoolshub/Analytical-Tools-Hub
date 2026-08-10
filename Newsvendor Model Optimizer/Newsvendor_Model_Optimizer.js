@@ -127,7 +127,7 @@ function renderDataDiagnostics(values) {
     elements.dataDiagnostics.classList.add("hidden");
     return;
   }
-  const diagnostics = calculateDataDiagnostics(values);
+  const diagnostics = ATHNewsvendor.calculateDataDiagnostics(values);
   setText("diagnosticCount", formatNumber(diagnostics.count, 0));
   setText("diagnosticMedian", formatNumber(diagnostics.median));
   setText("diagnosticCv", formatPercent(diagnostics.cv));
@@ -266,7 +266,7 @@ function getDemandInputs() {
   if (distribution === "poisson" && expertMean !== null) expertStdDev = Math.sqrt(expertMean);
 
   if (expertOpen && expertMean !== null && expertStdDev !== null) {
-    const blend = blendDemandMoments(baseMean, baseStdDev, expertMean, expertStdDev, historicalWeight);
+    const blend = ATHNewsvendor.blendDemandMoments(baseMean, baseStdDev, expertMean, expertStdDev, historicalWeight);
     demandMean = blend.mean;
     demandStdDev = blend.stdDev;
     adjusted = true;
@@ -389,31 +389,7 @@ function buildDemandModel(demand) {
 }
 
 function evaluateQuantity(model, economics, quantity) {
-  const q = Math.max(0, quantity);
-  let expectedSales = 0;
-  let expectedLeftovers = 0;
-  let expectedLostSales = 0;
-
-  model.outcomes.forEach(outcome => {
-    expectedSales += Math.min(outcome.demand, q) * outcome.probability;
-    expectedLeftovers += Math.max(q - outcome.demand, 0) * outcome.probability;
-    expectedLostSales += Math.max(outcome.demand - q, 0) * outcome.probability;
-  });
-
-  const expectedRevenue = economics.sellingPrice * expectedSales;
-  const expectedProfit = expectedRevenue + economics.salvageValue * expectedLeftovers - economics.unitCost * q -
-    economics.holdingCost * expectedLeftovers - economics.shortageCost * expectedLostSales;
-
-  return {
-    quantity: q,
-    serviceLevel: model.cdf(q),
-    stockoutProbability: 1 - model.cdf(q),
-    expectedSales,
-    expectedLeftovers,
-    expectedLostSales,
-    expectedRevenue,
-    expectedProfit
-  };
+  return ATHNewsvendor.evaluateQuantity(model, economics, quantity);
 }
 
 function adjustToPack(rawQuantity, packSize, method, model, economics) {
@@ -481,17 +457,7 @@ function applyOperationalConstraints(unconstrainedQuantity, model, economics) {
 }
 
 function calculateNewsvendor(demand, economics) {
-  const model = buildDemandModel(demand);
-  const underageCost = economics.sellingPrice - economics.unitCost + economics.shortageCost;
-  const overageCost = economics.unitCost - economics.salvageValue + economics.holdingCost;
-  const criticalRatio = underageCost / (underageCost + overageCost);
-  const rawOptimalQuantity = model.quantile(criticalRatio);
-  const unconstrainedQuantity = adjustToPack(rawOptimalQuantity, economics.packSize, economics.roundingMethod, model, economics);
-  const constraintResult = applyOperationalConstraints(unconstrainedQuantity, model, economics);
-  const optimalQuantity = constraintResult.quantity;
-  const optimized = evaluateQuantity(model, economics, optimalQuantity);
-  const current = economics.currentOrderQty === null ? null : evaluateQuantity(model, economics, economics.currentOrderQty);
-  return { demand, economics, model, underageCost, overageCost, criticalRatio, rawOptimalQuantity, unconstrainedQuantity, constraintResult, optimalQuantity, optimized, current };
+  return ATHNewsvendor.calculateNewsvendor(demand, economics);
 }
 
 function demandForComparison(distribution, demand) {
@@ -774,7 +740,7 @@ function calculate() {
   clearError();
   const demand = getDemandInputs();
   const economics = getEconomicInputs();
-  const validationMessage = validateInputs(demand, economics);
+  const validationMessage = ATHNewsvendor.validateInputs(demand, economics);
   if (validationMessage) {
     showError(validationMessage);
     return;

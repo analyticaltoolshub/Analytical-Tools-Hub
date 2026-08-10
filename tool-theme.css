@@ -448,7 +448,57 @@ body.newsvendor-page main.container {
 
 .panel,
 .themed-card {
+  min-width: 0;
+  max-width: 100%;
   padding: var(--tool-panel-padding) !important;
+}
+
+.forecast-layout,
+.kraljic-layout,
+.gantt-layout,
+.break-even-layout,
+.eoq-layout,
+.ssrop-layout,
+.ahp-layout,
+.monte-carlo-layout,
+.ism-layout,
+.newsvendor-layout,
+.forecast-content,
+.kraljic-content,
+.gantt-content,
+.break-even-content,
+.eoq-content,
+.ssrop-content,
+.ahp-content,
+.monte-carlo-content,
+.ism-content,
+.newsvendor-content,
+.section-header > *,
+.results-header > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chart-wrap,
+.matrix-wrapper,
+.table-wrap,
+.table-scroll,
+.manual-table-wrap,
+.max-h-60,
+.svg-chart,
+.gantt-wrapper {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.result-card,
+.result-block,
+.metric-card,
+.chart-grid,
+.results-grid {
+  min-width: 0;
+  max-width: 100%;
 }
 
 body.abc-page main > .themed-card,

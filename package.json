@@ -4,8 +4,12 @@
   "private": true,
   "description": "Static browser-based analytical and decision-support tools.",
   "scripts": {
-    "test": "node --test",
-    "check": "npm test"
+    "test": "node --test tests/calculation-core.test.cjs tests/repository-integrity.test.cjs",
+    "test:browser": "playwright test",
+    "check": "npm test && npm run test:browser"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2"
   },
   "engines": {
     "node": ">=20"

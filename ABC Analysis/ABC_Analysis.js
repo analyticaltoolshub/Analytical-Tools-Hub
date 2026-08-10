@@ -146,14 +146,11 @@ function isXyzMode() {
 }
 
 function sumNumbers(values) {
-  return values.reduce((sum, value) => sum + (Number(value) || 0), 0);
+  return ATHAbc.sumNumbers(values);
 }
 
 function getStandardDeviation(values) {
-  if (values.length === 0) return 0;
-  const average = sumNumbers(values) / values.length;
-  const variance = values.reduce((sum, value) => sum + Math.pow(value - average, 2), 0) / values.length;
-  return Math.sqrt(variance);
+  return ATHAbc.populationStandardDeviation(values);
 }
 
 function addManualRow(item = "", val1 = "", val2 = "", monthlyValues = []) {
@@ -771,72 +768,23 @@ document.getElementById("btn-calculate").addEventListener("click", () => {
     return;
   }
 
-  // 2. Sorting array sequence by individual items value weights (Descending structural sort)
-  dataToProcess.sort((a, b) => b.calculatedValue - a.calculatedValue);
-
-  // 3. Mathematical aggregation metrics computations
-  const totalValue = dataToProcess.reduce(
-    (sum, item) => sum + item.calculatedValue,
-    0,
-  );
-
-  if (totalValue <= 0) {
-    alert(
-      "Total cumulative sum aggregate value must be strictly greater than 0 to calculate fractional values.",
-    );
-    return;
-  }
-
-  // 4. Threshold parsing configurations variables maps
   const { thresholdA, thresholdB } = thresholdConfig;
   const { thresholdX, thresholdY } = xyzThresholdConfig;
-
-  let runningSum = 0;
-  finalAnalysisResults = dataToProcess.map((item, index) => {
-    runningSum += item.calculatedValue;
-    const individualPercent = item.calculatedValue / totalValue;
-    const cumulativePercent = runningSum / totalValue;
-
-    // ABC Conditional Assignment logic blocks
-    let abcClass = "C";
-    if (cumulativePercent <= thresholdA) {
-      abcClass = "A";
-    } else if (
-      cumulativePercent <= thresholdB ||
-      cumulativePercent - individualPercent < thresholdB
-    ) {
-      // Inclusion edge logic catches cutoff bounds efficiently
-      abcClass = "B";
-    }
-
-    let xyzClass = null;
-    let combinedClass = null;
-    if (useXyz) {
-      if (item.coefficientOfVariation <= thresholdX) {
-        xyzClass = "X";
-      } else if (item.coefficientOfVariation <= thresholdY) {
-        xyzClass = "Y";
-      } else {
-        xyzClass = "Z";
-      }
-      combinedClass = `${abcClass}${xyzClass}`;
-    }
-
-    return {
-      rank: index + 1,
-      name: item.name,
-      value: item.calculatedValue,
-      annualQuantity: item.annualQuantity,
-      unitCost: item.unitCost,
-      monthCount: item.monthCount,
-      coefficientOfVariation: item.coefficientOfVariation,
-      xyzClass,
-      combinedClass,
-      percent: individualPercent,
-      cumulative: cumulativePercent,
-      class: abcClass,
-    };
-  });
+  let analysis;
+  try {
+    analysis = ATHAbc.calculateAbcAnalysis(dataToProcess, {
+      thresholdA,
+      thresholdB,
+      thresholdX,
+      thresholdY,
+      useXyz,
+    });
+  } catch (error) {
+    alert(error.message);
+    return;
+  }
+  const totalValue = analysis.totalValue;
+  finalAnalysisResults = analysis.results;
 
   renderDashboardOutputs(totalValue, finalAnalysisResults, useXyz);
 });

@@ -6,6 +6,12 @@ const eoq = require("../calculation-core/eoq.js");
 const safetyStock = require("../calculation-core/safety-stock.js");
 const forecasting = require("../calculation-core/exponential-smoothing.js");
 const ahp = require("../calculation-core/ahp.js");
+const abc = require("../calculation-core/abc.js");
+const kraljic = require("../calculation-core/kraljic.js");
+const ism = require("../calculation-core/ism.js");
+const gantt = require("../calculation-core/gantt.js");
+const monteCarlo = require("../calculation-core/monte-carlo.js");
+const newsvendor = require("../calculation-core/newsvendor.js");
 
 function approximatelyEqual(actual, expected, tolerance = 1e-9) {
   assert.ok(
@@ -195,4 +201,187 @@ test("AHP rejects incompatible expert questionnaire structures", () => {
   };
 
   assert.throws(() => ahp.calculateAhp([base, incompatible]), /same questionnaire structure/);
+});
+
+test("ABC keeps the item that crosses a cutoff in the higher-priority class", () => {
+  const result = abc.calculateAbcAnalysis([
+    { name: "Dominant item", calculatedValue: 90 },
+    { name: "Remaining item", calculatedValue: 10 },
+  ]);
+
+  assert.equal(result.results[0].class, "A");
+  assert.equal(result.results[1].class, "B");
+  approximatelyEqual(result.results[0].cumulative, 0.9);
+});
+
+test("ABC plus XYZ applies inclusive variability thresholds", () => {
+  const result = abc.calculateAbcAnalysis([
+    { name: "X boundary", calculatedValue: 80, coefficientOfVariation: 0.25 },
+    { name: "Y boundary", calculatedValue: 15, coefficientOfVariation: 0.5 },
+    { name: "Z item", calculatedValue: 5, coefficientOfVariation: 0.8 },
+  ], { useXyz: true });
+
+  assert.deepEqual(result.results.map((row) => row.xyzClass), ["X", "Y", "Z"]);
+  assert.deepEqual(result.results.map((row) => row.combinedClass), ["AX", "BY", "CZ"]);
+});
+
+test("Kraljic calculates weighted risk and all four portfolio quadrants", () => {
+  const risk = kraljic.calculateRiskDetails({
+    scoresConfirmed: true,
+    weightMode: "custom",
+    factors: [{ id: "continuity" }, { id: "quality" }],
+    scores: { continuity: 5, quality: 2 },
+    weights: { continuity: 60, quality: 40 },
+  });
+
+  approximatelyEqual(risk.overall, 3.8);
+  assert.deepEqual(
+    [[4, 4], [2, 4], [4, 2], [2, 2]].map(([impact, score]) => kraljic.classifyItem({ impact, risk: score })),
+    ["strategic", "bottleneck", "leverage", "non-critical"]
+  );
+  assert.equal(kraljic.calculateRiskDetails({ ...risk.assessment, weights: { continuity: 50, quality: 40 } }), null);
+});
+
+test("Kraljic maps relative annual spend onto the 1-to-5 impact scale", () => {
+  const result = kraljic.calculateImpactScores([
+    { name: "Low", annualSpend: 100 },
+    { name: "Middle", annualSpend: 300 },
+    { name: "High", annualSpend: 500 },
+  ]);
+  assert.deepEqual(result.map((row) => row.impact), [1, 3, 5]);
+});
+
+test("ISM converts SSIM judgements and creates a multi-level transitive hierarchy", () => {
+  const factors = [{ id: "F1" }, { id: "F2" }, { id: "F3" }];
+  const relationships = new Map([
+    [ism.relationshipKey("F1", "F2"), "V"],
+    [ism.relationshipKey("F1", "F3"), "O"],
+    [ism.relationshipKey("F2", "F3"), "V"],
+  ]);
+  const result = ism.analyzeModel(factors, relationships);
+
+  assert.deepEqual(result.initialMatrix, [[1, 1, 0], [0, 1, 1], [0, 0, 1]]);
+  assert.deepEqual(result.finalMatrix, [[1, 1, 1], [0, 1, 1], [0, 0, 1]]);
+  assert.equal(result.transitive[0][2], true);
+  assert.deepEqual(result.levels, [[2], [1], [0]]);
+  assert.deepEqual(result.factorLevels, [3, 2, 1]);
+  assert.deepEqual(result.driving, [3, 2, 1]);
+  assert.deepEqual(result.dependence, [1, 2, 3]);
+});
+
+test("ISM honours reciprocal and bidirectional SSIM symbols", () => {
+  const factors = [{ id: "F1" }, { id: "F2" }, { id: "F3" }];
+  const matrix = ism.buildInitialMatrix(factors, new Map([
+    ["F1::F2", "A"],
+    ["F1::F3", "X"],
+    ["F2::F3", "O"],
+  ]));
+  assert.deepEqual(matrix, [[1, 0, 1], [1, 1, 0], [1, 0, 1]]);
+});
+
+test("Monte Carlo parser handles unary signs without changing precedence", () => {
+  approximatelyEqual(monteCarlo.evaluateFormula("A * -1", { A: 7 }), -7);
+  approximatelyEqual(monteCarlo.evaluateFormula("-(A + B) * 2", { A: 3, B: 4 }), -14);
+  approximatelyEqual(monteCarlo.evaluateFormula("A + -B * 2", { A: 10, B: 3 }), 4);
+  assert.throws(() => monteCarlo.evaluateFormula("A + Unknown", { A: 1 }), /Unknown formula variable/);
+});
+
+test("Monte Carlo seeded simulation is deterministic and reports target probability", async () => {
+  const config = {
+    modelName: "Reference",
+    outputName: "Outcome",
+    formula: "A + B * -1",
+    seed: 123,
+    iterations: 1000,
+    targetValue: 4,
+    targetCondition: "gte",
+    confidenceLevel: 90,
+    variables: [
+      { id: "A", name: "A", distribution: "fixed", params: { value: 10 } },
+      { id: "B", name: "B", distribution: "fixed", params: { value: 5 } },
+    ],
+  };
+  const first = await monteCarlo.runSimulation(config);
+  const second = await monteCarlo.runSimulation(config);
+
+  assert.deepEqual(first.summary, second.summary);
+  approximatelyEqual(first.summary.mean, 5);
+  approximatelyEqual(first.summary.standardDeviation, 0);
+  approximatelyEqual(first.summary.targetProbability, 1);
+  assert.equal(first.valid, 1000);
+});
+
+test("Newsvendor reproduces the critical-ratio optimum for symmetric Uniform demand", () => {
+  const demand = {
+    distribution: "uniform",
+    baseMean: 100,
+    baseStdDev: 20,
+    demandMean: 100,
+    demandStdDev: 20,
+    values: [],
+    adjusted: false,
+  };
+  const economics = {
+    sellingPrice: 20,
+    unitCost: 10,
+    salvageValue: 0,
+    shortageCost: 0,
+    holdingCost: 0,
+    packSize: 1,
+    roundingMethod: "profit",
+    currentOrderQty: 80,
+    minimumOrderQty: null,
+    maximumOrderQty: null,
+    storageCapacity: null,
+    purchaseBudget: null,
+    minimumServiceLevel: null,
+  };
+  const result = newsvendor.calculateNewsvendor(demand, economics);
+
+  approximatelyEqual(result.underageCost, 10);
+  approximatelyEqual(result.overageCost, 10);
+  approximatelyEqual(result.criticalRatio, 0.5);
+  approximatelyEqual(result.rawOptimalQuantity, 100);
+  assert.equal(result.optimalQuantity, 100);
+  approximatelyEqual(result.optimized.serviceLevel, 0.5);
+  assert.ok(result.optimized.expectedProfit > result.current.expectedProfit);
+});
+
+test("Newsvendor applies pack sizes and operational constraints explicitly", () => {
+  const model = newsvendor.buildDemandModel({
+    distribution: "empirical",
+    baseMean: 20,
+    baseStdDev: 10,
+    demandMean: 20,
+    demandStdDev: 10,
+    values: [10, 20, 30, 40],
+    adjusted: false,
+  });
+  const economics = {
+    sellingPrice: 20,
+    unitCost: 10,
+    salvageValue: 0,
+    shortageCost: 0,
+    holdingCost: 0,
+    packSize: 12,
+    roundingMethod: "profit",
+    minimumOrderQty: 24,
+    maximumOrderQty: 36,
+    storageCapacity: null,
+    purchaseBudget: null,
+    minimumServiceLevel: null,
+  };
+  const constrained = newsvendor.applyOperationalConstraints(48, model, economics);
+  assert.equal(constrained.quantity, 36);
+  assert.ok(constrained.binding.includes("maximum order quantity"));
+  approximatelyEqual(newsvendor.poissonOutcomes(8).reduce((sum, row) => sum + row.probability, 0), 1);
+});
+
+test("Gantt day arithmetic remains stable across daylight-saving transitions", () => {
+  const start = new Date(2026, 2, 28, 12);
+  const end = new Date(2026, 2, 30, 12);
+  assert.equal(gantt.daysBetween(start, end), 2);
+  assert.equal(gantt.formatDate(gantt.addDays(start, 2)), "2026-03-30");
+  assert.equal(gantt.getWeekStart(new Date(2026, 5, 17)).getDay(), 0);
+  assert.equal(gantt.getWeekEnd(new Date(2026, 5, 17)).getDay(), 6);
 });

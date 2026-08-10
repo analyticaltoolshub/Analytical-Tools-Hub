@@ -28,13 +28,18 @@ Then open `http://localhost:8000`.
 
 ## Test Changes
 
-Install Node.js 20 or newer once, then run before pushing calculation changes:
+Install Node.js 20 or newer, install the test dependencies once, then run the checks:
 
 ```bash
+npm ci
+npx playwright install chromium
 npm test
+npm run test:browser
 ```
 
-The test suite has no third-party packages. GitHub Actions runs the same checks on pushes and pull requests.
+`npm test` verifies calculation cores and repository integrity. The Playwright suite
+smoke-tests the homepage and every tool at desktop and mobile widths. GitHub Actions
+runs both suites on pushes and pull requests.
 
 ## Contact
 

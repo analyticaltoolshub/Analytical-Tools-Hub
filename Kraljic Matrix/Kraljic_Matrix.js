@@ -157,43 +157,7 @@ function sanitizeRiskAssessment(assessment) {
 
 function calculateRiskDetails(assessment) {
   const sanitized = sanitizeRiskAssessment(assessment);
-
-  if (!sanitized || !sanitized.scoresConfirmed || !sanitized.weightMode) {
-    return null;
-  }
-
-  const equalWeight = 100 / sanitized.factors.length;
-  const weights = sanitized.weightMode === "equal"
-    ? Object.fromEntries(sanitized.factors.map(factor => [factor.id, equalWeight]))
-    : sanitized.weights;
-  const totalWeight = sanitized.factors.reduce((total, factor) => (
-    total + Number(weights[factor.id] || 0)
-  ), 0);
-
-  if (Math.abs(totalWeight - 100) > 0.01) {
-    return null;
-  }
-
-  const rows = sanitized.factors.map(factor => {
-    const score = sanitized.scores[factor.id];
-    const weight = Number(weights[factor.id] || 0);
-
-    return {
-      factor,
-      score,
-      weight,
-      contribution: score * (weight / 100)
-    };
-  });
-
-  return {
-    assessment: {
-      ...sanitized,
-      weights
-    },
-    rows,
-    overall: rows.reduce((total, row) => total + row.contribution, 0)
-  };
+  return ATHKraljic.calculateRiskDetails(sanitized);
 }
 
 const sampleSpendRows = [
@@ -777,11 +741,7 @@ function save() {
 }
 
 function classifyItem(item) {
-  if (!isValidRisk(item.risk)) return null;
-  if (item.impact > 2 && item.risk > 2) return "strategic";
-  if (item.impact <= 2 && item.risk > 2) return "bottleneck";
-  if (item.impact > 2 && item.risk <= 2) return "leverage";
-  return "non-critical";
+  return ATHKraljic.classifyItem(item);
 }
 
 function formatQuadrant(category) {
@@ -950,21 +910,7 @@ function formatCurrency(value) {
 }
 
 function calculateImpactScores(aggregatedItems) {
-  const spends = aggregatedItems.map(item => item.annualSpend);
-  const minSpend = Math.min(...spends);
-  const maxSpend = Math.max(...spends);
-
-  return aggregatedItems.map(item => {
-    if (maxSpend === minSpend) {
-      return { ...item, impact: 3 };
-    }
-
-    const normalized = (item.annualSpend - minSpend) / (maxSpend - minSpend);
-    return {
-      ...item,
-      impact: Math.min(5, Math.max(1, Math.round(normalized * 4) + 1))
-    };
-  });
+  return ATHKraljic.calculateImpactScores(aggregatedItems);
 }
 
 function populateColumnSelectors(headers) {
