@@ -54,14 +54,27 @@ for (const entry of pages) {
       }
     }
 
-    const layout = await page.evaluate(() => ({
-      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      offenders: [...document.querySelectorAll('body *')]
+    const layout = await page.evaluate(async () => {
+      const rawOverflow = document.documentElement.scrollWidth - document.documentElement.clientWidth;
+      const originalX = window.scrollX;
+      window.scrollTo(document.documentElement.scrollWidth, window.scrollY);
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const pageScroll = Math.abs(window.scrollX - originalX);
+      window.scrollTo(originalX, window.scrollY);
+
+      return {
+        rawOverflow,
+        pageScroll,
+        offenders: [...document.querySelectorAll('body *')]
         .filter((element) => element.getBoundingClientRect().right > document.documentElement.clientWidth + 1)
         .slice(0, 8)
         .map((element) => `${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ''}${element.classList.length ? `.${[...element.classList].join('.')}` : ''}`),
-    }));
-    expect(layout.overflow, `Page-level horizontal overflow on ${entry.name}: ${layout.offenders.join(', ')}`).toBeLessThanOrEqual(2);
+      };
+    });
+    expect(
+      layout.pageScroll,
+      `Page-level horizontal scrolling on ${entry.name} (reported overflow ${layout.rawOverflow}px): ${layout.offenders.join(', ')}`
+    ).toBeLessThanOrEqual(2);
     expect(errors, `Uncaught errors on ${entry.name}`).toEqual([]);
   });
 }
