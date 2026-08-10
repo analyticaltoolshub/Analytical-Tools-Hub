@@ -5,8 +5,10 @@ module.exports = defineConfig({
   timeout: 30000,
   expect: { timeout: 5000 },
   fullyParallel: true,
-  workers: 4,
-  reporter: 'line',
+  workers: process.env.CI ? 2 : 4,
+  reporter: process.env.CI
+    ? [['line'], ['github'], ['html', { open: 'never', outputFolder: 'playwright-report' }]]
+    : 'line',
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
