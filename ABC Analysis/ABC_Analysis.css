@@ -857,9 +857,15 @@ html {
   max-inline-size: 100%;
   overflow-x: auto !important;
   overflow-y: auto !important;
-  contain: inline-size;
+  contain: layout inline-size paint;
   overscroll-behavior-inline: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 760px) {
+  .abc-page #manual-entry .abc-manual-table thead {
+    position: static !important;
+  }
 }
 
 .abc-page #manual-search {
