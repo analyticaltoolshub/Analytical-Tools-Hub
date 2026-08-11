@@ -17,6 +17,7 @@ Website: https://analyticaltoolshub.com/
 - Analytic Hierarchy Process
 - Monte Carlo Risk Simulation
 - Interpretive Structural Modeling
+- Data Envelopment Analysis
 
 ## Run Locally
 

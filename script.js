@@ -497,6 +497,71 @@ const problems = [
     title: 'Which cold-chain implementation barriers have the greatest driving power?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
     href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+  },
+  {
+    title: 'Which comparable branches, warehouses, or operating units are relatively efficient within the observed peer group?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'Which observed peer units provide useful efficiency benchmarks?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'How much could an inefficient unit reduce its inputs while maintaining current outputs?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'How much could an operating unit increase its outputs using current resources?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'Which peer units define a mathematically feasible benchmark for an underperforming unit?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'What peer-based input, output, and slack targets should each operating unit review?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'Which distribution centres are below the observed efficiency frontier?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'How efficiently do comparable suppliers convert resources into service outputs?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'Which manufacturing plants convert labour and energy into good output most efficiently relative to peers?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'Which transport depots or last-mile hubs make the best relative use of available resources?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'Which maintenance or service teams have the greatest relative efficiency improvement opportunity?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'How do comparable retail branches perform when several resources and outcomes matter simultaneously?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'Which operating units have input excesses or output shortfalls after proportional efficiency adjustment?',
+    detail: 'Recommended tool: Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
   }
 ];
 
@@ -540,6 +605,10 @@ const problemGroups = [
   {
     title: 'Structural Analysis',
     hrefs: ['Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html']
+  },
+  {
+    title: 'Operational Efficiency',
+    hrefs: ['Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html']
   }
 ];
 
@@ -554,7 +623,8 @@ const featuredProblemTitles = [
   'How many units do I need to sell to break even?',
   'Which option should I choose when several criteria matter?',
   'What is the probability of achieving a target profit when demand and costs are uncertain?',
-  'Which factors are foundational drivers and which are dependent outcomes?'
+  'Which factors are foundational drivers and which are dependent outcomes?',
+  'Which comparable branches, warehouses, or operating units are relatively efficient within the observed peer group?'
 ];
 
 const featuredProblems = featuredProblemTitles
@@ -564,12 +634,12 @@ const featuredProblems = featuredProblemTitles
 const categories = [
   { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '5 tools available', icon: 'boxes' },
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
-  { title: 'Operations', benefit: 'Evaluate capacity, productivity, queues, and process performance.', count: 'Expanding soon', icon: 'settings' },
+  { title: 'Operations', benefit: 'Benchmark relative efficiency, resource use, productivity, and operating performance.', count: '1 tool available', icon: 'settings' },
   { title: 'Statistics', benefit: 'Analyze distributions, uncertainty, samples, and probability-driven outcomes.', count: '1 tool available', icon: 'compare' },
   { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: '1 tool available', icon: 'calculator' },
-  { title: 'Decision Science', benefit: 'Structure complex decisions, expert judgements, relationships, priorities, and trade-offs.', count: '2 tools available', icon: 'decision' },
+  { title: 'Decision Science', benefit: 'Structure complex decisions, expert judgements, relationships, priorities, and trade-offs.', count: '3 tools available', icon: 'decision' },
   { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '4 tools available', icon: 'chart' }
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '5 tools available', icon: 'chart' }
 ];
 
 const tools = [
@@ -680,6 +750,16 @@ const tools = [
     cta: 'Open Interpretive Structural Modeling',
     href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html',
     categories: ['Decision Science', 'Business Analysis']
+  },
+  {
+    name: 'Data Envelopment Analysis',
+    description: 'Benchmark the relative efficiency of comparable operating units using multiple inputs and outputs.',
+    category: 'Operations',
+    input: 'Comparable units with non-negative input and output measures',
+    output: 'Efficiency scores, peer benchmarks, targets, slacks, and ranking',
+    cta: 'Open Data Envelopment Analysis',
+    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html',
+    categories: ['Operations', 'Decision Science', 'Business Analysis']
   }
 ];
 

@@ -59,6 +59,7 @@ The same folder/file pattern is used for:
 - `Analytic Hierarchy Process`
 - `Interpretive Structural Modeling`
 - `Newsvendor Model Optimizer`
+- `Data Envelopment Analysis`
 
 `Monte Carlo Risk Simulation` follows the same static tool-page pattern but also uses
 `monte-carlo-worker.js` for background simulation.
@@ -329,6 +330,7 @@ Available tools should be represented consistently:
 - Monte Carlo Risk Simulation
 - Interpretive Structural Modeling
 - Newsvendor Model Optimizer
+- Data Envelopment Analysis
 
 ## Current Tool-Specific Rules
 
@@ -465,6 +467,27 @@ Available tools should be represented consistently:
   distribution of a user-selected or custom formula and does not inherently optimize
   an inventory decision.
 
+### Data Envelopment Analysis
+
+- Present DEA as relative efficiency benchmarking among comparable decision-making
+  units, not as an absolute productivity score or proof of managerial quality.
+- Keep CCR/constant-returns and BCC/variable-returns assumptions explicit, and explain
+  the decision implication of input versus output orientation.
+- Require at least two units, non-negative measures, and at least one positive input
+  and output for every unit. Warn when too many measures relative to the number of
+  units make the frontier weakly discriminating.
+- Preserve the same production calculation core for browser and automated tests.
+  Verify efficiency, peers, targets, slacks, and rankings with independently checked
+  reference cases before changing the linear-programming implementation.
+- Describe efficient units as efficient relative to the observed sample and selected
+  model. Do not imply causality, statistical significance, or universal best practice.
+- Keep imported CSV data local, require one row per comparable unit, and retain clear
+  measure names and model settings in exported results.
+- Keep DEA sample templates limited to practical use-case guidance. Templates may set
+  suggested measures, units, model, and orientation, but users should enter or import
+  their own DMU observations. Clearly identify placeholder rows as editable setup aids,
+  not an adequate sample, industry benchmark, or validated performance dataset.
+
 ## SEO Requirements
 
 Every production page should have:
@@ -545,6 +568,10 @@ dependencies with `npm ci`, then run:
 `npm test`
 
 `npm run test:browser`
+
+Run browser tests through `npm run test:browser`, not by invoking Playwright directly.
+The repository wrapper starts and stops the local static server in the same process,
+which prevents orphaned server processes and runner timeouts on Windows.
 
 Calculation functions covered by automated tests live in `calculation-core/`. The
 browser UI and Node tests must call the same production function; do not duplicate a

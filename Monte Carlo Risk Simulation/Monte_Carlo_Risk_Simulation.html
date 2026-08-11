@@ -151,21 +151,41 @@
           <div class="section-header">
             <div>
               <h2>1. Choose Model</h2>
-              <p>Selecting a model loads a practical sample that you can adapt to your decision.</p>
+              <p>Choose a practical sample model, load it, then adapt its assumptions to your decision.</p>
             </div>
-            <div class="editor-actions">
+          </div>
+          <div class="model-template-controls">
+            <label class="model-template-field" for="modelTemplateSelect">
+              <span>Sample model</span>
+              <select id="modelTemplateSelect" aria-describedby="modelTemplateHelp">
+                <optgroup label="Finance and business">
+                  <option value="profit" selected>Profit Target Risk</option>
+                  <option value="cost">Project Cost Risk</option>
+                  <option value="cashFlow">Net Cash Flow Risk</option>
+                </optgroup>
+                <optgroup label="Inventory and supply">
+                  <option value="inventory">Demand and Inventory Risk</option>
+                  <option value="leadTimeStockout">Supplier Lead-Time and Stockout Risk</option>
+                  <option value="procurementCost">Procurement Cost Risk</option>
+                  <option value="supplierDelay">Supplier Delivery Delay Risk</option>
+                </optgroup>
+                <optgroup label="Logistics and operations">
+                  <option value="transportCost">Transportation Cost Risk</option>
+                  <option value="warehouseCapacity">Warehouse Capacity Risk</option>
+                  <option value="productionYield">Production Yield Risk</option>
+                </optgroup>
+                <optgroup label="Build your own">
+                  <option value="custom">Blank Custom Model</option>
+                </optgroup>
+              </select>
+            </label>
+            <div class="model-template-actions">
+              <button id="loadTemplateButton" type="button">Load Sample Model</button>
               <button class="reset" id="resetToolButton" type="button">Reset</button>
             </div>
           </div>
-          <fieldset class="model-grid">
-            <legend class="sr-only">Simulation model template</legend>
-            <label><input type="radio" name="modelTemplate" value="profit" checked> <span><strong>Profit Target Risk</strong><small>Test whether uncertain demand, price, and cost can achieve a defined profit target.</small></span></label>
-            <label><input type="radio" name="modelTemplate" value="cost"> <span><strong>Project Cost Risk</strong><small>Estimate the probability of completing a project within budget.</small></span></label>
-            <label><input type="radio" name="modelTemplate" value="inventory"> <span><strong>Demand and Inventory Risk</strong><small>Assess stockout exposure when demand and inventory inputs vary.</small></span></label>
-            <label><input type="radio" name="modelTemplate" value="leadTimeStockout"> <span><strong>Supplier Lead-Time and Stockout Risk</strong><small>Estimate whether available inventory will cover demand until replenishment arrives.</small></span></label>
-            <label><input type="radio" name="modelTemplate" value="transportCost"> <span><strong>Transportation Cost Risk</strong><small>Estimate total shipment cost and the probability of remaining within budget.</small></span></label>
-            <label><input type="radio" name="modelTemplate" value="custom"> <span><strong>Custom Model</strong><small>Add variables and combine them with a controlled arithmetic formula.</small></span></label>
-          </fieldset>
+          <p class="model-template-help" id="modelTemplateHelp">Test whether uncertain demand, price, and cost can achieve a defined profit target.</p>
+          <p class="model-template-note"><strong>Illustrative starting point:</strong> Review every distribution, parameter, formula, and target before using the result for a real decision.</p>
           <div class="privacy-note" role="note">Your model inputs and simulation results remain in your browser and are not uploaded to a server.</div>
         </section>
 
@@ -225,7 +245,7 @@
             </label>
           </div>
           <details class="advanced-settings" id="advanced-settings">
-            <summary>Advanced settings</summary>
+            <summary><span>Advanced settings</span></summary>
             <p>Use these controls when you need to change output formatting, reproducibility, percentile range, or calculation logic.</p>
             <div class="input-grid config-grid">
               <label>

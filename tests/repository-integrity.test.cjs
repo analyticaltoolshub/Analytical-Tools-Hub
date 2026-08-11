@@ -73,6 +73,7 @@ test("production pages load the tested calculation modules before their UI scrip
     "Kraljic Matrix/Kraljic_Matrix.html": ["../calculation-core/kraljic.js", "Kraljic_Matrix.js"],
     "Monte Carlo Risk Simulation/Monte_Carlo_Risk_Simulation.html": ["../calculation-core/monte-carlo.js", "monte-carlo.js"],
     "Newsvendor Model Optimizer/Newsvendor_Model_Optimizer.html": ["../calculation-core/newsvendor.js", "Newsvendor_Model_Optimizer.js"],
+    "Data Envelopment Analysis/Data_Envelopment_Analysis.html": ["../calculation-core/dea.js", "Data_Envelopment_Analysis.js"],
   };
 
   Object.entries(expected).forEach(([relativePage, scripts]) => {

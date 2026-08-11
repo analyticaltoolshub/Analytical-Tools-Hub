@@ -17,9 +17,4 @@ module.exports = defineConfig({
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
   ],
-  webServer: {
-    command: 'node tests/static-server.cjs',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: true,
-  },
 });

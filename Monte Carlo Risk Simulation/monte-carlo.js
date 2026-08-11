@@ -12,6 +12,7 @@ const distributionGuidance = {
 const templates = {
   profit: {
     name: 'Profit Target Risk',
+    summary: 'Test whether uncertain demand, price, and cost can achieve a defined profit target.',
     outputName: 'Annual Profit',
     unitType: 'currency',
     unitSymbol: '£',
@@ -27,6 +28,7 @@ const templates = {
   },
   cost: {
     name: 'Project Cost Risk',
+    summary: 'Estimate the probability of completing a project within its approved budget.',
     outputName: 'Total Project Cost',
     unitType: 'currency',
     unitSymbol: '£',
@@ -42,6 +44,7 @@ const templates = {
   },
   inventory: {
     name: 'Demand and Inventory Risk',
+    summary: 'Assess the risk that uncertain demand will exceed available inventory during a review period.',
     outputName: 'Ending Inventory',
     unitType: 'units',
     unitSymbol: 'units',
@@ -56,6 +59,7 @@ const templates = {
   },
   leadTimeStockout: {
     name: 'Supplier Lead-Time and Stockout Risk',
+    summary: 'Estimate whether available inventory will cover uncertain demand until replenishment arrives.',
     outputName: 'Inventory Before Replenishment',
     unitType: 'units',
     unitSymbol: 'units',
@@ -70,6 +74,7 @@ const templates = {
   },
   transportCost: {
     name: 'Transportation Cost Risk',
+    summary: 'Estimate total shipment cost and the probability of remaining within a transport budget.',
     outputName: 'Total Shipment Cost',
     unitType: 'currency',
     unitSymbol: '£',
@@ -83,8 +88,85 @@ const templates = {
       { name: 'Delay Cost', id: 'Delay_Cost', unit: '£', distribution: 'discrete', discrete: [{ value: 0, probability: 0.7 }, { value: 500, probability: 0.2 }, { value: 1500, probability: 0.1 }], description: 'Operational cost arising from a delayed shipment.' }
     ]
   },
+  cashFlow: {
+    name: 'Net Cash Flow Risk',
+    summary: 'Estimate whether uncertain cash inflows and outflows will produce a non-negative net cash position.',
+    outputName: 'Net Cash Flow',
+    unitType: 'currency',
+    unitSymbol: '\u00a3',
+    formula: 'Cash_Inflows - Operating_Cost - Capital_Spend - Debt_Service',
+    targetValue: 0,
+    targetCondition: 'gte',
+    variables: [
+      { name: 'Cash Inflows', id: 'Cash_Inflows', unit: '\u00a3', distribution: 'normal', params: { mean: 900000, sd: 90000, min: 0, max: '' }, description: 'Expected cash receipts during the planning period.' },
+      { name: 'Operating Cost', id: 'Operating_Cost', unit: '\u00a3', distribution: 'triangular', params: { min: 520000, mode: 570000, max: 650000 }, description: 'Recurring operating cash outflows.' },
+      { name: 'Capital Spend', id: 'Capital_Spend', unit: '\u00a3', distribution: 'discrete', discrete: [{ value: 0, probability: 0.5 }, { value: 75000, probability: 0.35 }, { value: 160000, probability: 0.15 }], description: 'Possible capital expenditure scenarios.' },
+      { name: 'Debt Service', id: 'Debt_Service', unit: '\u00a3', distribution: 'fixed', params: { value: 90000 }, description: 'Committed interest and principal payments.' }
+    ]
+  },
+  procurementCost: {
+    name: 'Procurement Cost Risk',
+    summary: 'Estimate total purchasing exposure when unit price, demand, expediting, and quality costs are uncertain.',
+    outputName: 'Annual Procurement Cost',
+    unitType: 'currency',
+    unitSymbol: '\u00a3',
+    formula: 'Unit_Price * Purchase_Quantity + Expediting_Cost + Quality_Failure_Cost',
+    targetValue: 1250000,
+    targetCondition: 'lte',
+    variables: [
+      { name: 'Unit Price', id: 'Unit_Price', unit: '\u00a3/unit', distribution: 'triangular', params: { min: 92, mode: 100, max: 115 }, description: 'Expected purchase price per unit.' },
+      { name: 'Purchase Quantity', id: 'Purchase_Quantity', unit: 'units', distribution: 'normal', params: { mean: 10500, sd: 1000, min: 0, max: '' }, description: 'Quantity expected to be purchased during the period.' },
+      { name: 'Expediting Cost', id: 'Expediting_Cost', unit: '\u00a3', distribution: 'discrete', discrete: [{ value: 0, probability: 0.65 }, { value: 35000, probability: 0.25 }, { value: 90000, probability: 0.1 }], description: 'Possible premium freight and recovery costs.' },
+      { name: 'Quality Failure Cost', id: 'Quality_Failure_Cost', unit: '\u00a3', distribution: 'triangular', params: { min: 0, mode: 15000, max: 80000 }, description: 'Inspection, rework, return, and disruption cost caused by supplier quality failures.' }
+    ]
+  },
+  supplierDelay: {
+    name: 'Supplier Delivery Delay Risk',
+    summary: 'Estimate the probability and likely extent of a supplier arriving later than the required lead time.',
+    outputName: 'Delivery Delay',
+    unitType: 'days',
+    unitSymbol: 'days',
+    formula: 'Actual_Lead_Time - Required_Lead_Time',
+    targetValue: 0,
+    targetCondition: 'lte',
+    variables: [
+      { name: 'Actual Lead Time', id: 'Actual_Lead_Time', unit: 'days', distribution: 'triangular', params: { min: 8, mode: 11, max: 20 }, description: 'Elapsed supplier lead time under expected operating conditions.' },
+      { name: 'Required Lead Time', id: 'Required_Lead_Time', unit: 'days', distribution: 'fixed', params: { value: 12 }, description: 'Latest lead time that still supports the operating plan.' }
+    ]
+  },
+  warehouseCapacity: {
+    name: 'Warehouse Capacity Risk',
+    summary: 'Estimate whether uncertain inbound flow and outbound demand will exceed available storage capacity.',
+    outputName: 'Peak Storage Requirement',
+    unitType: 'units',
+    unitSymbol: 'pallet positions',
+    formula: 'Opening_Stock + Inbound_Quantity - Outbound_Demand',
+    targetValue: 7000,
+    targetCondition: 'lte',
+    variables: [
+      { name: 'Opening Stock', id: 'Opening_Stock', unit: 'pallet positions', distribution: 'fixed', params: { value: 3500 }, description: 'Occupied capacity at the start of the planning period.' },
+      { name: 'Inbound Quantity', id: 'Inbound_Quantity', unit: 'pallet positions', distribution: 'normal', params: { mean: 5000, sd: 800, min: 0, max: '' }, description: 'Inbound volume expected during the planning period.' },
+      { name: 'Outbound Demand', id: 'Outbound_Demand', unit: 'pallet positions', distribution: 'normal', params: { mean: 2500, sd: 600, min: 0, max: '' }, description: 'Stock expected to leave storage during the same period.' }
+    ]
+  },
+  productionYield: {
+    name: 'Production Yield Risk',
+    summary: 'Estimate whether uncertain process yield and downtime will deliver the required saleable output.',
+    outputName: 'Saleable Production',
+    unitType: 'units',
+    unitSymbol: 'units',
+    formula: 'Planned_Production * Yield_Rate / 100 - Downtime_Loss',
+    targetValue: 9000,
+    targetCondition: 'gte',
+    variables: [
+      { name: 'Planned Production', id: 'Planned_Production', unit: 'units', distribution: 'fixed', params: { value: 10000 }, description: 'Gross production planned before yield and downtime losses.' },
+      { name: 'Yield Rate', id: 'Yield_Rate', unit: '%', distribution: 'triangular', params: { min: 90, mode: 95, max: 98 }, description: 'Share of produced units expected to meet the required quality standard.' },
+      { name: 'Downtime Loss', id: 'Downtime_Loss', unit: 'units', distribution: 'triangular', params: { min: 100, mode: 300, max: 900 }, description: 'Output lost because of equipment or process downtime.' }
+    ]
+  },
   custom: {
     name: 'Custom Model',
+    summary: 'Build a controlled arithmetic model from your own fixed or uncertain variables.',
     outputName: 'Custom Outcome',
     unitType: 'custom',
     unitSymbol: 'units',
@@ -110,7 +192,8 @@ const state = {
   lastConfig: null,
   lastResult: null,
   scenarios: [],
-  modalReturnFocus: null
+  modalReturnFocus: null,
+  pendingTemplateKey: null
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -196,7 +279,7 @@ function markDirty() {
 
 function applyTemplate(key) {
   const template = templates[key] || templates.profit;
-  state.templateKey = key;
+  state.templateKey = templates[key] ? key : 'profit';
   state.variables = clone(template.variables);
   $('#outputName').value = template.outputName;
   $('#outputUnitType').value = template.unitType;
@@ -207,12 +290,18 @@ function applyTemplate(key) {
   $('#iterations').value = '10000';
   $('#seed').value = '12345';
   $('#confidenceLevel').value = '90';
-  document.querySelectorAll('[name="modelTemplate"]').forEach((input) => { input.checked = input.value === key; });
+  $('#modelTemplateSelect').value = state.templateKey;
+  updateTemplateHelp(state.templateKey);
   renderVariables();
   clearResults();
   setError([]);
   setWorkflowStep(1);
   state.dirty = false;
+}
+
+function updateTemplateHelp(key) {
+  const template = templates[key] || templates.profit;
+  $('#modelTemplateHelp').textContent = template.summary;
 }
 
 function renderVariables() {
@@ -569,8 +658,7 @@ function renderResults(result) {
 
 function renderMetricCards(result) {
   const s = result.summary;
-  const templateKey = state.lastConfig?.templateKey;
-  const usesDownside = templateKey === 'profit' || templateKey === 'inventory' || templateKey === 'leadTimeStockout';
+  const usesDownside = result.targetCondition === 'gt' || result.targetCondition === 'gte';
   const planningKey = usesDownside ? 'P10' : 'P90';
   const planningLabel = usesDownside ? 'Downside planning value (P10)' : 'Conservative planning value (P90)';
   const mainDriver = result.sensitivity[0]?.name || 'No clear driver';
@@ -702,6 +790,36 @@ function renderInterpretation(result) {
       action: probability >= 80
         ? `Confirm the cost assumptions for ${driver} and retain appropriate allowance for accessorial or delay exposure.`
         : `Review the transport budget, carrier terms, and the assumption for ${driver}, then test routing or service alternatives before booking the shipment.`
+    },
+    cashFlow: {
+      planning: `Use P10 (${formatValue(result.percentiles.P10)}) to review downside cash-flow exposure rather than relying only on the average result.`,
+      action: probability >= 80
+        ? `Validate the assumption for ${driver} and confirm that downside liquidity remains acceptable.`
+        : `Review the timing or amount of ${driver}, then test cash-preservation actions before committing discretionary outflows.`
+    },
+    procurementCost: {
+      planning: `Use P90 (${formatValue(result.percentiles.P90)}) as a conservative procurement-cost reference under the current price, quantity, and disruption assumptions.`,
+      action: probability >= 80
+        ? `Confirm the assumption for ${driver} and retain an appropriate allowance for supplier and expediting exposure.`
+        : `Review ${driver}, sourcing terms, quantity commitments, and recovery-cost assumptions before accepting the purchasing budget.`
+    },
+    supplierDelay: {
+      planning: `Use P90 (${formatValue(result.percentiles.P90)}) to understand a conservative delivery-delay outcome under the current lead-time assumptions.`,
+      action: probability >= 80
+        ? `Monitor ${driver} and confirm that the remaining delay exposure is operationally acceptable.`
+        : `Review the supplier commitment, required date, contingency route, and the assumption for ${driver} before finalising the plan.`
+    },
+    warehouseCapacity: {
+      planning: `Use P90 (${formatValue(result.percentiles.P90)}) as a conservative peak-capacity requirement under the current flow assumptions.`,
+      action: probability >= 80
+        ? `Confirm the capacity and ${driver} assumptions, then retain an operating buffer for peak days.`
+        : `Test inbound smoothing, additional storage, or faster outbound flow and review the assumption for ${driver}.`
+    },
+    productionYield: {
+      planning: `Use P10 (${formatValue(result.percentiles.P10)}) to review downside saleable-output exposure under yield and downtime uncertainty.`,
+      action: probability >= 80
+        ? `Validate ${driver} and confirm that downside output still supports the production commitment.`
+        : `Review yield improvement, downtime recovery, planned volume, and the assumption for ${driver} before confirming output.`
     },
     custom: {
       planning: `Review the median and central outcome range together; select a planning percentile that matches whether higher or lower outcomes are more conservative.`,
@@ -871,7 +989,14 @@ function clearResults() {
   if (!state.running) setWorkflowStep(1);
 }
 
-function openResetModal() {
+function openResetModal(action = 'reset', templateKey = state.templateKey) {
+  state.pendingTemplateKey = templateKey;
+  const loadingTemplate = action === 'load';
+  $('#confirmTitle').textContent = loadingTemplate ? 'Load sample model?' : 'Reset model?';
+  $('#confirmDescription').textContent = loadingTemplate
+    ? `Loading ${templates[templateKey]?.name || 'this sample model'} will replace the current variables, formula, target, and results.`
+    : 'Resetting will replace the current inputs with the original values for the active sample model.';
+  $('#confirmResetButton').textContent = loadingTemplate ? 'Load Model' : 'Reset';
   state.modalReturnFocus = document.activeElement;
   $('#confirmModal').hidden = false;
   $('#confirmResetButton').focus();
@@ -879,8 +1004,11 @@ function openResetModal() {
 
 function closeResetModal() {
   $('#confirmModal').hidden = true;
+  $('#modelTemplateSelect').value = state.templateKey;
+  updateTemplateHelp(state.templateKey);
   state.modalReturnFocus?.focus?.();
   state.modalReturnFocus = null;
+  state.pendingTemplateKey = null;
 }
 
 function handleModalKeydown(event) {
@@ -906,8 +1034,13 @@ function handleModalKeydown(event) {
 }
 
 function initEvents() {
-  document.querySelectorAll('[name="modelTemplate"]').forEach((input) => {
-    input.addEventListener('change', () => applyTemplate(input.value));
+  $('#modelTemplateSelect').addEventListener('change', (event) => {
+    updateTemplateHelp(event.target.value);
+  });
+  $('#loadTemplateButton').addEventListener('click', () => {
+    const selectedKey = $('#modelTemplateSelect').value;
+    if (state.dirty) openResetModal('load', selectedKey);
+    else applyTemplate(selectedKey);
   });
   $('#addVariableButton').addEventListener('click', addVariable);
   $('#generateSeedButton').addEventListener('click', () => {
@@ -991,15 +1124,19 @@ function initEvents() {
     }
   });
   $('#resetToolButton').addEventListener('click', () => {
-    if (state.dirty) openResetModal();
+    $('#modelTemplateSelect').value = state.templateKey;
+    updateTemplateHelp(state.templateKey);
+    if (state.dirty) openResetModal('reset', state.templateKey);
     else applyTemplate(state.templateKey);
   });
   $('#confirmResetButton').addEventListener('click', () => {
-    const templateKey = state.templateKey;
+    const templateKey = state.pendingTemplateKey || state.templateKey;
     closeResetModal();
     applyTemplate(templateKey);
   });
-  $('#cancelResetButton').addEventListener('click', closeResetModal);
+  $('#cancelResetButton').addEventListener('click', () => {
+    closeResetModal();
+  });
   $('#confirmModal').addEventListener('click', (event) => {
     if (event.target === $('#confirmModal')) closeResetModal();
   });

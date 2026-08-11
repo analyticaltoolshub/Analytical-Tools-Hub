@@ -5,7 +5,7 @@
   "description": "Static browser-based analytical and decision-support tools.",
   "scripts": {
     "test": "node --test tests/calculation-core.test.cjs tests/repository-integrity.test.cjs",
-    "test:browser": "playwright test",
+    "test:browser": "node tests/run-browser-tests.cjs",
     "check": "npm test && npm run test:browser"
   },
   "devDependencies": {

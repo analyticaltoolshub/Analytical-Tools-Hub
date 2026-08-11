@@ -12,6 +12,7 @@ const ism = require("../calculation-core/ism.js");
 const gantt = require("../calculation-core/gantt.js");
 const monteCarlo = require("../calculation-core/monte-carlo.js");
 const newsvendor = require("../calculation-core/newsvendor.js");
+const dea = require("../calculation-core/dea.js");
 
 function approximatelyEqual(actual, expected, tolerance = 1e-9) {
   assert.ok(
@@ -375,6 +376,222 @@ test("Newsvendor applies pack sizes and operational constraints explicitly", () 
   assert.equal(constrained.quantity, 36);
   assert.ok(constrained.binding.includes("maximum order quantity"));
   approximatelyEqual(newsvendor.poissonOutcomes(8).reduce((sum, row) => sum + row.probability, 0), 1);
+});
+
+test("DEA reproduces a hand-calculated one-input, one-output CCR frontier", () => {
+  const result = dea.analyseDea({
+    model: "ccr",
+    orientation: "input",
+    inputNames: ["Labour hours"],
+    outputNames: ["Completed orders"],
+    dmus: [
+      { name: "Unit A", inputs: [1], outputs: [1] },
+      { name: "Unit B", inputs: [2], outputs: [1] },
+      { name: "Unit C", inputs: [1], outputs: [0.5] },
+    ],
+  });
+
+  approximatelyEqual(result.results[0].efficiency, 1);
+  approximatelyEqual(result.results[1].efficiency, 0.5);
+  approximatelyEqual(result.results[2].efficiency, 0.5);
+  approximatelyEqual(result.results[1].inputTargets[0], 1);
+  assert.equal(result.summary.efficientCount, 1);
+});
+
+test("DEA CCR output orientation reproduces the same ratio frontier", () => {
+  const result = dea.analyseDea({
+    model: "ccr",
+    orientation: "output",
+    inputNames: ["Labour hours"],
+    outputNames: ["Completed orders"],
+    dmus: [
+      { name: "Unit A", inputs: [1], outputs: [1] },
+      { name: "Unit B", inputs: [2], outputs: [1] },
+      { name: "Unit C", inputs: [1], outputs: [0.5] },
+    ],
+  });
+
+  approximatelyEqual(result.results[0].efficiency, 1);
+  approximatelyEqual(result.results[1].radialFactor, 2);
+  approximatelyEqual(result.results[1].efficiency, 0.5);
+  approximatelyEqual(result.results[1].outputTargets[0], 2);
+  approximatelyEqual(result.results[2].efficiency, 0.5);
+  assert.equal(result.results[1].rank, result.results[2].rank);
+});
+
+const bccReferenceDmus = [
+  { name: "Unit A", inputs: [1], outputs: [1] },
+  { name: "Unit B", inputs: [2], outputs: [3] },
+  { name: "Unit C", inputs: [3], outputs: [4] },
+  { name: "Unit D", inputs: [2], outputs: [2] },
+];
+
+test("DEA BCC input orientation reproduces a convex peer benchmark", () => {
+  const result = dea.analyseDea({
+    model: "bcc",
+    orientation: "input",
+    inputNames: ["Input"],
+    outputNames: ["Output"],
+    dmus: bccReferenceDmus,
+  });
+  const unitD = result.results.find((row) => row.name === "Unit D");
+
+  approximatelyEqual(unitD.efficiency, 0.75);
+  approximatelyEqual(unitD.radialFactor, 0.75);
+  approximatelyEqual(unitD.inputTargets[0], 1.5);
+  approximatelyEqual(unitD.outputTargets[0], 2);
+  approximatelyEqual(unitD.lambdas.reduce((sum, value) => sum + value, 0), 1);
+});
+
+test("DEA BCC output orientation reproduces an exact expansion target", () => {
+  const result = dea.analyseDea({
+    model: "bcc",
+    orientation: "output",
+    inputNames: ["Input"],
+    outputNames: ["Output"],
+    dmus: bccReferenceDmus,
+  });
+  const unitD = result.results.find((row) => row.name === "Unit D");
+
+  approximatelyEqual(unitD.radialFactor, 1.5);
+  approximatelyEqual(unitD.efficiency, 2 / 3);
+  approximatelyEqual(unitD.inputTargets[0], 2);
+  approximatelyEqual(unitD.outputTargets[0], 3);
+  approximatelyEqual(unitD.lambdas[1], 1);
+  approximatelyEqual(unitD.lambdas.reduce((sum, value) => sum + value, 0), 1);
+});
+
+test("DEA returns exact peer targets and non-radial input and output slacks", () => {
+  const inputSlack = dea.analyseDea({
+    model: "ccr",
+    orientation: "input",
+    inputNames: ["Input 1", "Input 2"],
+    outputNames: ["Output"],
+    dmus: [
+      { name: "Peer", inputs: [1, 1], outputs: [1] },
+      { name: "Reviewed unit", inputs: [2, 3], outputs: [1] },
+    ],
+  }).results[1];
+  approximatelyEqual(inputSlack.efficiency, 0.5);
+  approximatelyEqual(inputSlack.inputTargets[0], 1);
+  approximatelyEqual(inputSlack.inputTargets[1], 1);
+  approximatelyEqual(inputSlack.inputSlacks[0], 0);
+  approximatelyEqual(inputSlack.inputSlacks[1], 0.5);
+  assert.deepEqual(inputSlack.peers.map((peer) => peer.name), ["Peer"]);
+
+  const outputSlack = dea.analyseDea({
+    model: "bcc",
+    orientation: "output",
+    inputNames: ["Input"],
+    outputNames: ["Output 1", "Output 2"],
+    dmus: [
+      { name: "Peer", inputs: [1], outputs: [1, 1] },
+      { name: "Reviewed unit", inputs: [1], outputs: [1, 0.5] },
+    ],
+  }).results[1];
+  approximatelyEqual(outputSlack.efficiency, 1);
+  approximatelyEqual(outputSlack.outputTargets[0], 1);
+  approximatelyEqual(outputSlack.outputTargets[1], 1);
+  approximatelyEqual(outputSlack.outputSlacks[0], 0);
+  approximatelyEqual(outputSlack.outputSlacks[1], 0.5);
+  assert.equal(outputSlack.efficient, false);
+});
+
+test("DEA handles degeneracy, tied ranks, duplicate observations, and zero values", () => {
+  const result = dea.analyseDea({
+    model: "bcc",
+    orientation: "input",
+    inputNames: ["Input 1", "Input 2"],
+    outputNames: ["Output 1", "Output 2"],
+    dmus: [
+      { name: "Unit A", inputs: [1, 0], outputs: [1, 0] },
+      { name: "Unit A duplicate observation", inputs: [1, 0], outputs: [1, 0] },
+      { name: "Unit B", inputs: [0, 1], outputs: [0, 1] },
+      { name: "Unit C", inputs: [1, 1], outputs: [0.5, 0.5] },
+    ],
+  });
+
+  assert.equal(result.results[0].rank, 1);
+  assert.equal(result.results[1].rank, 1);
+  assert.equal(result.results[2].rank, 1);
+  assert.equal(result.results[3].rank, 4);
+  approximatelyEqual(result.results[3].efficiency, 0.5);
+});
+
+test("DEA remains stable when input and output units use very different scales", () => {
+  const base = [
+    { name: "Unit A", inputs: [1], outputs: [1] },
+    { name: "Unit B", inputs: [2], outputs: [1] },
+    { name: "Unit C", inputs: [1], outputs: [0.5] },
+  ];
+  const scaled = base.map((row) => ({
+    name: row.name,
+    inputs: row.inputs.map((value) => value * 1e6),
+    outputs: row.outputs.map((value) => value * 1e-3),
+  }));
+  const baseResult = dea.analyseDea({ model: "ccr", orientation: "input", inputNames: ["Input"], outputNames: ["Output"], dmus: base });
+  const scaledResult = dea.analyseDea({ model: "ccr", orientation: "input", inputNames: ["Input"], outputNames: ["Output"], dmus: scaled });
+  baseResult.results.forEach((row, index) => approximatelyEqual(row.efficiency, scaledResult.results[index].efficiency));
+});
+
+test("DEA reports sample-size adequacy as guidance rather than a validity gate", () => {
+  assert.deepEqual(dea.assessSampleAdequacy(3, 2, 2), {
+    dmuCount: 3,
+    measureCount: 4,
+    recommendedMinimum: 12,
+    meetsHeuristic: false,
+  });
+  assert.equal(dea.assessSampleAdequacy(12, 2, 2).meetsHeuristic, true);
+});
+
+test("DEA rejects incomplete and non-comparable datasets", () => {
+  assert.throws(() => dea.analyseDea({
+    model: "ccr",
+    orientation: "input",
+    inputNames: ["Cost"],
+    outputNames: ["Orders"],
+    dmus: [{ name: "Only unit", inputs: [10], outputs: [20] }],
+  }), /at least two/);
+  assert.throws(() => dea.analyseDea({
+    model: "ccr",
+    orientation: "input",
+    inputNames: ["Cost"],
+    outputNames: ["Orders"],
+    dmus: [
+      { name: "Unit A", inputs: [-1], outputs: [20] },
+      { name: "Unit B", inputs: [2], outputs: [15] },
+    ],
+  }), /non-negative/);
+  assert.throws(() => dea.analyseDea({
+    model: "ccr",
+    orientation: "input",
+    inputNames: ["Cost"],
+    outputNames: ["Orders"],
+    dmus: [
+      { name: "Unit A", inputs: [""], outputs: [20] },
+      { name: "Unit B", inputs: [2], outputs: [15] },
+    ],
+  }), /Unit A: Cost is required/);
+  assert.throws(() => dea.analyseDea({
+    model: "ccr",
+    orientation: "input",
+    inputNames: ["Cost"],
+    outputNames: ["Orders"],
+    dmus: [
+      { name: "Unit A", inputs: [1], outputs: [20] },
+      { name: "unit a", inputs: [2], outputs: [15] },
+    ],
+  }), /names must be unique/);
+  assert.throws(() => dea.analyseDea({
+    model: "invalid",
+    orientation: "input",
+    inputNames: ["Cost"],
+    outputNames: ["Orders"],
+    dmus: [
+      { name: "Unit A", inputs: [1], outputs: [20] },
+      { name: "Unit B", inputs: [2], outputs: [15] },
+    ],
+  }), /model must be CCR or BCC/);
 });
 
 test("Gantt day arithmetic remains stable across daylight-saving transitions", () => {

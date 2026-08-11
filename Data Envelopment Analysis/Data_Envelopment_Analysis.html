@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Envelopment Analysis Tool | Analytical Tools Hub</title>
+  <meta name="description" content="Compare the relative efficiency of branches, suppliers, depots, hospitals, schools, or other comparable units using browser-based CCR and BCC Data Envelopment Analysis.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Data Envelopment Analysis Tool | Analytical Tools Hub">
+  <meta property="og:description" content="Measure relative efficiency, identify peer benchmarks, and calculate improvement targets with CCR or BCC DEA models.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Data Envelopment Analysis Tool | Analytical Tools Hub">
+  <meta name="twitter:description" content="Compare operational efficiency and generate peer-based improvement targets with browser-based DEA.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Data_Envelopment_Analysis.css">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html#software",
+          "name": "Data Envelopment Analysis Tool",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html",
+          "description": "A browser-based tool for CCR and BCC Data Envelopment Analysis, efficiency ranking, peer benchmarking, slacks, and improvement targets.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": ["CCR and BCC models", "Input and output orientation", "Peer benchmarks", "Efficiency ranking", "Improvement targets", "CSV import and export"],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://analyticaltoolshub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Data Envelopment Analysis", "item": "https://analyticaltoolshub.com/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="dea-page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text"><strong>Data Envelopment Analysis</strong><span>Relative efficiency workspace</span></span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" id="main-content">
+    <section class="tool-hero" aria-labelledby="dea-page-title">
+      <span class="tool-badge">Operations and Decision Science</span>
+      <h1 id="dea-page-title">Data Envelopment Analysis</h1>
+      <p>Compare the relative efficiency of comparable operating units, identify peer benchmarks, and translate the efficiency frontier into practical input or output targets.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based calculation</span><span>CCR and BCC models</span><span>Peer-based targets</span>
+      </div>
+    </section>
+
+    <section class="panel content-section" aria-labelledby="decision-guide-heading">
+      <h2 id="decision-guide-heading">Why use this tool?</h2>
+      <div class="guidance-grid">
+        <div class="guidance-card"><span>Decision Supported</span><p>Use DEA to compare branches, depots, suppliers, plants, service centres, or other units that use similar resources to produce similar outcomes.</p></div>
+        <div class="guidance-card"><span>What It Tells You</span><p>It identifies the observed efficiency frontier, relative scores, benchmark peers, proportional improvement potential, and remaining input or output slacks.</p></div>
+        <div class="guidance-card"><span>Example Input</span><p>Load the sample to compare distribution centres using staff and operating cost as inputs, and completed and on-time orders as outputs.</p></div>
+        <div class="guidance-card"><span>Sample Output Interpretation</span><p>A score below 100% indicates a unit is below the observed frontier. Its peers and targets show what comparable performance could look like.</p></div>
+      </div>
+    </section>
+
+    <section class="dea-workflow" aria-label="Data Envelopment Analysis workflow">
+      <ol>
+        <li class="active" data-workflow-step="1" aria-current="step"><span>1</span><strong>Prepare Data</strong><small>Define measures and comparable units</small></li>
+        <li data-workflow-step="2"><span>2</span><strong>Choose Model</strong><small>Set returns to scale and orientation</small></li>
+        <li data-workflow-step="3"><span>3</span><strong>Analyze</strong><small>Build the observed efficiency frontier</small></li>
+        <li data-workflow-step="4"><span>4</span><strong>Interpret</strong><small>Review peers, targets, and slacks</small></li>
+      </ol>
+    </section>
+
+    <div class="dea-layout">
+      <div class="dea-content">
+        <section class="panel" id="data-preparation">
+          <div class="section-header">
+            <div><h2>1. Prepare Comparable Data</h2><p>Use units performing the same broad function, measured over the same period with consistent definitions.</p></div>
+          </div>
+          <div class="template-loader">
+            <label for="templateSelect"><span>Sample template</span>
+              <select id="templateSelect">
+                <option value="" selected>Blank custom model</option>
+                <optgroup label="Supply chain and logistics">
+                  <option value="distribution-centres">Distribution Centre Efficiency</option>
+                  <option value="warehouse-operations">Warehouse Operations Efficiency</option>
+                  <option value="supplier-delivery">Supplier Delivery Efficiency</option>
+                  <option value="transport-depots">Transport Depot Efficiency</option>
+                  <option value="last-mile-hubs">Last-Mile Delivery Hub Efficiency</option>
+                  <option value="procurement-teams">Procurement Team Efficiency</option>
+                </optgroup>
+                <optgroup label="Manufacturing and asset operations">
+                  <option value="manufacturing-plants">Manufacturing Plant Efficiency</option>
+                  <option value="production-lines">Production Line Efficiency</option>
+                  <option value="maintenance-teams">Maintenance Team Efficiency</option>
+                  <option value="quality-units">Quality-Control Unit Efficiency</option>
+                </optgroup>
+                <optgroup label="Commercial and service operations">
+                  <option value="retail-branches">Retail Branch Efficiency</option>
+                  <option value="regional-sales">Regional Sales Office Efficiency</option>
+                  <option value="customer-support">Customer Support Centre Efficiency</option>
+                  <option value="service-centres">Service Centre Efficiency</option>
+                </optgroup>
+              </select>
+            </label>
+            <div class="editor-actions"><button id="loadSampleButton" type="button" disabled>Load Sample Template</button><button class="reset" id="resetButton" type="button">Reset</button></div>
+          </div>
+          <p class="template-helper">Select an illustrative operating scenario, then review and adapt its measures, units, assumptions, and data before analysis.</p>
+          <div class="template-context" id="templateContext" role="note" aria-live="polite">
+            <strong>Blank custom model</strong>
+            <p>Define measures and add comparable decision-making units manually, or configure the measures before importing a CSV.</p>
+          </div>
+          <div class="privacy-note" role="note">CSV data and calculations remain in your browser. Nothing is uploaded to a server.</div>
+          <div class="import-guidance">
+            <h3>Prepare your DEA file</h3>
+            <p>Upload a CSV with one row per decision-making unit (DMU). The first column identifies the unit; remaining columns are the inputs and outputs being compared.</p>
+            <div class="import-columns">
+              <div><strong>DMU Name</strong><span>A unique branch, depot, supplier, hospital, school, or comparable operating unit.</span></div>
+              <div><strong>Inputs</strong><span>Resources consumed, such as staff, cost, floor area, energy, or equipment hours.</span></div>
+              <div><strong>Outputs</strong><span>Outcomes produced, such as orders, revenue, cases completed, service quality, or on-time deliveries.</span></div>
+            </div>
+            <p class="example-row"><strong>Example row:</strong> Depot North | 20 | 900000 | 12000 | 10800</p>
+            <p><strong>Important:</strong> DEA is sensitive to measure selection. Avoid using the same concept as both an input and output, and do not mix units with fundamentally different responsibilities.</p>
+          </div>
+
+          <div class="measure-builder">
+            <div>
+              <div class="subsection-heading"><h3>Input measures</h3><button id="addInputButton" type="button">Add Input</button></div>
+              <div id="inputMeasures" class="measure-list"></div>
+            </div>
+            <div>
+              <div class="subsection-heading"><h3>Output measures</h3><button id="addOutputButton" type="button">Add Output</button></div>
+              <div id="outputMeasures" class="measure-list"></div>
+            </div>
+          </div>
+
+          <div class="upload-row">
+            <label for="csvFile"><span>Import CSV data</span><input id="csvFile" type="file" accept=".csv,text/csv"></label>
+            <button id="importCsvButton" type="button">Import CSV</button>
+          </div>
+          <p class="upload-status" id="uploadStatus" aria-live="polite">Define the measures above, add rows manually, load a sample template, or import a CSV.</p>
+
+          <div class="subsection-heading data-heading"><div><h3>Decision-making units</h3><p>At least two units are required. More observations generally create a more informative comparison.</p></div><button id="addDmuButton" type="button">Add DMU</button></div>
+          <div class="table-scroll" tabindex="0" aria-label="Editable DEA data table">
+            <table class="data-table" id="dmuTable"></table>
+          </div>
+          <div class="sample-adequacy" id="sampleAdequacy" role="status" aria-live="polite">
+            <strong>Sample adequacy check</strong>
+            <p id="sampleAdequacyText">Add comparable units to review the sample size against the selected number of measures.</p>
+          </div>
+          <div class="error" id="errorMessage" role="alert" hidden></div>
+          <div class="actions"><button id="continueToModelButton" type="button">Continue to Model</button></div>
+        </section>
+
+        <section class="panel" id="model-setup">
+          <div class="section-header"><div><h2>2. Choose the DEA Model</h2><p>Confirm the assumptions after reviewing the units, measures, scale differences, and decision objective.</p></div></div>
+          <div class="model-choice-grid">
+            <label><span>Returns to scale</span><select id="modelType"><option value="bcc" selected>BCC / VRS - variable returns to scale</option><option value="ccr">CCR / CRS - constant returns to scale</option></select><small>BCC separates scale effects when units operate at different sizes. CCR assumes outputs can change proportionally with inputs.</small></label>
+            <label><span>Orientation</span><select id="orientation"><option value="input" selected>Input-oriented - reduce resources</option><option value="output">Output-oriented - increase outcomes</option></select><small>Input orientation asks how much resource use could fall. Output orientation asks how much output could rise with current resources.</small></label>
+          </div>
+          <div class="method-note" id="modelExplanation" role="note"><strong>Selected approach:</strong> BCC input-oriented DEA compares units after allowing variable returns to scale and focuses on proportional input reduction.</div>
+        </section>
+
+        <section class="panel" id="run-analysis">
+          <div class="section-header">
+            <div><h2>3. Run DEA</h2><p>Validate the prepared data and build the observed efficiency frontier using the selected model.</p></div>
+            <button id="analyzeButton" type="button">Run DEA</button>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="results" aria-labelledby="results-heading">
+          <div class="results-header"><div><h2 id="results-heading" tabindex="-1">4. Results and Interpretation</h2><p>Efficiency is relative to the best observed combinations in this dataset, not an absolute performance standard.</p></div><button id="exportCsvButton" type="button">Export Results CSV</button></div>
+          <div class="summary-grid" id="summaryCards"></div>
+          <div class="interpretation-panel" id="interpretationPanel" aria-live="polite"></div>
+
+          <section class="result-section" aria-labelledby="ranking-heading">
+            <h3 id="ranking-heading">Efficiency Ranking</h3>
+            <div class="table-scroll" tabindex="0" aria-label="DEA efficiency ranking table"><table class="result-table" id="rankingTable"></table></div>
+          </section>
+
+          <section class="result-section" aria-labelledby="chart-heading">
+            <h3 id="chart-heading">Relative Efficiency Comparison</h3>
+            <div class="efficiency-chart" id="efficiencyChart" role="img" aria-label="Horizontal bars comparing DEA efficiency scores"></div>
+            <p class="chart-summary" id="chartSummary"></p>
+          </section>
+
+          <section class="result-section" aria-labelledby="detail-heading">
+            <div class="detail-selector"><div><h3 id="detail-heading">Peer Benchmark and Improvement Targets</h3><p>Select a unit to inspect its benchmark peers, targets, and non-radial slacks.</p></div><label><span>Decision-making unit</span><select id="selectedDmu"></select></label></div>
+            <div class="peer-summary" id="peerSummary"></div>
+            <div class="table-scroll" tabindex="0" aria-label="Selected DMU targets and slacks"><table class="result-table" id="targetTable"></table></div>
+            <div class="lp-calculation" aria-labelledby="lp-calculation-heading">
+              <div class="lp-calculation-header">
+                <div><h4 id="lp-calculation-heading">Linear Programming Formulation</h4><p>Review the important equations solved for the selected DMU. Simplex tableau pivot operations are intentionally omitted.</p></div>
+                <span>Two-phase simplex</span>
+              </div>
+              <div id="lpFormulation"></div>
+            </div>
+          </section>
+        </section>
+
+        <section class="panel content-section" id="about-dea">
+          <h2>About Data Envelopment Analysis</h2>
+          <p>Data Envelopment Analysis is a non-parametric operations-research method for comparing the relative efficiency of decision-making units that use multiple inputs to produce multiple outputs. Efficient units form an observed frontier; other units are assessed relative to feasible combinations of those peers.</p>
+          <p>DEA does not require a predefined production function or externally assigned input/output weights. That flexibility is useful, but it can also allow a unit to receive favourable implicit weights. Results should therefore be reviewed with operational knowledge and sensitivity checks.</p>
+        </section>
+
+        <section class="panel content-section" id="guidance">
+          <h2>Guidance</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card"><span>Choose Comparable Units</span><p>Compare units with similar objectives, services, operating environments, and access to resources. Segment materially different units before analysis.</p></div>
+            <div class="guidance-card"><span>Limit the Measures</span><p>Too many inputs and outputs relative to the number of DMUs can make most units appear efficient. Use decision-relevant measures and gather more units where possible.</p></div>
+            <div class="guidance-card"><span>Review Data Quality</span><p>Use the same time period, currency basis, accounting rules, and output definitions. Investigate missing values, outliers, and exceptional operating conditions.</p></div>
+            <div class="guidance-card"><span>Interpret Targets Carefully</span><p>Targets are mathematical projections onto the observed frontier. Confirm that peer practices and projected changes are operationally feasible before acting.</p></div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card methodology-formula-card"><span>Formula Logic</span><div class="ath-formula-list">
+              <p><strong>Input-oriented envelopment</strong><br>Minimise <var>&theta;</var>, subject to <var>X&lambda;</var> &le; <var>&theta;x</var><sub>o</sub>, <var>Y&lambda;</var> &ge; <var>y</var><sub>o</sub>, and <var>&lambda;</var> &ge; 0.</p>
+              <p><strong>Output-oriented envelopment</strong><br>Maximise <var>&phi;</var>, subject to <var>X&lambda;</var> &le; <var>x</var><sub>o</sub>, <var>Y&lambda;</var> &ge; <var>&phi;y</var><sub>o</sub>, and <var>&lambda;</var> &ge; 0. Reported efficiency is 1 / <var>&phi;</var>.</p>
+              <p><strong>BCC / VRS condition</strong><br>&Sigma;<var>&lambda;</var><sub>j</sub> = 1. The CCR / CRS model omits this convexity restriction.</p>
+              <p><strong>Slacks</strong><br>After radial adjustment, remaining input excesses and output shortfalls are calculated against the peer-weighted frontier target.</p>
+            </div></div>
+            <div class="guidance-card"><span>Assumptions</span><p>Units are comparable, inputs and outputs are measured consistently, values are non-negative, and the observed sample provides a meaningful production possibility set.</p></div>
+            <div class="guidance-card"><span>Limitations</span><p>DEA is deterministic and sensitive to measurement error, outliers, omitted environmental factors, sample size, and measure selection. It does not establish statistical causality.</p></div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details><summary>What is a decision-making unit?</summary><p>A DMU is the comparable entity being assessed, such as a branch, depot, supplier, plant, hospital, school, team, or service centre.</p></details>
+          <details><summary>Should I choose CCR or BCC?</summary><p>Use CCR when proportional scaling is a reasonable assumption. Use BCC when units operate at different sizes and you want to separate managerial efficiency from scale effects.</p></details>
+          <details><summary>What does an efficiency score of 82% mean?</summary><p>In an input-oriented model, it indicates the unit could proportionally reduce controllable inputs by about 18% before considering slacks, relative to the observed frontier. In an output-oriented model, inspect the reported target increase and peers.</p></details>
+          <details><summary>Can financial and non-financial measures be combined?</summary><p>Yes. DEA can combine different units of measurement because each measure is compared consistently across DMUs. The measures must still represent coherent resources and outcomes.</p></details>
+          <details><summary>Does DEA prove that an efficient unit is well managed?</summary><p>No. Efficiency is relative to the selected sample and measures. A 100% score means no observed comparator dominates the unit under the chosen model; it is not proof of absolute excellence.</p></details>
+          <details><summary>Is my data uploaded?</summary><p>No. CSV parsing, optimisation, results, and exports run locally in the current browser.</p></details>
+        </section>
+      </div>
+
+      <aside class="dea-side-nav panel">
+        <h2>Navigation</h2>
+        <nav aria-label="Data Envelopment Analysis page sections">
+          <a href="#data-preparation">Prepare Data</a><a href="#model-setup">Choose Model</a><a href="#run-analysis">Run Analysis</a><a href="#results">Results</a><a href="#about-dea">About DEA</a><a href="#guidance">Guidance</a><a href="#methodology">Methodology</a><a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+  <script src="../calculation-core/dea.js"></script>
+  <script src="Data_Envelopment_Analysis.js"></script>
+</body>
+</html>
