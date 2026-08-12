@@ -206,6 +206,12 @@
             <p class="chart-summary" id="chartSummary"></p>
           </section>
 
+          <section class="result-section" aria-labelledby="action-summary-heading">
+            <h3 id="action-summary-heading">DMU Action Summary</h3>
+            <p class="section-intro">Use this management view to identify where to maintain performance, validate peer practices, or investigate resource and output gaps.</p>
+            <div class="table-scroll" tabindex="0" aria-label="Management action summary by decision-making unit"><table class="result-table action-summary-table" id="actionSummaryTable"></table></div>
+          </section>
+
           <section class="result-section" aria-labelledby="detail-heading">
             <div class="detail-selector"><div><h3 id="detail-heading">Peer Benchmark and Improvement Targets</h3><p>Select a unit to inspect its benchmark peers, targets, and non-radial slacks.</p></div><label><span>Decision-making unit</span><select id="selectedDmu"></select></label></div>
             <div class="peer-summary" id="peerSummary"></div>
@@ -216,6 +222,40 @@
                 <span>Two-phase simplex</span>
               </div>
               <div id="lpFormulation"></div>
+            </div>
+          </section>
+
+
+          <section class="result-section assumption-scenario" aria-labelledby="assumption-scenario-heading">
+            <div class="scenario-heading">
+              <div>
+                <span class="scenario-eyebrow">Optional scenario planning</span>
+                <h3 id="assumption-scenario-heading">Test DEA Assumptions</h3>
+                <p>Compare returns-to-scale and orientation assumptions without replacing the baseline result above.</p>
+              </div>
+              <button class="scenario-toggle" id="assumptionScenarioToggle" type="button" aria-pressed="false" aria-controls="assumptionScenarioPanel">
+                <span class="scenario-toggle-text">Scenario Planning</span>
+                <span class="scenario-switch" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div class="hidden" id="assumptionScenarioPanel">
+              <div class="scenario-explainer" role="note">
+                <p><strong>CCR versus BCC:</strong> CCR assumes constant returns to scale and combines operational and scale inefficiency. BCC allows variable returns to scale and estimates efficiency after separating the effect of operating size. Scale efficiency is CCR efficiency divided by BCC efficiency. A value near 100% suggests limited scale inefficiency; a lower value suggests operating size contributes to the observed gap.</p>
+                <p><strong>Input versus output orientation:</strong> Input orientation asks how far resources could contract while preserving outputs. Output orientation asks how far outcomes could expand with current resources. Compare both when management can influence both sides of the operating model.</p>
+              </div>
+              <div class="scenario-grid">
+                <section>
+                  <h4>CCR versus BCC</h4>
+                  <p id="modelComparisonSummary"></p>
+                  <div class="table-scroll" tabindex="0" aria-label="CCR and BCC efficiency comparison"><table class="result-table" id="modelComparisonTable"></table></div>
+                </section>
+                <section>
+                  <h4>Input versus Output Orientation</h4>
+                  <p id="orientationComparisonSummary"></p>
+                  <div class="table-scroll" tabindex="0" aria-label="Input and output orientation efficiency comparison"><table class="result-table" id="orientationComparisonTable"></table></div>
+                </section>
+              </div>
+              <div class="interpretation-panel scenario-interpretation" id="scenarioInterpretation" aria-live="polite"></div>
             </div>
           </section>
         </section>
@@ -243,6 +283,7 @@
               <p><strong>Input-oriented envelopment</strong><br>Minimise <var>&theta;</var>, subject to <var>X&lambda;</var> &le; <var>&theta;x</var><sub>o</sub>, <var>Y&lambda;</var> &ge; <var>y</var><sub>o</sub>, and <var>&lambda;</var> &ge; 0.</p>
               <p><strong>Output-oriented envelopment</strong><br>Maximise <var>&phi;</var>, subject to <var>X&lambda;</var> &le; <var>x</var><sub>o</sub>, <var>Y&lambda;</var> &ge; <var>&phi;y</var><sub>o</sub>, and <var>&lambda;</var> &ge; 0. Reported efficiency is 1 / <var>&phi;</var>.</p>
               <p><strong>BCC / VRS condition</strong><br>&Sigma;<var>&lambda;</var><sub>j</sub> = 1. The CCR / CRS model omits this convexity restriction.</p>
+              <p><strong>Scale efficiency</strong><br><var>SE</var> = <var>CCR efficiency</var> / <var>BCC efficiency</var>. Values range from 0 to 1; a value near 1 indicates that scale contributes little to the observed inefficiency.</p>
               <p><strong>Slacks</strong><br>After radial adjustment, remaining input excesses and output shortfalls are calculated against the peer-weighted frontier target.</p>
             </div></div>
             <div class="guidance-card"><span>Assumptions</span><p>Units are comparable, inputs and outputs are measured consistently, values are non-negative, and the observed sample provides a meaningful production possibility set.</p></div>
@@ -254,7 +295,9 @@
           <h2>FAQ</h2>
           <details><summary>What is a decision-making unit?</summary><p>A DMU is the comparable entity being assessed, such as a branch, depot, supplier, plant, hospital, school, team, or service centre.</p></details>
           <details><summary>Should I choose CCR or BCC?</summary><p>Use CCR when proportional scaling is a reasonable assumption. Use BCC when units operate at different sizes and you want to separate managerial efficiency from scale effects.</p></details>
+          <details><summary>What does scale efficiency mean?</summary><p>Scale efficiency compares the CCR score with the BCC score for the same data and orientation: <strong>Scale efficiency = CCR efficiency / BCC efficiency</strong>. A value close to 100% suggests the unit is operating near an efficient scale relative to the observed sample. A lower value suggests operating size contributes to its overall efficiency gap. This ratio does not identify whether the unit should become larger or smaller; determining increasing or decreasing returns to scale requires an additional returns-to-scale analysis.</p></details>
           <details><summary>What does an efficiency score of 82% mean?</summary><p>In an input-oriented model, it indicates the unit could proportionally reduce controllable inputs by about 18% before considering slacks, relative to the observed frontier. In an output-oriented model, inspect the reported target increase and peers.</p></details>
+          <details><summary>What do input slack and output slack mean?</summary><p>A DEA score first applies a proportional, or radial, adjustment to all inputs or outputs. Slack is any additional non-proportional gap that remains before the unit reaches its peer-based frontier target. <strong>Input slack</strong> indicates excess use of a particular input after the proportional reduction. <strong>Output slack</strong> indicates a shortfall in a particular output after the proportional expansion. A zero slack means no additional adjustment is identified for that measure. Non-zero slacks are diagnostic signals, not automatic targets; confirm that the peer comparison and proposed change are operationally feasible.</p></details>
           <details><summary>Can financial and non-financial measures be combined?</summary><p>Yes. DEA can combine different units of measurement because each measure is compared consistently across DMUs. The measures must still represent coherent resources and outcomes.</p></details>
           <details><summary>Does DEA prove that an efficient unit is well managed?</summary><p>No. Efficiency is relative to the selected sample and measures. A 100% score means no observed comparator dominates the unit under the chosen model; it is not proof of absolute excellence.</p></details>
           <details><summary>Is my data uploaded?</summary><p>No. CSV parsing, optimisation, results, and exports run locally in the current browser.</p></details>

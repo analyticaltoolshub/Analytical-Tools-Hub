@@ -35,6 +35,18 @@
     };
   }
 
+  function calculateScaleEfficiency(ccrEfficiency, bccEfficiency) {
+    const ccr = Number(ccrEfficiency);
+    const bcc = Number(bccEfficiency);
+    if (!Number.isFinite(ccr) || !Number.isFinite(bcc) || ccr < 0 || bcc <= 0) {
+      throw new Error('Scale efficiency requires a non-negative CCR efficiency and a positive BCC efficiency.');
+    }
+    if (ccr > bcc + 1e-6) {
+      throw new Error('CCR efficiency cannot materially exceed BCC efficiency for the same data and orientation.');
+    }
+    return Math.min(1, ccr / bcc);
+  }
+
   function validateDataset(dmus, inputNames, outputNames) {
     if (!Array.isArray(dmus) || dmus.length < 2) throw new Error('DEA requires at least two decision-making units.');
     if (!Array.isArray(inputNames) || inputNames.length < 1) throw new Error('DEA requires at least one input.');
@@ -312,5 +324,5 @@
     };
   }
 
-  return { analyseDea, assessSampleAdequacy, solveLinearProgram };
+  return { analyseDea, assessSampleAdequacy, calculateScaleEfficiency, solveLinearProgram };
 }));

@@ -117,8 +117,31 @@
 .interpretation-panel p { margin: .4rem 0 0; color: var(--text-secondary); }
 .result-section { margin-top: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; }
 .result-section > h3 { margin: 0; }
+.section-intro { margin: .35rem 0 0; color: var(--text-secondary); }
 .status-pill { display: inline-flex; min-height: 1.8rem; align-items: center; padding: .25rem .55rem; border-radius: 999px; background: #dcfce7; color: #047857; font-size: .78rem; font-weight: 800; }
 .status-pill.review { background: #fff4d6; color: #9a6700; }
+.action-summary-table td:last-child { min-width: 300px; line-height: 1.5; }
+
+.scenario-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.scenario-heading h3 { margin: .15rem 0 .3rem; }
+.scenario-heading p { margin: 0; color: var(--text-secondary); }
+.scenario-eyebrow { color: var(--blue-600); font-size: .75rem; font-weight: 800; text-transform: uppercase; }
+.scenario-toggle { display: inline-flex; min-height: 48px; flex: 0 0 auto; align-items: center; gap: .7rem; padding: .55rem .75rem .55rem 1rem; border: 1px solid var(--navy-950); border-radius: 8px; background: var(--navy-950); color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+.scenario-toggle:hover { background: var(--navy-800); }
+.scenario-toggle:focus-visible { outline: 3px solid rgba(45,127,249,.35); outline-offset: 3px; }
+.scenario-switch { position: relative; width: 48px; height: 26px; border-radius: 999px; background: #98a2b3; transition: background-color .2s ease; }
+.scenario-switch::after { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; content: ''; transition: transform .2s ease; }
+.scenario-toggle[aria-pressed="true"] .scenario-switch { background: var(--success); }
+.scenario-toggle[aria-pressed="true"] .scenario-switch::after { transform: translateX(22px); }
+.scenario-explainer { display: grid; gap: .65rem; margin-top: 1rem; padding: 1rem; border-left: 3px solid var(--blue-500); background: var(--surface); color: var(--text-secondary); }
+.scenario-explainer p { margin: 0; }
+.scenario-explainer strong { color: var(--navy-950); }
+.scenario-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; margin-top: 1rem; }
+.scenario-grid > section { min-width: 0; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; }
+.scenario-grid h4 { margin: 0; color: var(--navy-950); }
+.scenario-grid h4 + p { min-height: 3.15rem; margin: .35rem 0 0; color: var(--text-secondary); font-size: .88rem; }
+.scenario-grid .result-table { min-width: 560px; }
+.scenario-interpretation { margin-top: 1rem; }
 
 .efficiency-chart { display: grid; gap: .7rem; margin-top: 1rem; }
 .efficiency-row { display: grid; grid-template-columns: minmax(120px,1fr) minmax(220px,3fr) 64px; align-items: center; gap: .75rem; }
@@ -151,13 +174,15 @@
 .negative-change { color: #b42318; font-weight: 750; }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (prefers-reduced-motion: reduce) { .scenario-switch, .scenario-switch::after { transition: none; } }
 @media (max-width: 1080px) {
   .dea-layout { grid-template-columns: 1fr; }
   .dea-side-nav { position: static; }
   .dea-workflow ol { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .scenario-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
-  .section-header, .results-header, .subsection-heading, .detail-selector { align-items: stretch; flex-direction: column; }
+  .section-header, .results-header, .subsection-heading, .detail-selector, .scenario-heading { align-items: stretch; flex-direction: column; }
   .editor-actions button, .actions button, .section-header > button, .results-header > button { width: 100%; }
   .model-choice-grid, .measure-builder, .import-columns, .summary-grid, .upload-row, .template-loader, .template-context-grid, .template-measures { grid-template-columns: 1fr; }
   .template-loader .editor-actions button { width: 100%; }
@@ -167,6 +192,7 @@
   .detail-selector label { width: 100%; flex-basis: auto; }
   .lp-calculation-header { align-items: stretch; flex-direction: column; }
   .lp-calculation-header > span { align-self: flex-start; }
+  .scenario-toggle { width: 100%; justify-content: space-between; }
   .efficiency-row { grid-template-columns: minmax(90px,1fr) minmax(120px,2fr) 54px; font-size: .84rem; }
 }
 @media print {

@@ -443,6 +443,24 @@ test("DEA BCC input orientation reproduces a convex peer benchmark", () => {
   approximatelyEqual(unitD.lambdas.reduce((sum, value) => sum + value, 0), 1);
 });
 
+test("DEA calculates exact scale efficiency from matched CCR and BCC scores", () => {
+  const config = {
+    orientation: "input",
+    inputNames: ["Input"],
+    outputNames: ["Output"],
+    dmus: bccReferenceDmus,
+  };
+  const ccr = dea.analyseDea({ ...config, model: "ccr" });
+  const bcc = dea.analyseDea({ ...config, model: "bcc" });
+  const ccrUnitD = ccr.results.find((row) => row.name === "Unit D");
+  const bccUnitD = bcc.results.find((row) => row.name === "Unit D");
+
+  approximatelyEqual(ccrUnitD.efficiency, 2 / 3);
+  approximatelyEqual(bccUnitD.efficiency, 3 / 4);
+  approximatelyEqual(dea.calculateScaleEfficiency(ccrUnitD.efficiency, bccUnitD.efficiency), 8 / 9);
+  assert.throws(() => dea.calculateScaleEfficiency(0.9, 0.8), /cannot materially exceed/);
+});
+
 test("DEA BCC output orientation reproduces an exact expansion target", () => {
   const result = dea.analyseDea({
     model: "bcc",

@@ -5,6 +5,7 @@ const state = {
   outputNames: ['Output 1'],
   dmus: [],
   analysis: null,
+  scenarioAnalyses: null,
   templateKey: ''
 };
 
@@ -282,6 +283,8 @@ function markResultsStale(nextStep = 1) {
     $('#results').classList.add('hidden');
     state.analysis = null;
   }
+  state.scenarioAnalyses = null;
+  resetAssumptionScenario();
   setWorkflowStep(nextStep);
 }
 
@@ -528,6 +531,8 @@ function runAnalysis() {
       outputNames: state.outputNames,
       dmus: collectDataset()
     });
+    state.scenarioAnalyses = null;
+    resetAssumptionScenario();
     renderResults();
     setWorkflowStep(4);
     $('#results').classList.remove('hidden');
@@ -538,6 +543,34 @@ function runAnalysis() {
     setError(error.message);
     setWorkflowStep(3);
   }
+}
+
+function getDmuAction(result, analysis = state.analysis) {
+  const peerNames = result.peers.map((peer) => peer.name).filter((name) => name !== result.name);
+  if (result.efficient) {
+    return {
+      priority: 'Maintain and validate',
+      action: `Maintain current performance, verify data quality, and document transferable practices${peerNames.length ? ` for ${peerNames.join(', ')}` : ''}. Efficiency is relative to this observed sample.`
+    };
+  }
+
+  const gap = (1 - result.efficiency) * 100;
+  const inputSlackIndex = result.inputSlacks.indexOf(Math.max(...result.inputSlacks));
+  const outputSlackIndex = result.outputSlacks.indexOf(Math.max(...result.outputSlacks));
+  const largestInputSlack = result.inputSlacks[inputSlackIndex] || 0;
+  const largestOutputSlack = result.outputSlacks[outputSlackIndex] || 0;
+  const slackAction = largestInputSlack > 1e-6
+    ? ` Investigate excess ${analysis.inputNames[inputSlackIndex]} beyond the proportional adjustment.`
+    : largestOutputSlack > 1e-6
+      ? ` Investigate the additional ${analysis.outputNames[outputSlackIndex]} shortfall beyond the proportional adjustment.`
+      : '';
+  const radialAction = analysis.orientation === 'input'
+    ? `Review whether inputs could be reduced by about ${gap.toFixed(1)}% while maintaining current outputs.`
+    : `Review whether outputs could be expanded by about ${(1 / result.efficiency * 100 - 100).toFixed(1)}% with current inputs.`;
+  return {
+    priority: result.efficiency < 0.8 ? 'Priority review' : result.efficiency < 0.95 ? 'Improvement review' : 'Monitor near frontier',
+    action: `${radialAction}${slackAction} Compare operating practices with ${peerNames.join(', ') || 'the calculated peer reference set'} before setting a management target.`
+  };
 }
 
 function renderResults() {
@@ -559,6 +592,7 @@ function renderResults() {
     <p>The average relative efficiency is <strong>${formatPercent(summary.averageEfficiency)}</strong>. Scores reflect ${orientationText}; they are relative to this sample and these measures.</p>
     ${priority ? `<p><strong>Priority review:</strong> ${escapeHtml(priority.name)} has the lowest score at ${formatPercent(priority.efficiency)}. Review its peer benchmark and projected targets before diagnosing operational causes.</p>` : '<p>Every unit is efficient under the selected model. Review whether the sample is large enough and whether too many measures are making the model weakly discriminating.</p>'}
     ${adequacy.meetsHeuristic ? '' : `<p><strong>Sample caution:</strong> ${adequacy.dmuCount} DMUs are below the common ${adequacy.recommendedMinimum}-unit discrimination heuristic for this measure set. Interpret the number of efficient units cautiously.</p>`}
+    <p><strong>Management use:</strong> Treat frontier scores as a screening signal. Validate comparability, data definitions, operating constraints, and peer practices before assigning targets or accountability.</p>
   `;
 
   $('#rankingTable').innerHTML = `<thead><tr><th>Rank</th><th>DMU</th><th>Efficiency</th><th>Status</th><th>Benchmark peers</th></tr></thead><tbody>${results.slice().sort((a,b) => a.rank-b.rank).map((result) => `
@@ -570,8 +604,89 @@ function renderResults() {
   `).join('');
   $('#chartSummary').textContent = `${summary.efficientCount} units score 100% under the selected model. The chart presents relative radial efficiency and does not rank service quality beyond the outputs supplied.`;
 
+  $('#actionSummaryTable').innerHTML = `<thead><tr><th>DMU</th><th>Efficiency</th><th>Management priority</th><th>Peer reference</th><th>Suggested action</th></tr></thead><tbody>${results.slice().sort((a,b) => a.rank-b.rank).map((result) => {
+    const guidance = getDmuAction(result);
+    const peers = result.peers.map((peer) => peer.name).filter((name) => name !== result.name).join(', ') || (result.efficient ? 'Self / frontier unit' : 'Calculated reference set');
+    return `<tr><td><strong>${escapeHtml(result.name)}</strong></td><td>${formatPercent(result.efficiency)}</td><td>${escapeHtml(guidance.priority)}</td><td>${escapeHtml(peers)}</td><td>${escapeHtml(guidance.action)}</td></tr>`;
+  }).join('')}</tbody>`;
+
   $('#selectedDmu').innerHTML = results.slice().sort((a,b) => a.rank-b.rank).map((result) => `<option value="${escapeHtml(result.name)}">${escapeHtml(result.name)} - ${formatPercent(result.efficiency)}</option>`).join('');
   renderSelectedDmu();
+}
+
+function analyseAssumptionScenarios() {
+  const config = {
+    inputNames: state.analysis.inputNames,
+    outputNames: state.analysis.outputNames,
+    dmus: state.analysis.dmus
+  };
+  state.scenarioAnalyses = {
+    ccrInput: window.ATHDea.analyseDea({ ...config, model: 'ccr', orientation: 'input' }),
+    ccrOutput: window.ATHDea.analyseDea({ ...config, model: 'ccr', orientation: 'output' }),
+    bccInput: window.ATHDea.analyseDea({ ...config, model: 'bcc', orientation: 'input' }),
+    bccOutput: window.ATHDea.analyseDea({ ...config, model: 'bcc', orientation: 'output' })
+  };
+}
+
+function resultByName(analysis, name) {
+  return analysis.results.find((result) => result.name === name);
+}
+
+function renderAssumptionScenarios() {
+  if (!state.analysis) return;
+  if (!state.scenarioAnalyses) analyseAssumptionScenarios();
+  const orientation = state.analysis.orientation;
+  const model = state.analysis.model;
+  const ccr = state.scenarioAnalyses[orientation === 'input' ? 'ccrInput' : 'ccrOutput'];
+  const bcc = state.scenarioAnalyses[orientation === 'input' ? 'bccInput' : 'bccOutput'];
+  const input = state.scenarioAnalyses[model === 'ccr' ? 'ccrInput' : 'bccInput'];
+  const output = state.scenarioAnalyses[model === 'ccr' ? 'ccrOutput' : 'bccOutput'];
+  const names = state.analysis.dmus.map((dmu) => dmu.name);
+  const modelRows = names.map((name) => {
+    const ccrResult = resultByName(ccr, name);
+    const bccResult = resultByName(bcc, name);
+    const gap = Math.max(0, bccResult.efficiency - ccrResult.efficiency);
+    const scaleEfficiency = window.ATHDea.calculateScaleEfficiency(ccrResult.efficiency, bccResult.efficiency);
+    return { name, ccr: ccrResult.efficiency, bcc: bccResult.efficiency, gap, scaleEfficiency };
+  });
+  const orientationRows = names.map((name) => {
+    const inputResult = resultByName(input, name);
+    const outputResult = resultByName(output, name);
+    return { name, input: inputResult.efficiency, output: outputResult.efficiency, gap: Math.abs(inputResult.efficiency - outputResult.efficiency) };
+  });
+  const scaleSensitive = modelRows.filter((row) => row.scaleEfficiency < .98);
+  const orientationSensitive = orientationRows.filter((row) => row.gap > .02);
+
+  $('#modelComparisonSummary').textContent = `Uses the baseline ${orientation}-orientation and changes only the returns-to-scale assumption.`;
+  $('#modelComparisonTable').innerHTML = `<thead><tr><th>DMU</th><th>CCR efficiency</th><th>BCC efficiency</th><th>Scale efficiency</th><th>Interpretation signal</th></tr></thead><tbody>${modelRows.map((row) => `<tr><td><strong>${escapeHtml(row.name)}</strong></td><td>${formatPercent(row.ccr)}</td><td>${formatPercent(row.bcc)}</td><td><strong>${formatPercent(row.scaleEfficiency)}</strong></td><td>${row.scaleEfficiency < .98 ? 'Review operating scale' : 'Limited scale inefficiency'}</td></tr>`).join('')}</tbody>`;
+
+  $('#orientationComparisonSummary').textContent = `Uses the baseline ${model.toUpperCase()} model and changes only the improvement direction.`;
+  $('#orientationComparisonTable').innerHTML = `<thead><tr><th>DMU</th><th>Input-oriented</th><th>Output-oriented</th><th>Absolute difference</th><th>Interpretation signal</th></tr></thead><tbody>${orientationRows.map((row) => `<tr><td><strong>${escapeHtml(row.name)}</strong></td><td>${formatPercent(row.input)}</td><td>${formatPercent(row.output)}</td><td>${formatPercent(row.gap)}</td><td>${row.gap > .02 ? 'Result depends on management focus' : 'Limited orientation sensitivity'}</td></tr>`).join('')}</tbody>`;
+
+  $('#scenarioInterpretation').innerHTML = `
+    <h3>Assumption Sensitivity</h3>
+    <p><strong>${scaleSensitive.length} of ${names.length} DMUs</strong> have scale efficiency below 98%. ${scaleSensitive.length ? `Review whether operating size contributes to the gap for ${escapeHtml(scaleSensitive.map((row) => row.name).join(', '))}.` : 'Scale inefficiency appears limited under this diagnostic threshold.'}</p>
+    <p><strong>${orientationSensitive.length} of ${names.length} DMUs</strong> change by more than 2 percentage points between input and output orientation. ${orientationSensitive.length ? `Clarify whether management can primarily control resources or outcomes for ${escapeHtml(orientationSensitive.map((row) => row.name).join(', '))}.` : 'The improvement direction has limited effect on the observed scores.'}</p>
+    <p>Scenario comparisons test modelling assumptions only. They do not prove which specification is correct, and they do not overwrite the baseline ranking, peers, targets, or export above.</p>
+  `;
+}
+
+function resetAssumptionScenario() {
+  const toggle = $('#assumptionScenarioToggle');
+  const panel = $('#assumptionScenarioPanel');
+  if (!toggle || !panel) return;
+  toggle.setAttribute('aria-pressed', 'false');
+  panel.classList.add('hidden');
+}
+
+function toggleAssumptionScenario() {
+  if (!state.analysis) return;
+  const toggle = $('#assumptionScenarioToggle');
+  const panel = $('#assumptionScenarioPanel');
+  const nextState = toggle.getAttribute('aria-pressed') !== 'true';
+  toggle.setAttribute('aria-pressed', String(nextState));
+  panel.classList.toggle('hidden', !nextState);
+  if (nextState) renderAssumptionScenarios();
 }
 
 function renderSelectedDmu() {
@@ -642,17 +757,19 @@ function exportResultsCsv() {
   const generatedAt = new Date().toISOString();
   const headers = [
     'Rank', 'DMU', 'Model', 'Orientation', 'Efficiency', 'Radial Factor', 'Efficient', 'Peers',
-    'DMUs Compared', 'Recommended Minimum DMUs', 'Sample Heuristic Met', 'Generated At',
+    'Management Priority', 'Suggested Action', 'DMUs Compared', 'Recommended Minimum DMUs', 'Sample Heuristic Met', 'Generated At',
     ...state.inputNames.flatMap((name) => [`Actual Input: ${name}`, `Target Input: ${name}`, `Input Slack: ${name}`]),
     ...state.outputNames.flatMap((name) => [`Actual Output: ${name}`, `Target Output: ${name}`, `Output Slack: ${name}`])
   ];
   const sourceByName = new Map(state.analysis.dmus.map((dmu) => [dmu.name, dmu]));
   const rows = state.analysis.results.map((result) => {
     const source = sourceByName.get(result.name);
+    const guidance = getDmuAction(result);
     return [
       result.rank, result.name, state.analysis.model.toUpperCase(), state.analysis.orientation,
       result.efficiency, result.radialFactor, result.efficient ? 'Yes' : 'No',
       result.peers.map((peer) => `${peer.name} (${peer.lambda.toFixed(4)})`).join('; '),
+      guidance.priority, guidance.action,
       state.analysis.adequacy.dmuCount, state.analysis.adequacy.recommendedMinimum,
       state.analysis.adequacy.meetsHeuristic ? 'Yes' : 'No', generatedAt,
       ...state.inputNames.flatMap((_, index) => [source.inputs[index], result.inputTargets[index], result.inputSlacks[index]]),
@@ -701,6 +818,7 @@ function initEvents() {
   $('#continueToModelButton').addEventListener('click', continueToModel);
   $('#analyzeButton').addEventListener('click', runAnalysis);
   $('#exportCsvButton').addEventListener('click', exportResultsCsv);
+  $('#assumptionScenarioToggle').addEventListener('click', toggleAssumptionScenario);
   $('#selectedDmu').addEventListener('change', renderSelectedDmu);
   $('#inputMeasures').addEventListener('input', handleMeasureInput);
   $('#outputMeasures').addEventListener('input', handleMeasureInput);

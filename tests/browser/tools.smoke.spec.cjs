@@ -80,6 +80,19 @@ for (const entry of pages) {
       await expect(page.locator('#lpFormulation')).toContainText('Minimise θ');
       await expect(page.locator('#lpFormulation')).toContainText('BCC convexity');
       await expect(page.locator('#lpFormulation')).toContainText('Non-zero peer weights');
+      await expect(page.locator('#actionSummaryTable tbody tr')).toHaveCount(3);
+      await expect(page.locator('#actionSummaryTable')).toContainText('Suggested action');
+      await expect(page.locator('#interpretationPanel')).toContainText('Management use');
+      await expect(page.locator('#assumptionScenarioPanel')).toBeHidden();
+      await page.locator('#assumptionScenarioToggle').click();
+      await expect(page.locator('#assumptionScenarioToggle')).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('#assumptionScenarioPanel')).toBeVisible();
+      await expect(page.locator('#modelComparisonTable tbody tr')).toHaveCount(3);
+      await expect(page.locator('#modelComparisonTable')).toContainText('Scale efficiency');
+      await expect(page.locator('#orientationComparisonTable tbody tr')).toHaveCount(3);
+      await expect(page.locator('#assumptionScenarioPanel')).toContainText('CCR versus BCC');
+      await expect(page.locator('#assumptionScenarioPanel')).toContainText('Input versus output orientation');
+      await expect(page.locator('#scenarioInterpretation')).toContainText('do not overwrite the baseline');
       const downloadPromise = page.waitForEvent('download');
       await page.locator('#exportCsvButton').click();
       const download = await downloadPromise;
@@ -87,6 +100,8 @@ for (const entry of pages) {
       expect(exportText).toContain('Actual Input: Staff FTE');
       expect(exportText).toContain('Input Slack: Staff FTE');
       expect(exportText).toContain('Recommended Minimum DMUs');
+      expect(exportText).toContain('Management Priority');
+      expect(exportText).toContain('Suggested Action');
 
       await page.locator('#resetButton').click();
       await page.locator('#csvFile').setInputFiles({
