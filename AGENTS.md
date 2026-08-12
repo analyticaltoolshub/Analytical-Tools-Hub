@@ -487,6 +487,16 @@ Available tools should be represented consistently:
   suggested measures, units, model, and orientation, but users should enter or import
   their own DMU observations. Clearly identify placeholder rows as editable setup aids,
   not an adequate sample, industry benchmark, or validated performance dataset.
+- Keep future-scenario evaluation separate from Standard DEA. Build the scenario
+  frontier only from user-selected historical reference DMUs; the scenario DMU must
+  never receive a lambda or participate in constructing or changing that frontier.
+- Clearly distinguish `REFERENCE` and `SCENARIO` records. Warn when forecast outputs
+  exceed the observed historical range, and withhold BCC/VRS targets when the proposed
+  scenario is outside the feasible convex historical production set.
+- Scenario results should report the selected efficiency, CCR and BCC diagnostics,
+  scale efficiency, peers, targets, and slacks. Classify returns to scale only when the
+  required auxiliary model is implemented and tested; do not infer it from scale
+  efficiency alone.
 
 ## SEO Requirements
 

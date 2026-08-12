@@ -225,9 +225,27 @@
     return { solution, objective: tableau[tableau.length - 1][rhsColumn] };
   }
 
-  function solveDmu(dmus, dmuIndex, model, orientation) {
-    const count = dmus.length;
-    const evaluated = dmus[dmuIndex];
+  function validateEvaluatedDmu(dmu, inputNames, outputNames) {
+    const name = String(dmu && dmu.name || '').trim();
+    if (!name) throw new Error('The scenario DMU needs a name.');
+    if (!Array.isArray(dmu.inputs) || dmu.inputs.length !== inputNames.length) {
+      throw new Error(`${name} must contain ${inputNames.length} input value(s).`);
+    }
+    if (!Array.isArray(dmu.outputs) || dmu.outputs.length !== outputNames.length) {
+      throw new Error(`${name} must contain ${outputNames.length} output value(s).`);
+    }
+    const clean = {
+      name,
+      inputs: dmu.inputs.map((value, index) => assertFiniteNonNegative(value, `${name}: ${inputNames[index]}`)),
+      outputs: dmu.outputs.map((value, index) => assertFiniteNonNegative(value, `${name}: ${outputNames[index]}`))
+    };
+    if (!clean.inputs.some((value) => value > EPSILON)) throw new Error(`${name} must have at least one positive input.`);
+    if (!clean.outputs.some((value) => value > EPSILON)) throw new Error(`${name} must have at least one positive output.`);
+    return clean;
+  }
+
+  function solveAgainstFrontier(referenceDmus, evaluated, model, orientation, options = {}) {
+    const count = referenceDmus.length;
     const radialIndex = count;
     const objective = Array(count + 1).fill(0);
     objective[radialIndex] = orientation === 'input' ? -1 : 1;
@@ -236,36 +254,41 @@
     if (orientation === 'input') {
       evaluated.inputs.forEach((input, inputIndex) => {
         constraints.push({
-          coefficients: [...dmus.map((dmu) => dmu.inputs[inputIndex]), -input],
+          coefficients: [...referenceDmus.map((dmu) => dmu.inputs[inputIndex]), -input],
           sense: '<=', rhs: 0
         });
       });
       evaluated.outputs.forEach((output, outputIndex) => {
         constraints.push({
-          coefficients: [...dmus.map((dmu) => dmu.outputs[outputIndex]), 0],
+          coefficients: [...referenceDmus.map((dmu) => dmu.outputs[outputIndex]), 0],
           sense: '>=', rhs: output
         });
       });
       constraints.push({ coefficients: [...Array(count).fill(0), 1], sense: '<=', rhs: 1 });
     } else {
       evaluated.inputs.forEach((input, inputIndex) => {
-        constraints.push({ coefficients: [...dmus.map((dmu) => dmu.inputs[inputIndex]), 0], sense: '<=', rhs: input });
+        constraints.push({ coefficients: [...referenceDmus.map((dmu) => dmu.inputs[inputIndex]), 0], sense: '<=', rhs: input });
       });
       evaluated.outputs.forEach((output, outputIndex) => {
         constraints.push({
-          coefficients: [...dmus.map((dmu) => dmu.outputs[outputIndex]), -output],
+          coefficients: [...referenceDmus.map((dmu) => dmu.outputs[outputIndex]), -output],
           sense: '>=', rhs: 0
         });
       });
+      if (options.requireObservedDominance) {
+        constraints.push({ coefficients: [...Array(count).fill(0), 1], sense: '>=', rhs: 1 });
+      }
     }
-    if (model === 'bcc') constraints.push({ coefficients: [...Array(count).fill(1), 0], sense: '=', rhs: 1 });
+    const scaleRestriction = options.scaleRestriction || (model === 'bcc' ? 'vrs' : 'crs');
+    if (scaleRestriction === 'vrs') constraints.push({ coefficients: [...Array(count).fill(1), 0], sense: '=', rhs: 1 });
+    if (scaleRestriction === 'nirs') constraints.push({ coefficients: [...Array(count).fill(1), 0], sense: '<=', rhs: 1 });
 
     const solved = solveLinearProgram(objective, constraints);
     const lambdas = solved.solution.slice(0, count).map((value) => Math.max(0, value));
     const radial = Math.max(EPSILON, solved.solution[radialIndex]);
     const efficiency = Math.min(1, orientation === 'input' ? radial : 1 / radial);
-    const referenceInputs = evaluated.inputs.map((_, index) => lambdas.reduce((sum, lambda, j) => sum + lambda * dmus[j].inputs[index], 0));
-    const referenceOutputs = evaluated.outputs.map((_, index) => lambdas.reduce((sum, lambda, j) => sum + lambda * dmus[j].outputs[index], 0));
+    const referenceInputs = evaluated.inputs.map((_, index) => lambdas.reduce((sum, lambda, j) => sum + lambda * referenceDmus[j].inputs[index], 0));
+    const referenceOutputs = evaluated.outputs.map((_, index) => lambdas.reduce((sum, lambda, j) => sum + lambda * referenceDmus[j].outputs[index], 0));
     const inputTargets = orientation === 'input'
       ? evaluated.inputs.map((value) => radial * value)
       : evaluated.inputs.slice();
@@ -280,12 +303,78 @@
       efficiency,
       radialFactor: radial,
       efficient: efficiency >= 1 - 1e-6 && inputSlacks.every((value) => value <= 1e-5) && outputSlacks.every((value) => value <= 1e-5),
-      peers: lambdas.map((lambda, index) => ({ name: dmus[index].name, lambda })).filter((peer) => peer.lambda > 1e-6),
+      peers: lambdas.map((lambda, index) => ({ name: referenceDmus[index].name, lambda })).filter((peer) => peer.lambda > 1e-6),
       lambdas,
       inputTargets: referenceInputs,
       outputTargets: referenceOutputs,
       inputSlacks,
       outputSlacks
+    };
+  }
+
+  function solveDmu(dmus, dmuIndex, model, orientation) {
+    return solveAgainstFrontier(dmus, dmus[dmuIndex], model, orientation);
+  }
+
+  function tryScenarioSolve(referenceDmus, scenario, model, orientation, options) {
+    try {
+      return { feasible: true, result: solveAgainstFrontier(referenceDmus, scenario, model, orientation, options), error: '' };
+    } catch (error) {
+      if (!/infeasible/i.test(error.message)) throw error;
+      return { feasible: false, result: null, error: error.message };
+    }
+  }
+
+  function classifyReturnsToScale(ccr, bcc, nirs) {
+    if (!ccr.feasible || !bcc.feasible || !nirs.feasible) return 'Not available';
+    if (Math.abs(ccr.result.efficiency - bcc.result.efficiency) <= 1e-5) return 'Constant returns to scale';
+    if (Math.abs(nirs.result.efficiency - bcc.result.efficiency) <= 1e-5) return 'Decreasing returns to scale';
+    return 'Increasing returns to scale';
+  }
+
+  function evaluateScenario(config) {
+    const inputNames = (config.inputNames || []).map((name) => String(name || '').trim());
+    const outputNames = (config.outputNames || []).map((name) => String(name || '').trim());
+    if (inputNames.some((name) => !name) || outputNames.some((name) => !name)) throw new Error('Every input and output needs a name.');
+    if (!['ccr', 'bcc'].includes(config.model)) throw new Error('DEA model must be CCR or BCC.');
+    if (!['input', 'output'].includes(config.orientation)) throw new Error('DEA orientation must be input or output.');
+
+    const referenceDmus = validateDataset(config.referenceDmus, inputNames, outputNames);
+    const scenario = validateEvaluatedDmu(config.scenario, inputNames, outputNames);
+    if (referenceDmus.some((dmu) => dmu.name.toLowerCase() === scenario.name.toLowerCase())) {
+      throw new Error('The scenario DMU name must differ from every historical reference DMU name.');
+    }
+    const options = { requireObservedDominance: true };
+    const ccr = tryScenarioSolve(referenceDmus, scenario, 'ccr', config.orientation, options);
+    const bcc = tryScenarioSolve(referenceDmus, scenario, 'bcc', config.orientation, options);
+    const selected = config.model === 'bcc' ? bcc : ccr;
+    const outputRangeWarnings = outputNames.map((name, index) => {
+      const maximum = Math.max(...referenceDmus.map((dmu) => dmu.outputs[index]));
+      return scenario.outputs[index] > maximum + EPSILON ? { name, value: scenario.outputs[index], maximum } : null;
+    }).filter(Boolean);
+    let scaleEfficiency = null;
+    if (ccr.feasible && bcc.feasible) {
+      scaleEfficiency = calculateScaleEfficiency(ccr.result.efficiency, bcc.result.efficiency);
+    }
+    let returnsToScale = 'Available for input-oriented scenarios only';
+    if (config.orientation === 'input') {
+      const nirs = tryScenarioSolve(referenceDmus, scenario, 'ccr', 'input', { ...options, scaleRestriction: 'nirs' });
+      returnsToScale = classifyReturnsToScale(ccr, bcc, nirs);
+    }
+    return {
+      model: config.model,
+      orientation: config.orientation,
+      inputNames,
+      outputNames,
+      referenceDmus,
+      scenario,
+      selected,
+      ccr,
+      bcc,
+      scaleEfficiency,
+      returnsToScale,
+      outputRangeWarnings,
+      referenceCount: referenceDmus.length
     };
   }
 
@@ -324,5 +413,5 @@
     };
   }
 
-  return { analyseDea, assessSampleAdequacy, calculateScaleEfficiency, solveLinearProgram };
+  return { analyseDea, evaluateScenario, assessSampleAdequacy, calculateScaleEfficiency, solveLinearProgram };
 }));

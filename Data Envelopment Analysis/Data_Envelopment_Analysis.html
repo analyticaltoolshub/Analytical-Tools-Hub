@@ -229,7 +229,7 @@
           <section class="result-section assumption-scenario" aria-labelledby="assumption-scenario-heading">
             <div class="scenario-heading">
               <div>
-                <span class="scenario-eyebrow">Optional scenario planning</span>
+                <span class="scenario-eyebrow">Scenario planning &amp; forward-looking assessment</span>
                 <h3 id="assumption-scenario-heading">Test DEA Assumptions</h3>
                 <p>Compare returns-to-scale and orientation assumptions without replacing the baseline result above.</p>
               </div>
@@ -243,21 +243,80 @@
                 <p><strong>CCR versus BCC:</strong> CCR assumes constant returns to scale and combines operational and scale inefficiency. BCC allows variable returns to scale and estimates efficiency after separating the effect of operating size. Scale efficiency is CCR efficiency divided by BCC efficiency. A value near 100% suggests limited scale inefficiency; a lower value suggests operating size contributes to the observed gap.</p>
                 <p><strong>Input versus output orientation:</strong> Input orientation asks how far resources could contract while preserving outputs. Output orientation asks how far outcomes could expand with current resources. Compare both when management can influence both sides of the operating model.</p>
               </div>
-              <div class="scenario-grid">
+              <div class="scenario-grid assumption-model-grid">
                 <section>
                   <h4>CCR versus BCC</h4>
                   <p id="modelComparisonSummary"></p>
                   <div class="table-scroll" tabindex="0" aria-label="CCR and BCC efficiency comparison"><table class="result-table" id="modelComparisonTable"></table></div>
                 </section>
-                <section>
-                  <h4>Input versus Output Orientation</h4>
+                <details class="orientation-diagnostic">
+                  <summary><span class="orientation-summary-title">Input versus Output Orientation <small>Secondary diagnostic</small></span><span class="diagnostic-chevron" aria-hidden="true"></span></summary>
                   <p id="orientationComparisonSummary"></p>
                   <div class="table-scroll" tabindex="0" aria-label="Input and output orientation efficiency comparison"><table class="result-table" id="orientationComparisonTable"></table></div>
-                </section>
+                </details>
               </div>
               <div class="interpretation-panel scenario-interpretation" id="scenarioInterpretation" aria-live="polite"></div>
             </div>
           </section>
+        </section>
+
+        <section class="panel hidden" id="scenario-analysis" aria-labelledby="resource-scenario-heading">
+          <div class="results-header">
+            <div>
+              <h2 id="resource-scenario-heading">5. Scenario Analysis</h2>
+              <p>Evaluate a future resource plan against a frontier built only from selected historical reference DMUs.</p>
+            </div>
+            <span class="fixed-frontier-badge">Fixed historical frontier</span>
+          </div>
+          <div class="scenario-explainer" role="note">
+            <p><strong>REFERENCE records</strong> construct the comparison frontier. The <strong>SCENARIO record</strong> is evaluated against that fixed frontier and never receives a lambda or changes the benchmark.</p>
+            <p>Use comparable historical periods or operating units. Forecasts outside the observed range require particular caution because DEA does not validate whether an unprecedented plan is achievable.</p>
+          </div>
+
+          <div class="resource-scenario-grid">
+            <section class="scenario-editor-block" aria-labelledby="reference-dmus-heading">
+              <div class="subsection-heading">
+                <div><h3 id="reference-dmus-heading">Historical Reference DMUs</h3><p>Select at least two comparable observations to construct the frontier.</p></div>
+                <span class="record-badge reference">REFERENCE</span>
+              </div>
+              <fieldset class="reference-selector" id="scenarioReferenceSelector"><legend class="sr-only">Historical reference DMUs</legend></fieldset>
+            </section>
+
+            <section class="scenario-editor-block" aria-labelledby="future-scenario-heading">
+              <div class="subsection-heading">
+                <div><h3 id="future-scenario-heading">Future Scenario DMU</h3><p>Enter proposed resources and forecast outputs using the same definitions as the historical data.</p></div>
+                <span class="record-badge future">SCENARIO</span>
+              </div>
+              <div class="scenario-name-field"><label for="scenarioDmuName">Scenario name</label><input id="scenarioDmuName" type="text" value="Future Scenario Plan"></div>
+              <div class="scenario-value-grid" id="scenarioValueFields"></div>
+            </section>
+          </div>
+
+          <section class="scenario-settings" aria-labelledby="scenario-settings-heading">
+            <div><h3 id="scenario-settings-heading">Evaluation assumptions</h3><p>Choose the production assumption and improvement direction for this plan.</p></div>
+            <div class="model-choice-grid">
+              <label><span>Returns to scale</span><select id="scenarioModel"><option value="bcc">BCC - variable returns</option><option value="ccr">CCR - constant returns</option></select></label>
+              <label><span>Orientation</span><select id="scenarioOrientation"><option value="input">Input - test resource reduction</option><option value="output">Output - test output expansion</option></select></label>
+            </div>
+            <button id="evaluateScenarioButton" type="button">Evaluate Resource Plan</button>
+            <p class="error" id="scenarioError" role="alert" hidden></p>
+          </section>
+
+          <div class="hidden" id="resourceScenarioResults" aria-live="polite">
+            <div class="summary-grid scenario-summary-grid" id="resourceScenarioSummary"></div>
+            <div id="scenarioRangeWarning"></div>
+            <div class="interpretation-panel" id="resourceScenarioInterpretation"></div>
+
+            <section class="result-section" aria-labelledby="scenario-benchmark-heading">
+              <h3 id="scenario-benchmark-heading">Proposed Plan and DEA Benchmark</h3>
+              <div class="table-scroll" tabindex="0" aria-label="Scenario proposed values, targets, and slacks"><table class="result-table" id="scenarioBenchmarkTable"></table></div>
+            </section>
+            <section class="result-section" aria-labelledby="scenario-peer-heading">
+              <h3 id="scenario-peer-heading">Historical Peer References</h3>
+              <p class="section-intro" id="scenarioPeerSummary"></p>
+              <div class="table-scroll" tabindex="0" aria-label="Scenario historical peer weights"><table class="result-table compact-result-table" id="scenarioPeerTable"></table></div>
+            </section>
+          </div>
         </section>
 
         <section class="panel content-section" id="about-dea">
@@ -307,7 +366,7 @@
       <aside class="dea-side-nav panel">
         <h2>Navigation</h2>
         <nav aria-label="Data Envelopment Analysis page sections">
-          <a href="#data-preparation">Prepare Data</a><a href="#model-setup">Choose Model</a><a href="#run-analysis">Run Analysis</a><a href="#results">Results</a><a href="#about-dea">About DEA</a><a href="#guidance">Guidance</a><a href="#methodology">Methodology</a><a href="#faq">FAQ</a>
+          <a href="#data-preparation">Prepare Data</a><a href="#model-setup">Choose Model</a><a href="#run-analysis">Run Analysis</a><a href="#results">Results</a><a id="scenarioNavLink" href="#scenario-analysis" hidden>Scenario Analysis</a><a href="#about-dea">About DEA</a><a href="#guidance">Guidance</a><a href="#methodology">Methodology</a><a href="#faq">FAQ</a>
         </nav>
       </aside>
     </div>

@@ -6,6 +6,7 @@ const state = {
   dmus: [],
   analysis: null,
   scenarioAnalyses: null,
+  resourceScenario: null,
   templateKey: ''
 };
 
@@ -284,6 +285,9 @@ function markResultsStale(nextStep = 1) {
     state.analysis = null;
   }
   state.scenarioAnalyses = null;
+  state.resourceScenario = null;
+  $('#scenario-analysis').classList.add('hidden');
+  $('#resourceScenarioResults').classList.add('hidden');
   resetAssumptionScenario();
   setWorkflowStep(nextStep);
 }
@@ -532,8 +536,10 @@ function runAnalysis() {
       dmus: collectDataset()
     });
     state.scenarioAnalyses = null;
+    state.resourceScenario = null;
     resetAssumptionScenario();
     renderResults();
+    renderResourceScenarioEditor();
     setWorkflowStep(4);
     $('#results').classList.remove('hidden');
     $('#results-heading').focus();
@@ -542,6 +548,128 @@ function runAnalysis() {
     $('#results').classList.add('hidden');
     setError(error.message);
     setWorkflowStep(3);
+  }
+}
+
+function renderResourceScenarioEditor() {
+  if (!state.analysis) return;
+  $('#scenarioReferenceSelector').innerHTML = state.analysis.dmus.map((dmu, index) => `
+    <label class="reference-option">
+      <input type="checkbox" value="${index}" checked>
+      <span><strong>${escapeHtml(dmu.name)}</strong><small>Historical observation ${index + 1}</small></span>
+      <em>REFERENCE</em>
+    </label>
+  `).join('');
+  const fields = [
+    ...state.analysis.inputNames.map((name, index) => ({ kind: 'input', name, index })),
+    ...state.analysis.outputNames.map((name, index) => ({ kind: 'output', name, index }))
+  ];
+  $('#scenarioValueFields').innerHTML = fields.map((field) => `
+    <label>
+      <span>${escapeHtml(field.name)} <small>${field.kind === 'input' ? 'Proposed input' : 'Forecast output'}</small></span>
+      <input type="number" min="0" step="any" inputmode="decimal" data-scenario-kind="${field.kind}" data-scenario-index="${field.index}" placeholder="Enter value">
+    </label>
+  `).join('');
+  $('#scenarioModel').value = state.analysis.model;
+  $('#scenarioOrientation').value = state.analysis.orientation;
+  $('#scenarioDmuName').value = 'Future Scenario Plan';
+  $('#scenarioError').hidden = true;
+  $('#scenarioError').textContent = '';
+  $('#resourceScenarioResults').classList.add('hidden');
+}
+
+function collectResourceScenario() {
+  const selectedIndexes = [...$('#scenarioReferenceSelector').querySelectorAll('input:checked')].map((input) => Number(input.value));
+  const referenceDmus = selectedIndexes.map((index) => state.analysis.dmus[index]);
+  const inputs = state.analysis.inputNames.map((_, index) => {
+    const field = $(`[data-scenario-kind="input"][data-scenario-index="${index}"]`);
+    return field ? field.value : '';
+  });
+  const outputs = state.analysis.outputNames.map((_, index) => {
+    const field = $(`[data-scenario-kind="output"][data-scenario-index="${index}"]`);
+    return field ? field.value : '';
+  });
+  return {
+    model: $('#scenarioModel').value,
+    orientation: $('#scenarioOrientation').value,
+    inputNames: state.analysis.inputNames,
+    outputNames: state.analysis.outputNames,
+    referenceDmus,
+    scenario: { name: $('#scenarioDmuName').value, inputs, outputs }
+  };
+}
+
+function scenarioScore(solve) {
+  return solve.feasible ? formatPercent(solve.result.efficiency) : 'Not feasible';
+}
+
+function renderResourceScenarioResults() {
+  const analysis = state.resourceScenario;
+  const selected = analysis.selected;
+  $('#resourceScenarioSummary').innerHTML = [
+    ['Selected efficiency', scenarioScore(selected)],
+    ['CCR efficiency', scenarioScore(analysis.ccr)],
+    ['BCC efficiency', scenarioScore(analysis.bcc)],
+    ['Scale efficiency', analysis.scaleEfficiency === null ? 'Not available' : formatPercent(analysis.scaleEfficiency)],
+    ['Returns to scale', analysis.returnsToScale]
+  ].map(([label, value]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`).join('');
+
+  if (analysis.outputRangeWarnings.length) {
+    $('#scenarioRangeWarning').innerHTML = `<div class="scenario-warning" role="status"><strong>Outside observed output range</strong><p>${analysis.outputRangeWarnings.map((warning) => `${escapeHtml(warning.name)} is ${formatNumber(warning.value)}, above the historical maximum of ${formatNumber(warning.maximum)}.`).join(' ')} The plan may require extrapolation. BCC results are withheld when no feasible convex combination of historical references can support it.</p></div>`;
+  } else {
+    $('#scenarioRangeWarning').innerHTML = '';
+  }
+
+  if (!selected.feasible) {
+    $('#resourceScenarioInterpretation').innerHTML = `
+      <h3>Resource-plan conclusion</h3>
+      <p><strong>The selected ${analysis.model.toUpperCase()} ${analysis.orientation}-oriented scenario is not feasible within the historical production set.</strong></p>
+      <p>The tool has not presented a benchmark target because doing so would imply support that the selected reference observations do not provide. Review the forecast, proposed resources, reference selection, or model assumption.</p>
+    `;
+    $('#scenarioBenchmarkTable').innerHTML = '<tbody><tr><td>No benchmark is shown for an infeasible scenario.</td></tr></tbody>';
+    $('#scenarioPeerTable').innerHTML = '<tbody><tr><td>No historical peer combination supports this scenario under the selected model.</td></tr></tbody>';
+    $('#scenarioPeerSummary').textContent = `${analysis.referenceCount} historical records were considered; the scenario was not included in the frontier.`;
+    $('#resourceScenarioResults').classList.remove('hidden');
+    return;
+  }
+
+  const result = selected.result;
+  const hasInputOpportunity = analysis.orientation === 'input' && (result.efficiency < 1 - 1e-6 || result.inputSlacks.some((value) => value > 1e-6));
+  const answer = analysis.orientation === 'input'
+    ? hasInputOpportunity
+      ? `Yes. Relative to the selected historical frontier, the forecast outputs could potentially be achieved with fewer planned resources. The radial input reduction is about ${((1 - result.efficiency) * 100).toFixed(1)}% before measure-specific slacks.`
+      : 'No proportional resource reduction is identified relative to the selected historical frontier. The plan is on the observed frontier under this specification.'
+    : `The output-oriented model identifies a potential proportional output expansion of about ${((1 / result.efficiency - 1) * 100).toFixed(1)}% before output-specific slacks.`;
+  $('#resourceScenarioInterpretation').innerHTML = `
+    <h3>Could the forecast outputs potentially be achieved with fewer planned resources relative to historical efficient performance?</h3>
+    <p><strong>${escapeHtml(answer)}</strong></p>
+    <p>The scenario was evaluated against ${analysis.referenceCount} selected historical DMUs. It did not construct or alter the frontier. Treat the result as a relative planning diagnostic and verify operational constraints before changing resources.</p>
+  `;
+
+  const rows = [
+    ...analysis.inputNames.map((name, index) => ({ type: 'Input', name, proposed: analysis.scenario.inputs[index], target: result.inputTargets[index], gap: analysis.scenario.inputs[index] - result.inputTargets[index], slack: result.inputSlacks[index] })),
+    ...analysis.outputNames.map((name, index) => ({ type: 'Output', name, proposed: analysis.scenario.outputs[index], target: result.outputTargets[index], gap: result.outputTargets[index] - analysis.scenario.outputs[index], slack: result.outputSlacks[index] }))
+  ];
+  $('#scenarioBenchmarkTable').innerHTML = `<thead><tr><th>Measure</th><th>Record type</th><th>Proposed / forecast</th><th>DEA benchmark target</th><th>${analysis.orientation === 'input' ? 'Potential reduction / increase' : 'Potential change'}</th><th>Slack</th></tr></thead><tbody>${rows.map((row) => `<tr><td><strong>${escapeHtml(row.name)}</strong></td><td>${row.type}</td><td>${formatNumber(row.proposed)}</td><td>${formatNumber(row.target)}</td><td>${formatNumber(Math.max(0, row.gap))}</td><td>${formatNumber(row.slack)}</td></tr>`).join('')}</tbody>`;
+  $('#scenarioPeerSummary').textContent = `${result.peers.length} historical peer reference${result.peers.length === 1 ? '' : 's'} support the benchmark. No lambda is created for ${analysis.scenario.name}.`;
+  $('#scenarioPeerTable').innerHTML = `<thead><tr><th>Historical reference DMU</th><th>Lambda weight</th><th>Role</th></tr></thead><tbody>${result.peers.map((peer) => `<tr><td><strong>${escapeHtml(peer.name)}</strong></td><td>${peer.lambda.toFixed(4)}</td><td><span class="record-badge reference">REFERENCE</span></td></tr>`).join('')}</tbody>`;
+  $('#resourceScenarioResults').classList.remove('hidden');
+}
+
+function evaluateResourceScenario() {
+  if (!state.analysis) return;
+  const errorBox = $('#scenarioError');
+  errorBox.hidden = true;
+  errorBox.textContent = '';
+  try {
+    state.resourceScenario = window.ATHDea.evaluateScenario(collectResourceScenario());
+    renderResourceScenarioResults();
+  } catch (error) {
+    state.resourceScenario = null;
+    $('#resourceScenarioResults').classList.add('hidden');
+    errorBox.textContent = error.message;
+    errorBox.hidden = false;
+    errorBox.scrollIntoView({ block: 'center' });
   }
 }
 
@@ -677,6 +805,8 @@ function resetAssumptionScenario() {
   if (!toggle || !panel) return;
   toggle.setAttribute('aria-pressed', 'false');
   panel.classList.add('hidden');
+  $('#scenario-analysis').classList.add('hidden');
+  $('#scenarioNavLink').hidden = true;
 }
 
 function toggleAssumptionScenario() {
@@ -686,6 +816,8 @@ function toggleAssumptionScenario() {
   const nextState = toggle.getAttribute('aria-pressed') !== 'true';
   toggle.setAttribute('aria-pressed', String(nextState));
   panel.classList.toggle('hidden', !nextState);
+  $('#scenario-analysis').classList.toggle('hidden', !nextState);
+  $('#scenarioNavLink').hidden = !nextState;
   if (nextState) renderAssumptionScenarios();
 }
 
@@ -819,6 +951,7 @@ function initEvents() {
   $('#analyzeButton').addEventListener('click', runAnalysis);
   $('#exportCsvButton').addEventListener('click', exportResultsCsv);
   $('#assumptionScenarioToggle').addEventListener('click', toggleAssumptionScenario);
+  $('#evaluateScenarioButton').addEventListener('click', evaluateResourceScenario);
   $('#selectedDmu').addEventListener('change', renderSelectedDmu);
   $('#inputMeasures').addEventListener('input', handleMeasureInput);
   $('#outputMeasures').addEventListener('input', handleMeasureInput);

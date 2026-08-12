@@ -562,6 +562,97 @@ test("DEA reports sample-size adequacy as guidance rather than a validity gate",
   assert.equal(dea.assessSampleAdequacy(12, 2, 2).meetsHeuristic, true);
 });
 
+test("DEA evaluates a future scenario against historical references without adding a scenario lambda", () => {
+  const result = dea.evaluateScenario({
+    model: "bcc",
+    orientation: "input",
+    inputNames: ["Input"],
+    outputNames: ["Output"],
+    referenceDmus: [
+      { name: "Historical A", inputs: [1], outputs: [1] },
+      { name: "Historical B", inputs: [2], outputs: [3] },
+      { name: "Historical C", inputs: [4], outputs: [4] },
+    ],
+    scenario: { name: "Future plan", inputs: [2], outputs: [2] },
+  });
+
+  assert.equal(result.selected.feasible, true);
+  approximatelyEqual(result.selected.result.efficiency, 0.75);
+  assert.equal(result.selected.result.lambdas.length, 3);
+  assert.equal(result.selected.result.peers.some((peer) => peer.name === "Future plan"), false);
+  assert.equal(result.referenceDmus.some((dmu) => dmu.name === "Future plan"), false);
+});
+
+test("DEA scenario analysis classifies increasing, constant, and decreasing returns to scale", () => {
+  const referenceDmus = [
+    { name: "Historical A", inputs: [1], outputs: [1] },
+    { name: "Historical B", inputs: [2], outputs: [3] },
+    { name: "Historical C", inputs: [4], outputs: [4] },
+  ];
+  const evaluate = (scenario) => dea.evaluateScenario({
+    model: "bcc", orientation: "input", inputNames: ["Input"], outputNames: ["Output"], referenceDmus, scenario,
+  });
+
+  assert.equal(evaluate({ name: "Small plan", inputs: [1], outputs: [1] }).returnsToScale, "Increasing returns to scale");
+  assert.equal(evaluate({ name: "Middle plan", inputs: [2], outputs: [3] }).returnsToScale, "Constant returns to scale");
+  assert.equal(evaluate({ name: "Large plan", inputs: [4], outputs: [4] }).returnsToScale, "Decreasing returns to scale");
+});
+
+test("DEA scenario analysis supports an exact output-oriented benchmark", () => {
+  const result = dea.evaluateScenario({
+    model: "bcc",
+    orientation: "output",
+    inputNames: ["Input"],
+    outputNames: ["Output"],
+    referenceDmus: [
+      { name: "Historical A", inputs: [1], outputs: [1] },
+      { name: "Historical B", inputs: [2], outputs: [3] },
+      { name: "Historical C", inputs: [4], outputs: [4] },
+    ],
+    scenario: { name: "Future plan", inputs: [2], outputs: [2] },
+  });
+
+  assert.equal(result.selected.feasible, true);
+  approximatelyEqual(result.selected.result.radialFactor, 1.5);
+  approximatelyEqual(result.selected.result.efficiency, 2 / 3);
+  approximatelyEqual(result.selected.result.outputTargets[0], 3);
+  assert.equal(result.returnsToScale, "Available for input-oriented scenarios only");
+});
+
+test("DEA scenario analysis warns outside observed output ranges and withholds infeasible BCC results", () => {
+  const result = dea.evaluateScenario({
+    model: "bcc",
+    orientation: "input",
+    inputNames: ["Input"],
+    outputNames: ["Output"],
+    referenceDmus: [
+      { name: "Historical A", inputs: [1], outputs: [1] },
+      { name: "Historical B", inputs: [2], outputs: [3] },
+      { name: "Historical C", inputs: [4], outputs: [4] },
+    ],
+    scenario: { name: "Outside plan", inputs: [5], outputs: [6] },
+  });
+
+  assert.equal(result.bcc.feasible, false);
+  assert.equal(result.selected.result, null);
+  assert.deepEqual(result.outputRangeWarnings, [{ name: "Output", value: 6, maximum: 4 }]);
+  assert.equal(result.ccr.feasible, true);
+});
+
+test("DEA scenario analysis validates reference selection and future-plan values", () => {
+  const base = {
+    model: "bcc", orientation: "input", inputNames: ["Input"], outputNames: ["Output"],
+    referenceDmus: [
+      { name: "Historical A", inputs: [1], outputs: [1] },
+      { name: "Historical B", inputs: [2], outputs: [3] },
+    ],
+    scenario: { name: "Future plan", inputs: [2], outputs: [2] },
+  };
+  assert.throws(() => dea.evaluateScenario({ ...base, referenceDmus: base.referenceDmus.slice(0, 1) }), /at least two/);
+  assert.throws(() => dea.evaluateScenario({ ...base, scenario: { ...base.scenario, inputs: [""] } }), /Future plan: Input is required/);
+  assert.throws(() => dea.evaluateScenario({ ...base, scenario: { ...base.scenario, name: "Historical A" } }), /must differ/);
+});
+
 test("DEA rejects incomplete and non-comparable datasets", () => {
   assert.throws(() => dea.analyseDea({
     model: "ccr",
