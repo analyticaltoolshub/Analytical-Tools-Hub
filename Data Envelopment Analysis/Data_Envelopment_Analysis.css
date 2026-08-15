@@ -172,8 +172,9 @@
 .model-guidance h3, .model-guidance p { margin: 0; }
 .model-guidance p { margin-top: .35rem; color: var(--text-secondary); line-height: 1.55; }
 .model-recommendation {
-  display: flex;
-  align-items: center;
+  display: grid;
+  gap: .35rem;
+  align-content: center;
   padding: .8rem;
   border: 1px solid #b9d5ff;
   border-radius: 8px;
@@ -181,7 +182,7 @@
   color: var(--text-secondary);
   line-height: 1.5;
 }
-.model-recommendation strong { color: var(--navy-950); }
+.model-recommendation strong { display: block; color: var(--navy-950); }
 
 .table-scroll { max-width: 100%; overflow-x: auto; margin-top: .8rem; border: 1px solid var(--border); border-radius: 8px; }
 .data-table, .result-table { width: 100%; min-width: 720px; border-collapse: collapse; }
