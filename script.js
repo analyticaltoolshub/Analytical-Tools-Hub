@@ -773,7 +773,16 @@ const trust = [
 const learning = [
   { title: 'Guides', body: 'Clear method introductions that explain when and why to use each analytical approach.', icon: 'book' },
   { title: 'Worked Examples', body: 'Step-by-step examples that connect formulas to real operating decisions.', icon: 'calculator' },
-  { title: 'Method Comparisons', body: 'Side-by-side comparisons that help users choose the right technique.', icon: 'compare' }
+  { title: 'Method Comparisons', body: 'Side-by-side comparisons that help users choose the right technique.', icon: 'compare' },
+  {
+    title: 'Warehouse DEA Case Study',
+    body: 'Review a warehouse efficiency example and download sample DEA data for labour, cost, throughput, and service-output analysis.',
+    icon: 'chart',
+    actions: [
+      { label: 'View Case Study PDF', href: 'resources/warehouse-dea-case-study.pdf' },
+      { label: 'Download Sample Warehouse Data', href: 'resources/warehouse-dea-sample-data.csv', download: true }
+    ]
+  }
 ];
 
 const roadmap = [
@@ -1079,6 +1088,7 @@ function initRenderedContent() {
       ${icons[item.icon]}
       <h3>${item.title}</h3>
       <p>${item.body}</p>
+      ${item.actions ? `<div class="learning-actions">${item.actions.map((action) => `<a href="${action.href}"${action.download ? ' download' : ''}>${action.label}</a>`).join('')}</div>` : ''}
     </article>
   `);
 
