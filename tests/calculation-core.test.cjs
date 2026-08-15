@@ -653,6 +653,68 @@ test("DEA scenario analysis validates reference selection and future-plan values
   assert.throws(() => dea.evaluateScenario({ ...base, scenario: { ...base.scenario, name: "Historical A" } }), /must differ/);
 });
 
+test("DEA benchmark scenario generates input requirements from target outputs without adding scenario lambdas", () => {
+  const result = dea.evaluateScenarioBenchmark({
+    mode: "inputRequirement",
+    model: "bcc",
+    inputNames: ["Labour"],
+    outputNames: ["Orders"],
+    referenceDmus: [
+      { name: "Historical A", inputs: [1], outputs: [1] },
+      { name: "Historical B", inputs: [2], outputs: [3] },
+      { name: "Historical C", inputs: [4], outputs: [4] },
+    ],
+    values: [3],
+  });
+
+  assert.equal(result.selected.feasible, true);
+  approximatelyEqual(result.selected.result.generatedInputs[0], 2);
+  approximatelyEqual(result.selected.result.generatedOutputs[0], 3);
+  assert.deepEqual(result.selected.result.peers.map((peer) => peer.name), ["Historical B"]);
+  assert.equal(result.referenceDmus.some((dmu) => dmu.name === "Future Scenario Plan"), false);
+});
+
+test("DEA benchmark scenario generates output requirements from available inputs using a fixed frontier", () => {
+  const result = dea.evaluateScenarioBenchmark({
+    mode: "outputRequirement",
+    model: "ccr",
+    inputNames: ["Labour"],
+    outputNames: ["Orders"],
+    referenceDmus: [
+      { name: "Historical A", inputs: [1], outputs: [1] },
+      { name: "Historical B", inputs: [2], outputs: [3] },
+      { name: "Historical C", inputs: [4], outputs: [4] },
+    ],
+    values: [2],
+  });
+
+  assert.equal(result.selected.feasible, true);
+  approximatelyEqual(result.selected.result.generatedInputs[0], 2);
+  approximatelyEqual(result.selected.result.generatedOutputs[0], 3);
+  assert.equal(result.selected.result.lambdas.length, 3);
+  assert.equal(result.selected.result.peers.some((peer) => peer.name === "Future Scenario Plan"), false);
+});
+
+test("DEA benchmark scenario warns and withholds unsupported BCC benchmarks", () => {
+  const result = dea.evaluateScenarioBenchmark({
+    mode: "inputRequirement",
+    model: "bcc",
+    inputNames: ["Labour"],
+    outputNames: ["Orders"],
+    referenceDmus: [
+      { name: "Historical A", inputs: [1], outputs: [1] },
+      { name: "Historical B", inputs: [2], outputs: [3] },
+      { name: "Historical C", inputs: [4], outputs: [4] },
+    ],
+    values: [6],
+  });
+
+  assert.equal(result.selected.feasible, false);
+  assert.equal(result.selected.result, null);
+  assert.deepEqual(result.warnings.map((warning) => warning.type), ["outputRange", "bccFeasibility"]);
+  assert.equal(result.ccr.feasible, true);
+});
+
 test("DEA rejects incomplete and non-comparable datasets", () => {
   assert.throws(() => dea.analyseDea({
     model: "ccr",

@@ -170,12 +170,27 @@
             <strong>Sample adequacy check</strong>
             <p id="sampleAdequacyText">Add comparable units to review the sample size against the selected number of measures.</p>
           </div>
+          <div class="data-quality-panel" id="dataQualityPanel" role="status" aria-live="polite">
+            <div class="subsection-heading">
+              <div><h3>Data Quality Check</h3><p>Review basic governance signals before choosing a DEA model.</p></div>
+              <span id="dataQualityStatus" class="quality-status">Not ready</span>
+            </div>
+            <div class="quality-grid" id="dataQualityGrid"></div>
+            <ul class="quality-list" id="dataQualityWarnings"></ul>
+          </div>
           <div class="error" id="errorMessage" role="alert" hidden></div>
           <div class="actions"><button id="continueToModelButton" type="button">Continue to Model</button></div>
         </section>
 
         <section class="panel" id="model-setup">
           <div class="section-header"><div><h2>2. Choose the DEA Model</h2><p>Confirm the assumptions after reviewing the units, measures, scale differences, and decision objective.</p></div></div>
+          <div class="model-guidance" aria-labelledby="model-guidance-heading">
+            <div>
+              <h3 id="model-guidance-heading">Model Selection Guidance</h3>
+              <p>Use BCC when units differ materially in scale. Use CCR when constant proportional scaling is a reasonable assumption. Choose input orientation when managers mainly control resources; choose output orientation when the decision focus is increasing outcomes with current resources.</p>
+            </div>
+            <div id="modelRecommendation" class="model-recommendation">Recommendation appears after data is prepared.</div>
+          </div>
           <div class="model-choice-grid">
             <label><span>Returns to scale</span><select id="modelType"><option value="bcc" selected>BCC / VRS - variable returns to scale</option><option value="ccr">CCR / CRS - constant returns to scale</option></select><small>BCC separates scale effects when units operate at different sizes. CCR assumes outputs can change proportionally with inputs.</small></label>
             <label><span>Orientation</span><select id="orientation"><option value="input" selected>Input-oriented - reduce resources</option><option value="output">Output-oriented - increase outcomes</option></select><small>Input orientation asks how much resource use could fall. Output orientation asks how much output could rise with current resources.</small></label>
@@ -191,8 +206,12 @@
         </section>
 
         <section class="panel hidden" id="results" aria-labelledby="results-heading">
-          <div class="results-header"><div><h2 id="results-heading" tabindex="-1">4. Results and Interpretation</h2><p>Efficiency is relative to the best observed combinations in this dataset, not an absolute performance standard.</p></div><button id="exportCsvButton" type="button">Export Results CSV</button></div>
+          <div class="results-header">
+            <div><h2 id="results-heading" tabindex="-1">4. Results and Interpretation</h2><p>Efficiency is relative to the best observed combinations in this dataset, not an absolute performance standard.</p></div>
+            <div class="editor-actions"><button id="exportCsvButton" type="button">Export Results CSV</button><button id="printReportButton" type="button">Print Report</button></div>
+          </div>
           <div class="summary-grid" id="summaryCards"></div>
+          <div class="executive-summary-panel" id="executiveBenchmarkPanel" aria-live="polite"></div>
           <div class="interpretation-panel" id="interpretationPanel" aria-live="polite"></div>
 
           <section class="result-section" aria-labelledby="ranking-heading">
@@ -215,6 +234,7 @@
           <section class="result-section" aria-labelledby="detail-heading">
             <div class="detail-selector"><div><h3 id="detail-heading">Peer Benchmark and Improvement Targets</h3><p>Select a unit to inspect its benchmark peers, targets, and non-radial slacks.</p></div><label><span>Decision-making unit</span><select id="selectedDmu"></select></label></div>
             <div class="peer-summary" id="peerSummary"></div>
+            <div class="peer-profile-grid" id="peerProfilePanel"></div>
             <div class="table-scroll" tabindex="0" aria-label="Selected DMU targets and slacks"><table class="result-table" id="targetTable"></table></div>
             <div class="lp-calculation" aria-labelledby="lp-calculation-heading">
               <div class="lp-calculation-header">
@@ -264,7 +284,7 @@
           <div class="results-header">
             <div>
               <h2 id="resource-scenario-heading">5. Scenario Analysis</h2>
-              <p>Evaluate a future resource plan against a frontier built only from selected historical reference DMUs.</p>
+              <p>Generate a DEA Efficient Benchmark from selected historical reference DMUs without changing the standard DEA result.</p>
             </div>
             <span class="fixed-frontier-badge">Fixed historical frontier</span>
           </div>
@@ -273,18 +293,21 @@
             <p>Use comparable historical periods or operating units. Forecasts outside the observed range require particular caution because DEA does not validate whether an unprecedented plan is achievable.</p>
           </div>
 
-          <div class="resource-scenario-grid">
-            <section class="scenario-editor-block" aria-labelledby="reference-dmus-heading">
-              <div class="subsection-heading">
-                <div><h3 id="reference-dmus-heading">Historical Reference DMUs</h3><p>Select at least two comparable observations to construct the frontier.</p></div>
-                <span class="record-badge reference">REFERENCE</span>
-              </div>
-              <fieldset class="reference-selector" id="scenarioReferenceSelector"><legend class="sr-only">Historical reference DMUs</legend></fieldset>
-            </section>
+          <div class="scenario-mode-grid" role="radiogroup" aria-label="Scenario analysis mode">
+            <label class="scenario-mode-card">
+              <input type="radio" name="scenarioMode" value="inputRequirement" checked>
+              <span><strong>Generate Input Requirement</strong><small>Enter target or forecast outputs. DEA generates the efficient benchmark inputs implied by the fixed frontier.</small></span>
+            </label>
+            <label class="scenario-mode-card">
+              <input type="radio" name="scenarioMode" value="outputRequirement">
+              <span><strong>Generate Output Requirement</strong><small>Enter available inputs. DEA generates the efficient benchmark outputs implied by the fixed frontier.</small></span>
+            </label>
+          </div>
 
+          <div class="resource-scenario-grid scenario-values-only">
             <section class="scenario-editor-block" aria-labelledby="future-scenario-heading">
               <div class="subsection-heading">
-                <div><h3 id="future-scenario-heading">Future Scenario DMU</h3><p>Enter proposed resources and forecast outputs using the same definitions as the historical data.</p></div>
+                <div><h3 id="future-scenario-heading">Scenario Values</h3><p id="scenarioValueHelp">Enter target or forecast outputs using the same definitions as the historical data.</p></div>
                 <span class="record-badge future">SCENARIO</span>
               </div>
               <div class="scenario-name-field"><label for="scenarioDmuName">Scenario name</label><input id="scenarioDmuName" type="text" value="Future Scenario Plan"></div>
@@ -293,12 +316,11 @@
           </div>
 
           <section class="scenario-settings" aria-labelledby="scenario-settings-heading">
-            <div><h3 id="scenario-settings-heading">Evaluation assumptions</h3><p>Choose the production assumption and improvement direction for this plan.</p></div>
+            <div><h3 id="scenario-settings-heading">Evaluation assumptions</h3><p>Choose whether the fixed frontier should use constant or variable returns to scale.</p></div>
             <div class="model-choice-grid">
               <label><span>Returns to scale</span><select id="scenarioModel"><option value="bcc">BCC - variable returns</option><option value="ccr">CCR - constant returns</option></select></label>
-              <label><span>Orientation</span><select id="scenarioOrientation"><option value="input">Input - test resource reduction</option><option value="output">Output - test output expansion</option></select></label>
             </div>
-            <button id="evaluateScenarioButton" type="button">Evaluate Resource Plan</button>
+            <button id="evaluateScenarioButton" type="button">Generate DEA Efficient Benchmark</button>
             <p class="error" id="scenarioError" role="alert" hidden></p>
           </section>
 
@@ -308,8 +330,8 @@
             <div class="interpretation-panel" id="resourceScenarioInterpretation"></div>
 
             <section class="result-section" aria-labelledby="scenario-benchmark-heading">
-              <h3 id="scenario-benchmark-heading">Proposed Plan and DEA Benchmark</h3>
-              <div class="table-scroll" tabindex="0" aria-label="Scenario proposed values, targets, and slacks"><table class="result-table" id="scenarioBenchmarkTable"></table></div>
+              <h3 id="scenario-benchmark-heading">DEA Efficient Benchmark</h3>
+              <div class="table-scroll" tabindex="0" aria-label="Scenario entered values and DEA efficient benchmark values"><table class="result-table" id="scenarioBenchmarkTable"></table></div>
             </section>
             <section class="result-section" aria-labelledby="scenario-peer-heading">
               <h3 id="scenario-peer-heading">Historical Peer References</h3>

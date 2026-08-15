@@ -378,6 +378,134 @@
     };
   }
 
+  function solveBenchmarkGenerator(referenceDmus, values, model, mode, inputNames, outputNames) {
+    const count = referenceDmus.length;
+    const radialIndex = count;
+    const objective = Array(count + 1).fill(0);
+    const constraints = [];
+    const maxInputs = inputNames.map((_, index) => Math.max(...referenceDmus.map((dmu) => dmu.inputs[index])));
+    const maxOutputs = outputNames.map((_, index) => Math.max(...referenceDmus.map((dmu) => dmu.outputs[index])));
+
+    maxInputs.forEach((value, index) => {
+      if (value <= EPSILON) throw new Error(`Input ${inputNames[index]} contains no positive historical reference values.`);
+    });
+    maxOutputs.forEach((value, index) => {
+      if (value <= EPSILON) throw new Error(`Output ${outputNames[index]} contains no positive historical reference values.`);
+    });
+
+    if (mode === 'inputRequirement') {
+      objective[radialIndex] = -1;
+      values.forEach((output, outputIndex) => {
+        constraints.push({
+          coefficients: [...referenceDmus.map((dmu) => dmu.outputs[outputIndex]), 0],
+          sense: '>=',
+          rhs: output
+        });
+      });
+      maxInputs.forEach((maximum, inputIndex) => {
+        constraints.push({
+          coefficients: [...referenceDmus.map((dmu) => dmu.inputs[inputIndex]), -maximum],
+          sense: '<=',
+          rhs: 0
+        });
+      });
+    } else {
+      objective[radialIndex] = 1;
+      values.forEach((input, inputIndex) => {
+        constraints.push({
+          coefficients: [...referenceDmus.map((dmu) => dmu.inputs[inputIndex]), 0],
+          sense: '<=',
+          rhs: input
+        });
+      });
+      maxOutputs.forEach((maximum, outputIndex) => {
+        constraints.push({
+          coefficients: [...referenceDmus.map((dmu) => dmu.outputs[outputIndex]), -maximum],
+          sense: '>=',
+          rhs: 0
+        });
+      });
+    }
+
+    if (model === 'bcc') {
+      constraints.push({ coefficients: [...Array(count).fill(1), 0], sense: '=', rhs: 1 });
+    }
+
+    const solved = solveLinearProgram(objective, constraints);
+    const lambdas = solved.solution.slice(0, count).map((value) => Math.max(0, value));
+    const radial = Math.max(0, solved.solution[radialIndex]);
+    const generatedInputs = inputNames.map((_, index) => lambdas.reduce((sum, lambda, j) => sum + lambda * referenceDmus[j].inputs[index], 0));
+    const generatedOutputs = outputNames.map((_, index) => lambdas.reduce((sum, lambda, j) => sum + lambda * referenceDmus[j].outputs[index], 0));
+
+    return {
+      radialFactor: radial,
+      generatedInputs,
+      generatedOutputs,
+      peers: lambdas.map((lambda, index) => ({ name: referenceDmus[index].name, lambda })).filter((peer) => peer.lambda > 1e-6),
+      lambdas
+    };
+  }
+
+  function tryBenchmarkGenerator(referenceDmus, values, model, mode, inputNames, outputNames) {
+    try {
+      const result = solveBenchmarkGenerator(referenceDmus, values, model, mode, inputNames, outputNames);
+      const hasPeer = result.peers.length > 0;
+      const hasUsefulScale = mode === 'inputRequirement' ? result.generatedInputs.some((value) => value > EPSILON) : result.generatedOutputs.some((value) => value > EPSILON);
+      return { feasible: hasPeer && hasUsefulScale, result: hasPeer && hasUsefulScale ? result : null, error: hasPeer && hasUsefulScale ? '' : 'No positive historical peer combination supports this scenario.' };
+    } catch (error) {
+      if (!/infeasible|unbounded/i.test(error.message)) throw error;
+      return { feasible: false, result: null, error: error.message };
+    }
+  }
+
+  function evaluateScenarioBenchmark(config) {
+    const inputNames = (config.inputNames || []).map((name) => String(name || '').trim());
+    const outputNames = (config.outputNames || []).map((name) => String(name || '').trim());
+    if (inputNames.some((name) => !name) || outputNames.some((name) => !name)) throw new Error('Every input and output needs a name.');
+    if (!['ccr', 'bcc'].includes(config.model)) throw new Error('DEA model must be CCR or BCC.');
+    if (!['inputRequirement', 'outputRequirement'].includes(config.mode)) throw new Error('Choose Generate Input Requirement or Generate Output Requirement.');
+
+    const referenceDmus = validateDataset(config.referenceDmus, inputNames, outputNames);
+    const rawValues = Array.isArray(config.values) ? config.values : [];
+    const expectedNames = config.mode === 'inputRequirement' ? outputNames : inputNames;
+    if (rawValues.length !== expectedNames.length) throw new Error(`The scenario needs ${expectedNames.length} ${config.mode === 'inputRequirement' ? 'target output' : 'available input'} value(s).`);
+    const values = rawValues.map((value, index) => assertFiniteNonNegative(value, `Scenario ${expectedNames[index]}`));
+    if (!values.some((value) => value > EPSILON)) throw new Error(`Enter at least one positive ${config.mode === 'inputRequirement' ? 'target output' : 'available input'} value.`);
+
+    const selected = tryBenchmarkGenerator(referenceDmus, values, config.model, config.mode, inputNames, outputNames);
+    const ccr = tryBenchmarkGenerator(referenceDmus, values, 'ccr', config.mode, inputNames, outputNames);
+    const bcc = tryBenchmarkGenerator(referenceDmus, values, 'bcc', config.mode, inputNames, outputNames);
+
+    const warnings = [];
+    if (config.mode === 'inputRequirement') {
+      outputNames.forEach((name, index) => {
+        const maximum = Math.max(...referenceDmus.map((dmu) => dmu.outputs[index]));
+        if (values[index] > maximum + EPSILON) warnings.push({ type: 'outputRange', name, value: values[index], maximum });
+      });
+    } else {
+      inputNames.forEach((name, index) => {
+        const minimum = Math.min(...referenceDmus.map((dmu) => dmu.inputs[index]));
+        const maximum = Math.max(...referenceDmus.map((dmu) => dmu.inputs[index]));
+        if (values[index] < minimum - EPSILON || values[index] > maximum + EPSILON) warnings.push({ type: 'inputRange', name, value: values[index], minimum, maximum });
+      });
+    }
+    if (config.model === 'bcc' && !selected.feasible) warnings.push({ type: 'bccFeasibility' });
+
+    return {
+      mode: config.mode,
+      model: config.model,
+      inputNames,
+      outputNames,
+      referenceDmus,
+      values,
+      selected,
+      ccr,
+      bcc,
+      warnings,
+      referenceCount: referenceDmus.length
+    };
+  }
+
   function analyseDea(config) {
     const inputNames = (config.inputNames || []).map((name) => String(name || '').trim());
     const outputNames = (config.outputNames || []).map((name) => String(name || '').trim());
@@ -413,5 +541,5 @@
     };
   }
 
-  return { analyseDea, evaluateScenario, assessSampleAdequacy, calculateScaleEfficiency, solveLinearProgram };
+  return { analyseDea, evaluateScenario, evaluateScenarioBenchmark, assessSampleAdequacy, calculateScaleEfficiency, solveLinearProgram };
 }));

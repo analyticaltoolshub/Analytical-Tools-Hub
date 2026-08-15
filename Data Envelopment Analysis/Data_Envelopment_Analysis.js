@@ -231,6 +231,100 @@ function formatPercent(value, digits = 1) {
   return `${(Number(value) * 100).toFixed(digits)}%`;
 }
 
+function numericValues(values) {
+  return values.map(Number).filter((value) => Number.isFinite(value));
+}
+
+function getRange(values) {
+  const clean = numericValues(values);
+  if (!clean.length) return { min: 0, max: 0, spread: 0, hasValues: false };
+  const min = Math.min(...clean);
+  const max = Math.max(...clean);
+  return { min, max, spread: min > 0 ? max / min : Infinity, hasValues: true };
+}
+
+function getCompleteness() {
+  const expected = state.dmus.length * (1 + state.inputNames.length + state.outputNames.length);
+  if (!expected) return 0;
+  const filled = state.dmus.reduce((total, dmu) => (
+    total
+    + (String(dmu.name || '').trim() ? 1 : 0)
+    + dmu.inputs.filter((value) => String(value).trim()).length
+    + dmu.outputs.filter((value) => String(value).trim()).length
+  ), 0);
+  return filled / expected;
+}
+
+function getDataQualityDiagnostics() {
+  const warnings = [];
+  const dmuNames = state.dmus.map((dmu) => String(dmu.name || '').trim()).filter(Boolean);
+  const duplicateNames = dmuNames.filter((name, index) => dmuNames.findIndex((item) => item.toLowerCase() === name.toLowerCase()) !== index);
+  const measureCount = state.inputNames.length + state.outputNames.length;
+  const adequacy = window.ATHDea.assessSampleAdequacy(state.dmus.length, state.inputNames.length, state.outputNames.length);
+
+  if (!state.dmus.length) warnings.push({ level: 'info', text: 'Add or import comparable DMUs to begin the data-quality review.' });
+  if (duplicateNames.length) warnings.push({ level: 'critical', text: `Duplicate DMU names detected: ${[...new Set(duplicateNames)].join(', ')}.` });
+  if (state.dmus.length && !adequacy.meetsHeuristic) warnings.push({ level: 'warning', text: `${state.dmus.length} DMUs are below the common ${adequacy.recommendedMinimum}-unit heuristic for ${measureCount} measures.` });
+
+  [...state.inputNames.map((name, index) => ({ kind: 'input', name, index })), ...state.outputNames.map((name, index) => ({ kind: 'output', name, index }))].forEach((measure) => {
+    const values = state.dmus.map((dmu) => measure.kind === 'input' ? dmu.inputs[measure.index] : dmu.outputs[measure.index]);
+    const blanks = values.filter((value) => !String(value).trim()).length;
+    const numbers = numericValues(values);
+    const zeros = numbers.filter((value) => value === 0).length;
+    const negatives = numbers.filter((value) => value < 0).length;
+    const range = getRange(values);
+    if (blanks) warnings.push({ level: 'critical', text: `${measure.name} has ${blanks} blank value${blanks === 1 ? '' : 's'}.` });
+    if (negatives) warnings.push({ level: 'critical', text: `${measure.name} contains negative values, which are not valid for this DEA model.` });
+    if (numbers.length && zeros / numbers.length > .35) warnings.push({ level: 'warning', text: `${measure.name} has many zero values. Confirm that zero means true absence, not missing data.` });
+    if (range.hasValues && range.spread > 20) warnings.push({ level: 'warning', text: `${measure.name} has a wide range from ${formatNumber(range.min)} to ${formatNumber(range.max)}. Check for outliers or unit inconsistencies.` });
+  });
+
+  const status = warnings.some((warning) => warning.level === 'critical')
+    ? 'Needs review'
+    : warnings.some((warning) => warning.level === 'warning')
+      ? 'Use caution'
+      : state.dmus.length >= 2
+        ? 'Ready for modelling'
+        : 'Not ready';
+  return {
+    status,
+    warnings,
+    completeness: getCompleteness(),
+    dmuCount: state.dmus.length,
+    measureCount,
+    recommendedMinimum: adequacy.recommendedMinimum
+  };
+}
+
+function renderDataQualityPanel() {
+  const diagnostics = getDataQualityDiagnostics();
+  const status = $('#dataQualityStatus');
+  status.textContent = diagnostics.status;
+  status.className = `quality-status ${diagnostics.status === 'Ready for modelling' ? 'ready' : diagnostics.status === 'Needs review' ? 'critical' : diagnostics.status === 'Use caution' ? 'warning' : ''}`;
+  $('#dataQualityGrid').innerHTML = [
+    ['Completeness', formatPercent(diagnostics.completeness)],
+    ['DMUs', diagnostics.dmuCount],
+    ['Measures', diagnostics.measureCount],
+    ['Suggested minimum', diagnostics.recommendedMinimum]
+  ].map(([label, value]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`).join('');
+  $('#dataQualityWarnings').innerHTML = diagnostics.warnings.length
+    ? diagnostics.warnings.map((warning) => `<li class="${warning.level}">${escapeHtml(warning.text)}</li>`).join('')
+    : '<li class="ready">No obvious data-quality warnings from the current checks. Still verify comparability, definitions, and operating context before acting on DEA targets.</li>';
+}
+
+function updateModelRecommendation() {
+  const diagnostics = getDataQualityDiagnostics();
+  const selectedTemplate = sampleTemplates[state.templateKey || $('#templateSelect').value];
+  const model = selectedTemplate?.model || 'bcc';
+  const orientation = selectedTemplate?.orientation || 'input';
+  const modelLabel = model === 'bcc' ? 'BCC / VRS' : 'CCR / CRS';
+  const orientationLabel = orientation === 'input' ? 'input orientation' : 'output orientation';
+  const caution = diagnostics.dmuCount && diagnostics.dmuCount < diagnostics.recommendedMinimum
+    ? ` The sample is small for ${diagnostics.measureCount} measures, so treat the result as diagnostic.`
+    : '';
+  $('#modelRecommendation').innerHTML = `<strong>Suggested starting point:</strong> ${modelLabel} with ${orientationLabel}.${caution} You can override this when your operating assumption differs.`;
+}
+
 function renderTemplateContext(templateKey, loaded = false) {
   const template = sampleTemplates[templateKey];
   if (!template) {
@@ -260,6 +354,7 @@ function updateTemplateSelection() {
   const templateKey = $('#templateSelect').value;
   $('#loadSampleButton').disabled = !templateKey;
   renderTemplateContext(templateKey);
+  updateModelRecommendation();
 }
 
 function setWorkflowStep(step) {
@@ -302,6 +397,7 @@ function updateModelExplanation() {
     ? 'focuses on proportional input reduction while maintaining current outputs.'
     : 'focuses on proportional output expansion without increasing current inputs.';
   $('#modelExplanation').innerHTML = `<strong>Selected approach:</strong> ${scaleText} and ${orientationText}`;
+  updateModelRecommendation();
   markResultsStale(state.dmus.length >= 2 ? 3 : 1);
 }
 
@@ -333,6 +429,8 @@ function renderDataTable() {
   `).join('');
   $('#dmuTable').innerHTML = `<thead><tr>${headers}</tr></thead><tbody>${rows || `<tr><td colspan="${state.inputNames.length + state.outputNames.length + 2}">No DMUs added. Load a sample template, import a CSV, or add a row.</td></tr>`}</tbody>`;
   renderSampleAdequacy();
+  renderDataQualityPanel();
+  updateModelRecommendation();
 }
 
 function renderSampleAdequacy() {
@@ -527,6 +625,8 @@ function continueToModel() {
 function runAnalysis() {
   setError();
   setWorkflowStep(3);
+  syncDmusFromTable();
+  renderDataQualityPanel();
   try {
     state.analysis = window.ATHDea.analyseDea({
       model: $('#modelType').value,
@@ -553,49 +653,56 @@ function runAnalysis() {
 
 function renderResourceScenarioEditor() {
   if (!state.analysis) return;
-  $('#scenarioReferenceSelector').innerHTML = state.analysis.dmus.map((dmu, index) => `
-    <label class="reference-option">
-      <input type="checkbox" value="${index}" checked>
-      <span><strong>${escapeHtml(dmu.name)}</strong><small>Historical observation ${index + 1}</small></span>
-      <em>REFERENCE</em>
-    </label>
-  `).join('');
-  const fields = [
-    ...state.analysis.inputNames.map((name, index) => ({ kind: 'input', name, index })),
-    ...state.analysis.outputNames.map((name, index) => ({ kind: 'output', name, index }))
-  ];
-  $('#scenarioValueFields').innerHTML = fields.map((field) => `
-    <label>
-      <span>${escapeHtml(field.name)} <small>${field.kind === 'input' ? 'Proposed input' : 'Forecast output'}</small></span>
-      <input type="number" min="0" step="any" inputmode="decimal" data-scenario-kind="${field.kind}" data-scenario-index="${field.index}" placeholder="Enter value">
-    </label>
-  `).join('');
+  renderScenarioValueFields();
   $('#scenarioModel').value = state.analysis.model;
-  $('#scenarioOrientation').value = state.analysis.orientation;
   $('#scenarioDmuName').value = 'Future Scenario Plan';
   $('#scenarioError').hidden = true;
   $('#scenarioError').textContent = '';
   $('#resourceScenarioResults').classList.add('hidden');
 }
 
+function getScenarioMode() {
+  return $('input[name="scenarioMode"]:checked')?.value || 'inputRequirement';
+}
+
+function renderScenarioValueFields() {
+  if (!state.analysis) return;
+  const mode = getScenarioMode();
+  const isInputRequirement = mode === 'inputRequirement';
+  const fields = isInputRequirement
+    ? state.analysis.outputNames.map((name, index) => ({ kind: 'output', name, index }))
+    : state.analysis.inputNames.map((name, index) => ({ kind: 'input', name, index }));
+  $('#scenarioValueHelp').textContent = isInputRequirement
+    ? 'Enter target or forecast outputs using the same definitions as the historical data.'
+    : 'Enter available inputs using the same definitions as the historical data.';
+  $('#scenarioValueFields').innerHTML = fields.map((field) => `
+    <label>
+      <span>${escapeHtml(field.name)} <small>${isInputRequirement ? 'Target / forecast output' : 'Available input'}</small></span>
+      <input type="number" min="0" step="any" inputmode="decimal" data-scenario-kind="${field.kind}" data-scenario-index="${field.index}" placeholder="Enter value">
+    </label>
+  `).join('');
+  $('#evaluateScenarioButton').textContent = isInputRequirement ? 'Generate Benchmark Inputs' : 'Generate Benchmark Outputs';
+  $('#resourceScenarioResults').classList.add('hidden');
+  $('#scenarioError').hidden = true;
+  $('#scenarioError').textContent = '';
+}
+
 function collectResourceScenario() {
-  const selectedIndexes = [...$('#scenarioReferenceSelector').querySelectorAll('input:checked')].map((input) => Number(input.value));
-  const referenceDmus = selectedIndexes.map((index) => state.analysis.dmus[index]);
-  const inputs = state.analysis.inputNames.map((_, index) => {
-    const field = $(`[data-scenario-kind="input"][data-scenario-index="${index}"]`);
-    return field ? field.value : '';
-  });
-  const outputs = state.analysis.outputNames.map((_, index) => {
-    const field = $(`[data-scenario-kind="output"][data-scenario-index="${index}"]`);
+  const mode = getScenarioMode();
+  const names = mode === 'inputRequirement' ? state.analysis.outputNames : state.analysis.inputNames;
+  const kind = mode === 'inputRequirement' ? 'output' : 'input';
+  const values = names.map((_, index) => {
+    const field = $(`[data-scenario-kind="${kind}"][data-scenario-index="${index}"]`);
     return field ? field.value : '';
   });
   return {
+    mode,
     model: $('#scenarioModel').value,
-    orientation: $('#scenarioOrientation').value,
     inputNames: state.analysis.inputNames,
     outputNames: state.analysis.outputNames,
-    referenceDmus,
-    scenario: { name: $('#scenarioDmuName').value, inputs, outputs }
+    referenceDmus: state.analysis.dmus,
+    scenarioName: $('#scenarioDmuName').value,
+    values
   };
 }
 
@@ -606,52 +713,61 @@ function scenarioScore(solve) {
 function renderResourceScenarioResults() {
   const analysis = state.resourceScenario;
   const selected = analysis.selected;
+  const isInputRequirement = analysis.mode === 'inputRequirement';
   $('#resourceScenarioSummary').innerHTML = [
-    ['Selected efficiency', scenarioScore(selected)],
-    ['CCR efficiency', scenarioScore(analysis.ccr)],
-    ['BCC efficiency', scenarioScore(analysis.bcc)],
-    ['Scale efficiency', analysis.scaleEfficiency === null ? 'Not available' : formatPercent(analysis.scaleEfficiency)],
-    ['Returns to scale', analysis.returnsToScale]
+    ['Scenario mode', isInputRequirement ? 'Input benchmark' : 'Output benchmark'],
+    ['DEA model', analysis.model === 'bcc' ? 'BCC / VRS' : 'CCR / CRS'],
+    ['Feasibility', selected.feasible ? 'Feasible benchmark' : 'Not feasible'],
+    ['Historical references', String(analysis.referenceCount)],
+    ['Benchmark scale', selected.feasible ? formatNumber(selected.result.radialFactor, 3) : 'Not available']
   ].map(([label, value]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></article>`).join('');
 
-  if (analysis.outputRangeWarnings.length) {
-    $('#scenarioRangeWarning').innerHTML = `<div class="scenario-warning" role="status"><strong>Outside observed output range</strong><p>${analysis.outputRangeWarnings.map((warning) => `${escapeHtml(warning.name)} is ${formatNumber(warning.value)}, above the historical maximum of ${formatNumber(warning.maximum)}.`).join(' ')} The plan may require extrapolation. BCC results are withheld when no feasible convex combination of historical references can support it.</p></div>`;
+  if (analysis.warnings.length) {
+    const messages = analysis.warnings.map((warning) => {
+      if (warning.type === 'outputRange') return `${escapeHtml(warning.name)} target is ${formatNumber(warning.value)}, above the historical maximum of ${formatNumber(warning.maximum)}.`;
+      if (warning.type === 'inputRange') return `${escapeHtml(warning.name)} input is ${formatNumber(warning.value)}, outside the historical range of ${formatNumber(warning.minimum)} to ${formatNumber(warning.maximum)}.`;
+      if (warning.type === 'bccFeasibility') return 'The selected BCC/VRS benchmark is outside the feasible convex historical production set, so generated values are withheld.';
+      return 'Review the scenario against the selected historical reference set.';
+    }).join(' ');
+    $('#scenarioRangeWarning').innerHTML = `<div class="scenario-warning" role="status"><strong>Frontier support warning</strong><p>${messages} DEA Efficient Benchmark values are planning diagnostics, not guaranteed forecasts or requirements.</p></div>`;
   } else {
     $('#scenarioRangeWarning').innerHTML = '';
   }
 
   if (!selected.feasible) {
     $('#resourceScenarioInterpretation').innerHTML = `
-      <h3>Resource-plan conclusion</h3>
-      <p><strong>The selected ${analysis.model.toUpperCase()} ${analysis.orientation}-oriented scenario is not feasible within the historical production set.</strong></p>
-      <p>The tool has not presented a benchmark target because doing so would imply support that the selected reference observations do not provide. Review the forecast, proposed resources, reference selection, or model assumption.</p>
+      <h3>DEA Efficient Benchmark conclusion</h3>
+      <p><strong>The selected ${analysis.model.toUpperCase()} scenario is not feasible within the selected historical frontier.</strong></p>
+      <p>The tool has not generated benchmark values because doing so would imply frontier support that the selected reference observations do not provide. Review the entered values, reference DMUs, or returns-to-scale assumption.</p>
     `;
-    $('#scenarioBenchmarkTable').innerHTML = '<tbody><tr><td>No benchmark is shown for an infeasible scenario.</td></tr></tbody>';
+    $('#scenarioBenchmarkTable').innerHTML = '<tbody><tr><td>No DEA Efficient Benchmark is shown for an infeasible scenario.</td></tr></tbody>';
     $('#scenarioPeerTable').innerHTML = '<tbody><tr><td>No historical peer combination supports this scenario under the selected model.</td></tr></tbody>';
-    $('#scenarioPeerSummary').textContent = `${analysis.referenceCount} historical records were considered; the scenario was not included in the frontier.`;
+    $('#scenarioPeerSummary').textContent = `${analysis.referenceCount} historical records were considered. The scenario was not included in the frontier.`;
     $('#resourceScenarioResults').classList.remove('hidden');
     return;
   }
 
   const result = selected.result;
-  const hasInputOpportunity = analysis.orientation === 'input' && (result.efficiency < 1 - 1e-6 || result.inputSlacks.some((value) => value > 1e-6));
-  const answer = analysis.orientation === 'input'
-    ? hasInputOpportunity
-      ? `Yes. Relative to the selected historical frontier, the forecast outputs could potentially be achieved with fewer planned resources. The radial input reduction is about ${((1 - result.efficiency) * 100).toFixed(1)}% before measure-specific slacks.`
-      : 'No proportional resource reduction is identified relative to the selected historical frontier. The plan is on the observed frontier under this specification.'
-    : `The output-oriented model identifies a potential proportional output expansion of about ${((1 / result.efficiency - 1) * 100).toFixed(1)}% before output-specific slacks.`;
+  const answer = isInputRequirement
+    ? 'DEA has generated the efficient benchmark input mix associated with the entered target outputs and the selected fixed historical frontier.'
+    : 'DEA has generated the efficient benchmark output mix associated with the entered available inputs and the selected fixed historical frontier.';
   $('#resourceScenarioInterpretation').innerHTML = `
-    <h3>Could the forecast outputs potentially be achieved with fewer planned resources relative to historical efficient performance?</h3>
+    <h3>DEA Efficient Benchmark conclusion</h3>
     <p><strong>${escapeHtml(answer)}</strong></p>
-    <p>The scenario was evaluated against ${analysis.referenceCount} selected historical DMUs. It did not construct or alter the frontier. Treat the result as a relative planning diagnostic and verify operational constraints before changing resources.</p>
+    <p>The benchmark uses ${analysis.referenceCount} selected historical DMUs. The scenario values did not construct or alter the frontier, and no lambda is created for the scenario. Treat the generated values as a relative planning diagnostic, not a guaranteed forecast or requirement.</p>
   `;
 
-  const rows = [
-    ...analysis.inputNames.map((name, index) => ({ type: 'Input', name, proposed: analysis.scenario.inputs[index], target: result.inputTargets[index], gap: analysis.scenario.inputs[index] - result.inputTargets[index], slack: result.inputSlacks[index] })),
-    ...analysis.outputNames.map((name, index) => ({ type: 'Output', name, proposed: analysis.scenario.outputs[index], target: result.outputTargets[index], gap: result.outputTargets[index] - analysis.scenario.outputs[index], slack: result.outputSlacks[index] }))
-  ];
-  $('#scenarioBenchmarkTable').innerHTML = `<thead><tr><th>Measure</th><th>Record type</th><th>Proposed / forecast</th><th>DEA benchmark target</th><th>${analysis.orientation === 'input' ? 'Potential reduction / increase' : 'Potential change'}</th><th>Slack</th></tr></thead><tbody>${rows.map((row) => `<tr><td><strong>${escapeHtml(row.name)}</strong></td><td>${row.type}</td><td>${formatNumber(row.proposed)}</td><td>${formatNumber(row.target)}</td><td>${formatNumber(Math.max(0, row.gap))}</td><td>${formatNumber(row.slack)}</td></tr>`).join('')}</tbody>`;
-  $('#scenarioPeerSummary').textContent = `${result.peers.length} historical peer reference${result.peers.length === 1 ? '' : 's'} support the benchmark. No lambda is created for ${analysis.scenario.name}.`;
+  const rows = isInputRequirement
+    ? [
+      ...analysis.inputNames.map((name, index) => ({ type: 'Generated input', name, entered: 'Generated by DEA', benchmark: result.generatedInputs[index] })),
+      ...analysis.outputNames.map((name, index) => ({ type: 'Target output', name, entered: analysis.values[index], benchmark: analysis.values[index] }))
+    ]
+    : [
+      ...analysis.inputNames.map((name, index) => ({ type: 'Available input', name, entered: analysis.values[index], benchmark: analysis.values[index] })),
+      ...analysis.outputNames.map((name, index) => ({ type: 'Generated output', name, entered: 'Generated by DEA', benchmark: result.generatedOutputs[index] }))
+    ];
+  $('#scenarioBenchmarkTable').innerHTML = `<thead><tr><th>Measure</th><th>Scenario role</th><th>Entered value</th><th>DEA Efficient Benchmark</th></tr></thead><tbody>${rows.map((row) => `<tr><td><strong>${escapeHtml(row.name)}</strong></td><td>${escapeHtml(row.type)}</td><td>${typeof row.entered === 'number' ? formatNumber(row.entered) : escapeHtml(row.entered)}</td><td>${formatNumber(row.benchmark)}</td></tr>`).join('')}</tbody>`;
+  $('#scenarioPeerSummary').textContent = `${result.peers.length} historical peer reference${result.peers.length === 1 ? '' : 's'} support the DEA Efficient Benchmark. No lambda is created for ${$('#scenarioDmuName').value || 'the scenario'}.`;
   $('#scenarioPeerTable').innerHTML = `<thead><tr><th>Historical reference DMU</th><th>Lambda weight</th><th>Role</th></tr></thead><tbody>${result.peers.map((peer) => `<tr><td><strong>${escapeHtml(peer.name)}</strong></td><td>${peer.lambda.toFixed(4)}</td><td><span class="record-badge reference">REFERENCE</span></td></tr>`).join('')}</tbody>`;
   $('#resourceScenarioResults').classList.remove('hidden');
 }
@@ -662,7 +778,7 @@ function evaluateResourceScenario() {
   errorBox.hidden = true;
   errorBox.textContent = '';
   try {
-    state.resourceScenario = window.ATHDea.evaluateScenario(collectResourceScenario());
+    state.resourceScenario = window.ATHDea.evaluateScenarioBenchmark(collectResourceScenario());
     renderResourceScenarioResults();
   } catch (error) {
     state.resourceScenario = null;
@@ -701,6 +817,54 @@ function getDmuAction(result, analysis = state.analysis) {
   };
 }
 
+function getPeerFrequency(results) {
+  const counts = new Map();
+  results.forEach((result) => {
+    result.peers.forEach((peer) => {
+      if (peer.name === result.name) return;
+      counts.set(peer.name, (counts.get(peer.name) || 0) + 1);
+    });
+  });
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+function getLargestSlackSignal(results, analysis = state.analysis) {
+  const signals = [];
+  results.forEach((result) => {
+    result.inputSlacks.forEach((value, index) => {
+      if (value > 1e-6) signals.push({ dmu: result.name, measure: analysis.inputNames[index], type: 'input excess', value });
+    });
+    result.outputSlacks.forEach((value, index) => {
+      if (value > 1e-6) signals.push({ dmu: result.name, measure: analysis.outputNames[index], type: 'output shortfall', value });
+    });
+  });
+  return signals.sort((a, b) => b.value - a.value)[0] || null;
+}
+
+function renderExecutiveBenchmarkPanel() {
+  const { summary, results, adequacy } = state.analysis;
+  const reviewUnits = results.filter((result) => !result.efficient).sort((a, b) => a.efficiency - b.efficiency);
+  const topPeer = getPeerFrequency(results)[0];
+  const slackSignal = getLargestSlackSignal(results);
+  const efficientShare = summary.dmuCount ? summary.efficientCount / summary.dmuCount : 0;
+  const discriminationSignal = efficientShare > .6
+    ? 'Many units are on the frontier. Review whether the model has too many measures or too few comparable DMUs.'
+    : 'The model is providing useful discrimination across the sample.';
+  $('#executiveBenchmarkPanel').innerHTML = `
+    <div>
+      <span>Executive benchmark summary</span>
+      <h3>${reviewUnits.length ? `${reviewUnits.length} unit${reviewUnits.length === 1 ? '' : 's'} need benchmark review` : 'All units are on the observed frontier'}</h3>
+      <p>${reviewUnits[0] ? `${escapeHtml(reviewUnits[0].name)} has the lowest score at ${formatPercent(reviewUnits[0].efficiency)}.` : 'Use scenario and measure checks to confirm the frontier is still discriminating.'} ${discriminationSignal}</p>
+      ${adequacy.meetsHeuristic ? '' : `<p><strong>Sample caution:</strong> ${adequacy.dmuCount} DMUs are below the ${adequacy.recommendedMinimum}-unit heuristic for this measure set.</p>`}
+    </div>
+    <div class="executive-facts">
+      <article><span>Best-practice set</span><strong>${summary.efficientCount}</strong><small>frontier units</small></article>
+      <article><span>Most used peer</span><strong>${escapeHtml(topPeer ? topPeer[0] : 'None')}</strong><small>${topPeer ? `${topPeer[1]} reference${topPeer[1] === 1 ? '' : 's'}` : 'self-benchmarks only'}</small></article>
+      <article><span>Main slack signal</span><strong>${escapeHtml(slackSignal ? slackSignal.measure : 'None')}</strong><small>${slackSignal ? `${escapeHtml(slackSignal.type)} in ${escapeHtml(slackSignal.dmu)}` : 'no non-radial gap detected'}</small></article>
+    </div>
+  `;
+}
+
 function renderResults() {
   const { summary, results, model, orientation, adequacy } = state.analysis;
   $('#summaryCards').innerHTML = [
@@ -722,6 +886,7 @@ function renderResults() {
     ${adequacy.meetsHeuristic ? '' : `<p><strong>Sample caution:</strong> ${adequacy.dmuCount} DMUs are below the common ${adequacy.recommendedMinimum}-unit discrimination heuristic for this measure set. Interpret the number of efficient units cautiously.</p>`}
     <p><strong>Management use:</strong> Treat frontier scores as a screening signal. Validate comparability, data definitions, operating constraints, and peer practices before assigning targets or accountability.</p>
   `;
+  renderExecutiveBenchmarkPanel();
 
   $('#rankingTable').innerHTML = `<thead><tr><th>Rank</th><th>DMU</th><th>Efficiency</th><th>Status</th><th>Benchmark peers</th></tr></thead><tbody>${results.slice().sort((a,b) => a.rank-b.rank).map((result) => `
     <tr><td>${result.rank}</td><td><strong>${escapeHtml(result.name)}</strong></td><td>${formatPercent(result.efficiency)}</td><td><span class="status-pill${result.efficient ? '' : ' review'}">${result.efficient ? 'Efficient frontier' : 'Improvement opportunity'}</span></td><td>${escapeHtml(result.peers.map((peer) => peer.name).join(', ') || 'None')}</td></tr>
@@ -835,6 +1000,27 @@ function renderSelectedDmu() {
     ...state.analysis.inputNames.map((name, index) => ({ kind: 'Input', name, actual: source.inputs[index], target: selected.inputTargets[index], slack: selected.inputSlacks[index] })),
     ...state.analysis.outputNames.map((name, index) => ({ kind: 'Output', name, actual: source.outputs[index], target: selected.outputTargets[index], slack: selected.outputSlacks[index] }))
   ];
+  const largestGap = rows
+    .map((row) => ({ ...row, gap: row.kind === 'Input' ? row.actual - row.target : row.target - row.actual }))
+    .sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap))[0];
+  const peerMix = selected.peers.length
+    ? selected.peers.map((peer) => `<li><strong>${escapeHtml(peer.name)}</strong><span>&lambda; ${formatNumber(peer.lambda, 4)}</span></li>`).join('')
+    : '<li><strong>No peer mix returned</strong><span>Review data/model</span></li>';
+  $('#peerProfilePanel').innerHTML = `
+    <article>
+      <span>Peer mix</span>
+      <ul>${peerMix}</ul>
+    </article>
+    <article>
+      <span>Benchmark signal</span>
+      <strong>${escapeHtml(largestGap ? largestGap.name : 'No gap')}</strong>
+      <p>${largestGap && Math.abs(largestGap.gap) > 1e-6 ? `${largestGap.kind === 'Input' ? 'Largest potential input reduction' : 'Largest output target gap'}: ${formatNumber(Math.abs(largestGap.gap))}.` : 'No material target gap is identified for the selected unit.'}</p>
+    </article>
+    <article>
+      <span>Management reading</span>
+      <p>${escapeHtml(getDmuAction(selected).action)}</p>
+    </article>
+  `;
   $('#targetTable').innerHTML = `<thead><tr><th>Type</th><th>Measure</th><th>Actual</th><th>Peer-based target</th><th>Change</th><th>Slack</th></tr></thead><tbody>${rows.map((row) => {
     const change = row.actual > 0 ? (row.target - row.actual) / row.actual : 0;
     const className = Math.abs(change) < 1e-8 ? '' : change > 0 ? 'positive-change' : 'negative-change';
@@ -934,7 +1120,32 @@ function handleDmuInput(event) {
   if (input.dataset.dmuField === 'name') dmu.name = input.value;
   if (input.dataset.dmuField === 'input') dmu.inputs[Number(input.dataset.valueIndex)] = input.value;
   if (input.dataset.dmuField === 'output') dmu.outputs[Number(input.dataset.valueIndex)] = input.value;
+  renderSampleAdequacy();
+  renderDataQualityPanel();
+  updateModelRecommendation();
   markResultsStale();
+}
+
+function syncDmusFromTable() {
+  document.querySelectorAll('#dmuTable tbody tr').forEach((row) => {
+    const nameInput = row.querySelector('[data-dmu-field="name"]');
+    if (!nameInput) return;
+    const rowIndex = Number(nameInput.dataset.dmuRow);
+    const dmu = state.dmus[rowIndex];
+    if (!dmu) return;
+    dmu.name = nameInput.value;
+    row.querySelectorAll('[data-dmu-field="input"]').forEach((input) => {
+      dmu.inputs[Number(input.dataset.valueIndex)] = input.value;
+    });
+    row.querySelectorAll('[data-dmu-field="output"]').forEach((input) => {
+      dmu.outputs[Number(input.dataset.valueIndex)] = input.value;
+    });
+  });
+}
+
+function printDecisionReport() {
+  if (!state.analysis) return;
+  window.print();
 }
 
 function initEvents() {
@@ -950,8 +1161,10 @@ function initEvents() {
   $('#continueToModelButton').addEventListener('click', continueToModel);
   $('#analyzeButton').addEventListener('click', runAnalysis);
   $('#exportCsvButton').addEventListener('click', exportResultsCsv);
+  $('#printReportButton').addEventListener('click', printDecisionReport);
   $('#assumptionScenarioToggle').addEventListener('click', toggleAssumptionScenario);
   $('#evaluateScenarioButton').addEventListener('click', evaluateResourceScenario);
+  document.querySelectorAll('input[name="scenarioMode"]').forEach((input) => input.addEventListener('change', renderScenarioValueFields));
   $('#selectedDmu').addEventListener('change', renderSelectedDmu);
   $('#inputMeasures').addEventListener('input', handleMeasureInput);
   $('#outputMeasures').addEventListener('input', handleMeasureInput);
