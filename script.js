@@ -776,11 +776,11 @@ const learning = [
   { title: 'Method Comparisons', body: 'Side-by-side comparisons that help users choose the right technique.', icon: 'compare' },
   {
     title: 'Warehouse DEA Case Study',
-    body: 'Review a warehouse efficiency example and download sample DEA data for labour, cost, throughput, and service-output analysis.',
+    body: 'Explore a worked DEA example for warehouse performance, using labour hours and overtime as inputs and orders shipped and lines picked as outputs to interpret the efficiency frontier and benchmark future resource plans.',
     icon: 'chart',
     actions: [
-      { label: 'View Case Study PDF', href: 'resources/warehouse-dea-case-study.pdf' },
-      { label: 'Download Sample Warehouse Data', href: 'resources/warehouse-dea-sample-data.csv', download: true }
+      { label: 'View DEA Case Study PDF', href: 'resources/warehouse-dea-case-study.pdf' },
+      { label: 'Download Warehouse CSV', href: 'resources/warehouse-dea-sample-data.csv', download: true }
     ]
   }
 ];
