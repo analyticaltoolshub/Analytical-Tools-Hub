@@ -14,6 +14,7 @@ const pages = [
   { name: 'Monte Carlo Risk Simulation', url: '/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html', calculate: '#runSimulationButton' },
   { name: 'Newsvendor Model Optimizer', url: '/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
   { name: 'Data Envelopment Analysis', url: '/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html', template: { selector: '#templateSelect', value: 'distribution-centres' }, sample: '#loadSampleButton' },
+  { name: 'Multivariate Input-Output Estimator', url: '/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html', sample: '#loadSampleButton' },
   { name: 'Safety Stock and Reorder Point', url: '/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
 ];
 
@@ -170,6 +171,27 @@ for (const entry of pages) {
       await expect(page.locator('#outputName')).toHaveValue('Delivery Delay');
       await page.locator('#advanced-settings summary').click();
       await expect(page.locator('#advanced-settings')).toHaveAttribute('open', '');
+    }
+    if (entry.name === 'Multivariate Input-Output Estimator') {
+      await expect(page.locator('#columnTable')).toContainText('Input');
+      await expect(page.locator('#dataTable tbody tr')).toHaveCount(12);
+      await expect(page.locator('#dataQualityStatus')).toContainText('Ready');
+      await page.locator('#continueToModelButton').click({ force: true });
+      await expect(page.locator('[data-workflow-step="2"]')).toHaveAttribute('aria-current', 'step');
+      await page.locator('#fitModelButton').click();
+      await expect(page.locator('#scenario-planning')).toBeVisible();
+      await expect(page.locator('#scenarioInputs input')).toHaveCount(3);
+      await page.locator('#scenarioInputs input').nth(0).fill('1900');
+      await page.locator('#scenarioInputs input').nth(1).fill('300');
+      await page.locator('#scenarioInputs input').nth(2).fill('45500');
+      await page.locator('#estimateButton').click();
+      await expect(page.locator('#results')).toBeVisible();
+      await expect(page.locator('#executiveSummary')).toContainText('historical input-output relationships');
+      await expect(page.locator('#diagnosticsTable')).toContainText('CV RMSE');
+      await expect(page.locator('#estimateTable tbody tr')).toHaveCount(2);
+      await expect(page.locator('#equationList')).toContainText('Cross-validation');
+      await expect(page.locator('#equationList')).toContainText('Scenario support');
+      await expect(page.locator('#driverInsight')).toContainText('Driver Insight');
     }
     if (entry.calculate) {
       const calculate = page.locator(entry.calculate);

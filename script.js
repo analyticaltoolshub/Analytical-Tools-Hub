@@ -562,6 +562,41 @@ const problems = [
     title: 'Which operating units have input excesses or output shortfalls after proportional efficiency adjustment?',
     detail: 'Recommended tool: Data Envelopment Analysis',
     href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+  },
+  {
+    title: 'What outputs should I expect from a new input scenario?',
+    detail: 'Recommended tool: Multivariate Input-Output Estimator',
+    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+  },
+  {
+    title: 'How many orders or lines could be expected from planned labour, overtime, and floor area?',
+    detail: 'Recommended tool: Multivariate Input-Output Estimator',
+    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+  },
+  {
+    title: 'Can I estimate multiple operational outputs from several input measures?',
+    detail: 'Recommended tool: Multivariate Input-Output Estimator',
+    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+  },
+  {
+    title: 'Is a new operating scenario similar to historical conditions or an extrapolation?',
+    detail: 'Recommended tool: Multivariate Input-Output Estimator',
+    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+  },
+  {
+    title: 'Which historical observations are closest to a proposed input plan?',
+    detail: 'Recommended tool: Multivariate Input-Output Estimator',
+    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+  },
+  {
+    title: 'Should a linear or polynomial relationship be used for input-output prediction?',
+    detail: 'Recommended tool: Multivariate Input-Output Estimator',
+    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+  },
+  {
+    title: 'How reliable is an output estimate when the planned inputs are outside historical experience?',
+    detail: 'Recommended tool: Multivariate Input-Output Estimator',
+    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
   }
 ];
 
@@ -624,7 +659,8 @@ const featuredProblemTitles = [
   'Which option should I choose when several criteria matter?',
   'What is the probability of achieving a target profit when demand and costs are uncertain?',
   'Which factors are foundational drivers and which are dependent outcomes?',
-  'Which comparable branches, warehouses, or operating units are relatively efficient within the observed peer group?'
+  'Which comparable branches, warehouses, or operating units are relatively efficient within the observed peer group?',
+  'What outputs should I expect from a new input scenario?'
 ];
 
 const featuredProblems = featuredProblemTitles
@@ -634,12 +670,12 @@ const featuredProblems = featuredProblemTitles
 const categories = [
   { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '5 tools available', icon: 'boxes' },
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
-  { title: 'Operations', benefit: 'Benchmark relative efficiency, resource use, productivity, and operating performance.', count: '1 tool available', icon: 'settings' },
-  { title: 'Statistics', benefit: 'Analyze distributions, uncertainty, samples, and probability-driven outcomes.', count: '1 tool available', icon: 'compare' },
+  { title: 'Operations', benefit: 'Benchmark relative efficiency, estimate output relationships, and review operating performance.', count: '2 tools available', icon: 'settings' },
+  { title: 'Statistics', benefit: 'Analyze distributions, uncertainty, regression relationships, samples, and probability-driven outcomes.', count: '2 tools available', icon: 'compare' },
   { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: '1 tool available', icon: 'calculator' },
   { title: 'Decision Science', benefit: 'Structure complex decisions, expert judgements, relationships, priorities, and trade-offs.', count: '3 tools available', icon: 'decision' },
   { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '5 tools available', icon: 'chart' }
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '6 tools available', icon: 'chart' }
 ];
 
 const tools = [
@@ -760,6 +796,16 @@ const tools = [
     cta: 'Open Data Envelopment Analysis',
     href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html',
     categories: ['Operations', 'Decision Science', 'Business Analysis']
+  },
+  {
+    name: 'Multivariate Input-Output Estimator',
+    description: 'Estimate expected outputs for a new input scenario using historical multi-input, multi-output relationships.',
+    category: 'Statistics',
+    input: 'Historical observations with input and output columns',
+    output: 'Estimated outputs, diagnostics, and historical-support warning',
+    cta: 'Open Multivariate Estimator',
+    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html',
+    categories: ['Statistics', 'Operations', 'Business Analysis']
   }
 ];
 

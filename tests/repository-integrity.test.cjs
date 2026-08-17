@@ -74,6 +74,7 @@ test("production pages load the tested calculation modules before their UI scrip
     "Monte Carlo Risk Simulation/Monte_Carlo_Risk_Simulation.html": ["../calculation-core/monte-carlo.js", "monte-carlo.js"],
     "Newsvendor Model Optimizer/Newsvendor_Model_Optimizer.html": ["../calculation-core/newsvendor.js", "Newsvendor_Model_Optimizer.js"],
     "Data Envelopment Analysis/Data_Envelopment_Analysis.html": ["../calculation-core/dea.js", "Data_Envelopment_Analysis.js"],
+    "Multivariate Input-Output Estimator/Multivariate_Input_Output_Estimator.html": ["../calculation-core/multivariate-estimator.js", "Multivariate_Input_Output_Estimator.js"],
   };
 
   Object.entries(expected).forEach(([relativePage, scripts]) => {

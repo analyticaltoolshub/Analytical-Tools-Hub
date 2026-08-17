@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multivariate Input-Output Estimator | Analytical Tools Hub</title>
+  <meta name="description" content="Estimate expected outputs for a new operating scenario using historical multi-input, multi-output data with linear or polynomial regression.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Multivariate Input-Output Estimator | Analytical Tools Hub">
+  <meta property="og:description" content="Use historical operations data to estimate expected outputs for a new input scenario and assess interpolation or extrapolation risk.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Multivariate Input-Output Estimator | Analytical Tools Hub">
+  <meta name="twitter:description" content="Browser-based multi-input, multi-output regression estimator for operations and supply-chain planning.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" type="image/png" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <link rel="stylesheet" href="Multivariate_Input_Output_Estimator.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://analyticaltoolshub.com/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html#software",
+          "name": "Multivariate Input-Output Estimator",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web browser",
+          "url": "https://analyticaltoolshub.com/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html",
+          "description": "A browser-based tool for fitting linear or polynomial regression models to historical multi-input, multi-output operating data and estimating outputs for a new scenario.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "featureList": ["CSV import", "Manual data entry", "Multiple inputs and outputs", "Linear regression", "Polynomial regression", "Cross-validation", "Scenario support classification"],
+          "publisher": { "@type": "Organization", "name": "Analytical Tools Hub", "url": "https://analyticaltoolshub.com/" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://analyticaltoolshub.com/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://analyticaltoolshub.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Multivariate Input-Output Estimator", "item": "https://analyticaltoolshub.com/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html" }
+          ]
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="mio-page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <nav class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo" width="170" height="58">
+        <span class="tool-brand-text"><strong>Multivariate Input-Output Estimator</strong><span>Operations estimation workspace</span></span>
+      </a>
+      <div class="tool-nav-actions">
+        <a href="../index.html" class="tool-home-link">ATH Home</a>
+        <a href="../index.html#featured-tools" class="project-button">Explore Tools</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" id="main-content">
+    <section class="tool-hero" aria-labelledby="page-title">
+      <span class="tool-badge">Operations and Business Analytics</span>
+      <h1 id="page-title">Multivariate Input-Output Estimator</h1>
+      <p>Use historical data with multiple inputs and multiple outputs to estimate what outputs may be expected for a new operating scenario.</p>
+      <div class="tool-reassurance" aria-label="Tool assurances">
+        <span>Browser-based calculation</span><span>Linear and polynomial models</span><span>Scenario support check</span>
+      </div>
+    </section>
+
+    <section class="panel content-section" aria-labelledby="why-heading">
+      <h2 id="why-heading">Why use this tool?</h2>
+      <div class="guidance-grid">
+        <div class="guidance-card"><span>Decision Supported</span><p>Use this tool when you have historical operating data and need to estimate likely outputs for a new input plan.</p></div>
+        <div class="guidance-card"><span>What It Tells You</span><p>It fits one model per output, compares linear and polynomial relationships, and estimates expected outputs for entered input values.</p></div>
+        <div class="guidance-card"><span>Example Input</span><p>Warehouse labour hours, overtime hours, and floor area can be used to estimate orders shipped and lines picked.</p></div>
+        <div class="guidance-card"><span>Sample Output Interpretation</span><p>If the scenario is outside the historical operating region, estimates are flagged as extrapolation and should be treated cautiously.</p></div>
+      </div>
+    </section>
+
+    <section class="mio-workflow" aria-label="Multivariate estimator workflow">
+      <ol>
+        <li class="active" data-workflow-step="1" aria-current="step"><span>1</span><strong>Set Up Data</strong><small>Classify inputs and outputs</small></li>
+        <li data-workflow-step="2"><span>2</span><strong>Select Model</strong><small>Fit linear or polynomial models</small></li>
+        <li data-workflow-step="3"><span>3</span><strong>Plan Scenario</strong><small>Enter new input values</small></li>
+        <li data-workflow-step="4"><span>4</span><strong>Interpret</strong><small>Review estimates and support</small></li>
+      </ol>
+    </section>
+
+    <div class="tool-layout">
+      <div class="tool-main">
+        <section class="panel" id="data-setup">
+          <div class="section-header">
+            <div><h2>1. Add Data</h2><p>Enter historical observations manually, import a CSV, or load sample warehouse data to see the workflow.</p></div>
+            <div class="editor-actions">
+              <button id="loadSampleButton" type="button">Load Sample Data</button>
+              <button class="reset" id="resetButton" type="button">Reset</button>
+            </div>
+          </div>
+          <p class="template-helper">Sample data is an editable example only. For a real decision, replace it with your own comparable observations and confirm each input and output definition.</p>
+          <div class="privacy-note" role="note">CSV data, model fitting, and scenario estimates remain in your browser. Nothing is uploaded to a server.</div>
+
+          <div class="import-guidance">
+            <h3>Prepare your input-output file</h3>
+            <p>Upload a CSV with one row per historical observation. The first column should identify the observation, and numeric columns should represent operating inputs or outputs.</p>
+            <div class="import-columns">
+              <div><strong>Observation</strong><span>Month, branch, shift, route, production line, supplier, or another comparable record.</span></div>
+              <div><strong>Inputs</strong><span>Resources or conditions used to estimate outputs, such as labour, cost, hours, distance, or machine time.</span></div>
+              <div><strong>Outputs</strong><span>Expected outcomes, such as orders, lines picked, units produced, on-time deliveries, or completed tickets.</span></div>
+            </div>
+            <p class="example-row"><strong>Example row:</strong> Apr | 1610 | 170 | 31800 | 74500</p>
+            <p><strong>Important:</strong> This estimator models observed relationships. It does not measure DEA efficiency and does not guarantee future performance.</p>
+            <div class="data-use-guidance">
+              <strong>Column guidance:</strong>
+              <ul>
+                <li>Use inputs for controllable resources or operating conditions, such as labour hours, overtime, cost, distance, machine hours, or available capacity.</li>
+                <li>Use outputs for outcomes you want to estimate, such as orders shipped, lines picked, units produced, on-time deliveries, or resolved tickets.</li>
+                <li>Avoid duplicate or derived variables that represent the same thing twice, such as total labour cost and labour hours, unless there is a clear reason.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="upload-row">
+            <label for="csvFile"><span>Import CSV data</span><input id="csvFile" type="file" accept=".csv,text/csv"></label>
+            <button id="importCsvButton" type="button">Import CSV</button>
+          </div>
+          <p class="upload-status" id="uploadStatus" aria-live="polite">Load sample data, add rows manually, or import a CSV.</p>
+
+          <section class="setup-subsection" aria-labelledby="columns-heading">
+            <div class="subsection-heading">
+              <div><h3 id="columns-heading">Column classification</h3><p>Name each numeric column and classify it as an input, output, or ignored field. Enter integer or decimal values in the observations table below.</p></div>
+            </div>
+            <div class="table-scroll" tabindex="0" aria-label="Column classification table">
+              <table class="data-table" id="columnTable"></table>
+            </div>
+          </section>
+
+          <section class="setup-subsection" aria-labelledby="manual-heading">
+            <div class="subsection-heading data-heading">
+              <div><h3 id="manual-heading">Historical observations</h3><p>Use at least five complete observations. Decimal values are accepted. More observations are recommended for polynomial models.</p></div>
+              <div class="editor-actions"><button id="addColumnButton" type="button">Add Column</button><button id="addRowButton" type="button">Add Row</button></div>
+            </div>
+            <div class="table-scroll" tabindex="0" aria-label="Editable historical data table">
+              <table class="data-table" id="dataTable"></table>
+            </div>
+          </section>
+
+          <div class="data-quality-panel" id="dataQualityPanel" role="status" aria-live="polite">
+            <div class="subsection-heading">
+              <div><h3>Data Quality Check</h3><p>Review missing values, numeric fields, constant columns, and sample size before fitting.</p></div>
+              <span id="dataQualityStatus" class="quality-status">Not ready</span>
+            </div>
+            <div class="quality-grid" id="dataQualityGrid"></div>
+            <div class="sample-adequacy" id="sampleAdequacy"></div>
+            <ul class="quality-list" id="dataQualityWarnings"></ul>
+          </div>
+          <div class="error" id="errorMessage" role="alert" hidden></div>
+          <div class="actions"><button id="continueToModelButton" type="button">Continue to Model</button></div>
+        </section>
+
+        <section class="panel" id="model-selection">
+          <div class="section-header">
+            <div><h2>2. Model Selection</h2><p>Choose the relationship form. For multiple outputs, the tool fits a separate model for each output using the same inputs.</p></div>
+          </div>
+          <div class="model-guidance" aria-labelledby="model-guidance-heading">
+            <div>
+              <h3 id="model-guidance-heading">Model Selection Guidance</h3>
+              <p>Use Linear Regression when the relationship is broadly proportional and easy to explain. Use Polynomial Regression only when curvature or interactions are plausible and the dataset has enough observations. Auto Select compares out-of-sample error and keeps the simpler model unless polynomial performance is materially better.</p>
+            </div>
+            <div class="model-recommendation" id="modelAdequacyRecommendation">Prepare data to see model guidance.</div>
+          </div>
+          <div class="model-choice-grid">
+            <label><span>Regression model</span>
+              <select id="modelType">
+                <option value="auto" selected>Auto Select - compare cross-validated RMSE</option>
+                <option value="linear">Linear Regression</option>
+                <option value="polynomial">Polynomial Regression - degree 2</option>
+              </select>
+              <small>Auto Select chooses the model with stronger out-of-sample performance, not simply the highest fitted R-squared.</small>
+            </label>
+          </div>
+          <div class="method-note" id="modelExplanation" role="note"><strong>Linear:</strong> Yk = beta0 + beta1X1 + ... + betapXp. <strong>Polynomial:</strong> adds squared and interaction terms.</div>
+          <div class="actions"><button id="fitModelButton" type="button">Fit Model</button></div>
+        </section>
+
+        <section class="panel hidden" id="scenario-planning">
+          <div class="section-header">
+            <div><h2>3. Scenario Planning</h2><p>Enter a value for every input, then estimate the expected outputs and historical support.</p></div>
+          </div>
+          <div class="scenario-value-grid" id="scenarioInputs"></div>
+          <div class="actions"><button id="estimateButton" type="button">Estimate Outputs</button></div>
+        </section>
+
+        <section class="panel hidden" id="results">
+          <div class="results-header">
+            <div><h2 id="results-heading" tabindex="-1">4. Results Summary</h2><p>This tool estimates expected outputs from historical relationships. It does not determine operational efficiency or guarantee future performance.</p></div>
+            <div class="editor-actions"><button id="exportCsvButton" type="button">Export Results CSV</button><button id="printReportButton" type="button">Print Report</button></div>
+          </div>
+
+          <div class="summary-grid" id="summaryCards"></div>
+          <div class="interpretation-panel" id="executiveSummary" aria-live="polite"></div>
+
+          <section class="result-section" aria-labelledby="estimates-heading">
+            <h3 id="estimates-heading">Estimated Outputs</h3>
+            <div class="table-scroll" tabindex="0" aria-label="Estimated output table"><table class="result-table" id="estimateTable"></table></div>
+          </section>
+
+          <section class="result-section" aria-labelledby="diagnostics-heading">
+            <h3 id="diagnostics-heading">Model Diagnostics</h3>
+            <div class="table-scroll" tabindex="0" aria-label="Model diagnostics table"><table class="result-table" id="diagnosticsTable"></table></div>
+            <div class="method-note" id="selectionReason"></div>
+          </section>
+
+          <section class="result-section" aria-labelledby="interpretation-heading">
+            <h3 id="interpretation-heading">Model Interpretation</h3>
+            <div class="interpretation-grid">
+              <article class="insight-card" id="driverInsight"></article>
+              <article class="insight-card" id="residualInsight"></article>
+            </div>
+          </section>
+
+          <section class="result-section" aria-labelledby="equation-heading">
+            <h3 id="equation-heading">Formula Logic</h3>
+            <div id="equationList" class="equation-list"></div>
+          </section>
+
+          <section class="result-section" aria-labelledby="charts-heading">
+            <h3 id="charts-heading">Visual Review</h3>
+            <div class="chart-controls" aria-label="Input-output chart controls">
+              <label for="chartInputSelect"><span>Input for relationship chart</span><select id="chartInputSelect"></select></label>
+              <label for="chartOutputSelect"><span>Output for relationship chart</span><select id="chartOutputSelect"></select></label>
+            </div>
+            <div class="chart-grid">
+              <article class="chart-card chart-card-wide"><h4>Selected Input vs Selected Output</h4><canvas id="inputOutputChart" width="760" height="360"></canvas><p id="inputOutputSummary"></p></article>
+              <article class="chart-card"><h4>Actual vs Predicted</h4><canvas id="actualPredictedChart" width="560" height="320"></canvas><p id="actualPredictedSummary"></p></article>
+              <article class="chart-card"><h4>Residual Plot</h4><canvas id="residualChart" width="560" height="320"></canvas><p id="residualSummary"></p></article>
+              <article class="chart-card"><h4>Scenario Position Against Historical Range</h4><canvas id="rangeSupportChart" width="560" height="320"></canvas><p id="rangeSupportSummary"></p></article>
+              <article class="chart-card"><h4>Prediction Interval / Planning Range</h4><canvas id="planningRangeChart" width="560" height="320"></canvas><p id="planningRangeSummary"></p></article>
+              <article class="chart-card"><h4>Driver Strength</h4><canvas id="driverStrengthChart" width="560" height="320"></canvas><p id="driverStrengthSummary"></p></article>
+            </div>
+          </section>
+        </section>
+
+        <section class="panel content-section" id="about">
+          <h2>About this estimator</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card"><span>Method</span><p>The tool fits ordinary least-squares regression models using selected input columns to estimate each selected output column.</p></div>
+            <div class="guidance-card"><span>Multiple Outputs</span><p>Each output receives its own model, so one output may be predicted more reliably than another.</p></div>
+            <div class="guidance-card"><span>Historical Support</span><p>The scenario is assessed against the multivariate input space, using convex-hull membership where practical and nearest-neighbour support otherwise.</p></div>
+            <div class="guidance-card"><span>Decision Use</span><p>Use the result as a planning estimate and compare it with operational constraints, not as a guaranteed forecast.</p></div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="guidance">
+          <h2>Guidance</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card"><span>Use When</span><p>You want an expected output baseline from historical input-output relationships, such as output levels for a proposed labour or resource plan.</p></div>
+            <div class="guidance-card"><span>Do Not Use When</span><p>You need a causal proof, an efficiency frontier, or a forecast where future conditions are structurally different from history.</p></div>
+            <div class="guidance-card"><span>Check First</span><p>Make sure observations are comparable, columns are measured consistently, and outputs are not simply restatements of inputs.</p></div>
+            <div class="guidance-card"><span>Scenario Warning</span><p>Extrapolated scenarios are less reliable because they extend beyond operating conditions represented in the historical dataset.</p></div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card"><span>Linear Model</span><p>Yk = beta0 + beta1X1 + ... + betapXp. Inputs are standardised internally before fitting to improve numerical stability.</p></div>
+            <div class="guidance-card"><span>Polynomial Model</span><p>Degree 2 adds squared terms and pairwise interactions. This can capture curvature but may overfit small datasets.</p></div>
+            <div class="guidance-card"><span>Auto Select</span><p>Linear and polynomial models are compared using cross-validated RMSE. Lower out-of-sample error is preferred.</p></div>
+            <div class="guidance-card"><span>Limitations</span><p>Regression describes observed association. It does not prove causality, determine efficiency, or guarantee future performance.</p></div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details><summary>How is this different from DEA?</summary><p>DEA benchmarks relative efficiency against an observed frontier. This estimator predicts expected outputs from historical input-output relationships.</p></details>
+          <details><summary>Why fit one model per output?</summary><p>Multiple outputs often behave differently. Separate models let diagnostics show which outputs are estimated more reliably.</p></details>
+          <details><summary>What does extrapolation mean?</summary><p>The scenario sits outside the historical multivariate input region, so the model is estimating beyond observed operating conditions.</p></details>
+          <details><summary>Should I choose polynomial regression?</summary><p>Use it only when cross-validation improves materially and there are enough observations for the number of polynomial terms.</p></details>
+        </section>
+      </div>
+
+      <aside class="tool-side-nav" aria-label="Tool navigation">
+        <h2>Navigation</h2>
+        <a href="#data-setup">Add Data</a>
+        <a href="#model-selection">Model Selection</a>
+        <a href="#scenario-planning" id="scenarioNavLink" hidden>Scenario Planning</a>
+        <a href="#results" id="resultsNavLink" hidden>Results</a>
+        <a href="#about">About</a>
+        <a href="#guidance">Guidance</a>
+        <a href="#methodology">Methodology</a>
+        <a href="#faq">FAQ</a>
+      </aside>
+    </div>
+  </main>
+
+  <script src="../calculation-core/multivariate-estimator.js"></script>
+  <script src="Multivariate_Input_Output_Estimator.js"></script>
+</body>
+</html>

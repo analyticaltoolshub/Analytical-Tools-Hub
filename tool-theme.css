@@ -90,7 +90,8 @@ body.ahp-page,
 body.monte-carlo-page,
 body.ism-page,
 body.newsvendor-page,
-body.dea-page {
+body.dea-page,
+body.mio-page {
   min-height: 100vh;
   margin: 0;
   font-size: var(--tool-body-size);
@@ -113,7 +114,8 @@ body.ahp-page::before,
 body.monte-carlo-page::before,
 body.ism-page::before,
 body.newsvendor-page::before,
-body.dea-page::before {
+body.dea-page::before,
+body.mio-page::before {
   content: "ATH";
   position: fixed;
   right: -2rem;
@@ -140,7 +142,8 @@ body.ahp-page :focus-visible,
 body.monte-carlo-page :focus-visible,
 body.ism-page :focus-visible,
 body.newsvendor-page :focus-visible,
-body.dea-page :focus-visible {
+body.dea-page :focus-visible,
+body.mio-page :focus-visible {
   outline: 3px solid rgba(45, 127, 249, .72) !important;
   outline-offset: 3px;
 }
@@ -309,7 +312,8 @@ body.ahp-page main.container,
 body.monte-carlo-page main.container,
 body.ism-page main.container,
 body.newsvendor-page main.container,
-body.dea-page main.container {
+body.dea-page main.container,
+body.mio-page main.container {
   width: min(100% - 40px, var(--tool-content-width)) !important;
   max-width: var(--tool-content-width) !important;
   margin: 0 auto !important;
@@ -541,7 +545,8 @@ body.ahp-page main.container > .panel,
 body.monte-carlo-page main.container > .panel,
 body.ism-page main.container > .panel,
 body.newsvendor-page main.container > .panel,
-body.dea-page main.container > .panel {
+body.dea-page main.container > .panel,
+body.mio-page main.container > .panel {
   margin: 0 !important;
 }
 
@@ -1216,7 +1221,8 @@ tbody tr:hover td,
   body.monte-carlo-page main.container,
   body.ism-page main.container,
   body.newsvendor-page main.container,
-  body.dea-page main.container {
+  body.dea-page main.container,
+  body.mio-page main.container {
     width: min(100% - 28px, var(--tool-content-width)) !important;
   }
 

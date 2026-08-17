@@ -13,6 +13,7 @@ const gantt = require("../calculation-core/gantt.js");
 const monteCarlo = require("../calculation-core/monte-carlo.js");
 const newsvendor = require("../calculation-core/newsvendor.js");
 const dea = require("../calculation-core/dea.js");
+const multivariateEstimator = require("../calculation-core/multivariate-estimator.js");
 
 function approximatelyEqual(actual, expected, tolerance = 1e-9) {
   assert.ok(
@@ -763,6 +764,111 @@ test("DEA rejects incomplete and non-comparable datasets", () => {
       { name: "Unit B", inputs: [2], outputs: [15] },
     ],
   }), /model must be CCR or BCC/);
+});
+
+test("Multivariate estimator reproduces a hand-calculated linear relationship", () => {
+  const data = {
+    modelType: "linear",
+    inputNames: ["Labour", "Overtime"],
+    outputNames: ["Orders", "Lines"],
+    rows: [
+      { label: "A", inputs: [1, 0], outputs: [13, 25] },
+      { label: "B", inputs: [2, 1], outputs: [19, 38] },
+      { label: "C", inputs: [3, 0], outputs: [19, 35] },
+      { label: "D", inputs: [4, 1], outputs: [25, 48] },
+      { label: "E", inputs: [5, 0], outputs: [25, 45] },
+      { label: "F", inputs: [6, 1], outputs: [31, 58] },
+    ],
+  };
+  const analysis = multivariateEstimator.analyse(data).selected;
+  const estimate = multivariateEstimator.estimateScenario(analysis, [7, 1]);
+
+  approximatelyEqual(estimate.outputs[0].estimate, 34, 1e-6);
+  approximatelyEqual(estimate.outputs[1].estimate, 63, 1e-6);
+  assert.equal(analysis.outputs[0].rSquared > 0.999999, true);
+  assert.equal(estimate.support.classification, "EXTRAPOLATION");
+});
+
+test("Multivariate auto select prefers cross-validated performance over fitted R-squared", () => {
+  const rows = Array.from({ length: 18 }, (_, index) => {
+    const x = index + 1;
+    return { label: `Obs ${x}`, inputs: [x], outputs: [4 + 3 * x] };
+  });
+  const result = multivariateEstimator.analyse({
+    modelType: "auto",
+    inputNames: ["Hours"],
+    outputNames: ["Units"],
+    rows,
+  });
+
+  assert.equal(result.selected.modelType, "linear");
+  assert.match(result.reason, /cross-validated RMSE|simpler/);
+});
+
+test("Multivariate auto select chooses polynomial when curvature improves held-out error", () => {
+  const rows = Array.from({ length: 18 }, (_, index) => {
+    const x = index + 1;
+    return { label: `Obs ${x}`, inputs: [x], outputs: [5 + 2 * x + x ** 2] };
+  });
+  const result = multivariateEstimator.analyse({
+    modelType: "auto",
+    inputNames: ["Machine Hours"],
+    outputNames: ["Units Produced"],
+    rows,
+  });
+  const estimate = multivariateEstimator.estimateScenario(result.selected, [9.5]);
+
+  assert.equal(result.selected.modelType, "polynomial");
+  approximatelyEqual(estimate.outputs[0].estimate, 5 + 2 * 9.5 + 9.5 ** 2, 1e-5);
+  assert.equal(estimate.support.classification, "INTERPOLATION");
+});
+
+test("Multivariate estimator flags extrapolated multivariate scenarios", () => {
+  const rows = [
+    { label: "A", inputs: [0, 0], outputs: [10] },
+    { label: "B", inputs: [0, 10], outputs: [20] },
+    { label: "C", inputs: [10, 0], outputs: [30] },
+    { label: "D", inputs: [10, 10], outputs: [40] },
+    { label: "E", inputs: [5, 5], outputs: [25] },
+    { label: "F", inputs: [4, 7], outputs: [26] },
+  ];
+  const analysis = multivariateEstimator.analyse({
+    modelType: "linear",
+    inputNames: ["Labour", "Distance"],
+    outputNames: ["Deliveries"],
+    rows,
+  }).selected;
+  const estimate = multivariateEstimator.estimateScenario(analysis, [20, 20]);
+
+  assert.equal(estimate.support.classification, "EXTRAPOLATION");
+  assert.match(estimate.support.hull.method, /convex-hull/);
+});
+
+test("Multivariate estimator validates constant and incomplete columns", () => {
+  assert.throws(() => multivariateEstimator.analyse({
+    modelType: "linear",
+    inputNames: ["Constant input"],
+    outputNames: ["Output"],
+    rows: [
+      { label: "A", inputs: [1], outputs: [2] },
+      { label: "B", inputs: [1], outputs: [3] },
+      { label: "C", inputs: [1], outputs: [4] },
+      { label: "D", inputs: [1], outputs: [5] },
+      { label: "E", inputs: [1], outputs: [6] },
+    ],
+  }), /constant/);
+  assert.throws(() => multivariateEstimator.analyse({
+    modelType: "linear",
+    inputNames: ["Input"],
+    outputNames: ["Output"],
+    rows: [
+      { label: "A", inputs: [1], outputs: [2] },
+      { label: "B", inputs: [2], outputs: [3] },
+      { label: "C", inputs: [""], outputs: [4] },
+      { label: "D", inputs: [4], outputs: [5] },
+      { label: "E", inputs: [5], outputs: [6] },
+    ],
+  }), /C: Input is required/);
 });
 
 test("Gantt day arithmetic remains stable across daylight-saving transitions", () => {

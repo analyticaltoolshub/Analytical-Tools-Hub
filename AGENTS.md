@@ -331,6 +331,7 @@ Available tools should be represented consistently:
 - Interpretive Structural Modeling
 - Newsvendor Model Optimizer
 - Data Envelopment Analysis
+- Multivariate Input-Output Estimator
 
 ## Current Tool-Specific Rules
 
@@ -497,6 +498,26 @@ Available tools should be represented consistently:
   scale efficiency, peers, targets, and slacks. Classify returns to scale only when the
   required auxiliary model is implemented and tested; do not infer it from scale
   efficiency alone.
+
+### Multivariate Input-Output Estimator
+
+- Present the estimator as supervised prediction from historical input-output
+  relationships, not as efficiency benchmarking, causality, optimization, or guaranteed
+  future performance.
+- Support multiple inputs and multiple outputs by fitting one separate output model
+  per output using the same selected input variables.
+- Auto Select must compare models using out-of-sample prediction error, such as
+  cross-validated RMSE, not fitted R-squared alone.
+- Scenario support must assess the full multivariate input vector against historical
+  operating space where practical. Do not classify scenarios only by separate
+  one-variable min/max checks.
+- Use convex-hull membership where mathematically stable, and fall back to
+  nearest-neighbour/local-support checks in sparse or high-dimensional cases. Explain
+  the fallback method in the UI.
+- Warn prominently when a scenario is extrapolation or has limited historical support.
+  Estimates outside the observed operating region must be treated as less reliable.
+- Polynomial regression should include linear, squared, and interaction terms, and it
+  must warn about overfitting when terms are large relative to observations.
 
 ## SEO Requirements
 

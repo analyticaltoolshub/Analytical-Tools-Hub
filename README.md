@@ -18,6 +18,7 @@ Website: https://analyticaltoolshub.com/
 - Monte Carlo Risk Simulation
 - Interpretive Structural Modeling
 - Data Envelopment Analysis
+- Multivariate Input-Output Estimator
 
 ## Run Locally
 
