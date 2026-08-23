@@ -518,6 +518,20 @@ Available tools should be represented consistently:
   Estimates outside the observed operating region must be treated as less reliable.
 - Polynomial regression should include linear, squared, and interaction terms, and it
   must warn about overfitting when terms are large relative to observations.
+- Ridge, Lasso, Robust Regression, and k-Nearest Neighbour are supported estimator
+  models. Ridge and Lasso are penalised linear models, Robust Regression reduces the
+  influence of unusual residuals, and kNN is a local distance-based estimator rather
+  than a coefficient equation.
+- Auto Select must compare every model registered for automatic selection using
+  cross-validated RMSE and should preserve a bias toward simpler or more interpretable
+  models when performance is materially similar.
+- When adding a new estimator model, update the model registry in
+  `calculation-core/multivariate-estimator.js`, the UI dropdown, Auto Select
+  candidate set, formula logic, diagnostics comparison table, CSV exports, Node
+  calculation tests, browser smoke tests, homepage mappings, and methodology/FAQ copy
+  in the same change.
+- Future estimator models must not change existing Linear, Ridge, Polynomial, or Auto
+  Select results unless the method change is deliberate and independently tested.
 
 ## SEO Requirements
 

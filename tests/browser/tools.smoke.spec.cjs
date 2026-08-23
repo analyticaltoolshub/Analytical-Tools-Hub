@@ -192,6 +192,12 @@ for (const entry of pages) {
       await expect(page.locator('#equationList')).toContainText('Cross-validation');
       await expect(page.locator('#equationList')).toContainText('Scenario support');
       await expect(page.locator('#driverInsight')).toContainText('Driver Insight');
+      await page.locator('#modelType').selectOption('knn');
+      await page.locator('#fitModelButton').click();
+      await page.locator('#estimateButton').click();
+      await expect(page.locator('#driverInsight')).toContainText('Local Evidence');
+      await expect(page.locator('#equationList')).toContainText('nearest historical observations');
+      await expect(page.locator('#driverStrengthSummary')).toContainText('similarity weight');
     }
     if (entry.calculate) {
       const calculate = page.locator(entry.calculate);

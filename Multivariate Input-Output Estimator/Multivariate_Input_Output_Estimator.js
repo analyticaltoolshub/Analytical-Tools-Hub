@@ -76,7 +76,7 @@
       return 'Add at least one input, one output, and five complete observations before selecting a model.';
     }
     if (n <= polynomialTerms) {
-      return `${n} observations can support a simple linear check, but polynomial regression needs more than ${polynomialTerms} complete observations. Use Linear or collect more data.`;
+      return `${n} observations can support linear, ridge, lasso, robust, or kNN checks, but polynomial regression needs more than ${polynomialTerms} complete observations. Use a simpler model or collect more data.`;
     }
     if (n < polynomialTerms * 5) {
       return `${n} observations with ${config.inputNames.length} inputs gives ${polynomialTerms} polynomial terms. Auto Select can compare models, but treat polynomial results cautiously.`;
@@ -336,20 +336,65 @@
   function renderDiagnostics() {
     const model = state.analysis.selected;
     $('#selectionReason').innerHTML = `<strong>Model selection:</strong> ${escapeHtml(state.analysis.reason)} ${model.warnings.map((warning) => `<p>${escapeHtml(warning)}</p>`).join('')}`;
+    const candidateRows = state.analysis.candidates.map((candidate) => {
+      const terms = window.ATHMultivariateEstimator.createFeatureSpec(model.inputNames, candidate.modelType);
+      const definition = window.ATHMultivariateEstimator.getModelDefinition(candidate.modelType);
+      const selected = candidate.modelType === model.modelType;
+      const parameterNote = `${terms.length} ${definition.termSummary}`;
+      return `
+        <tr${selected ? ' class="selected-row"' : ''}>
+          <td><strong>${escapeHtml(window.ATHMultivariateEstimator.modelDisplayName(candidate.modelType))}</strong>${selected ? ' <span class="status-pill interpolation">Selected</span>' : ''}</td>
+          <td>${formatNumber(candidate.averageCvRmse)}</td>
+          <td>${escapeHtml(parameterNote)}</td>
+          <td>${escapeHtml(definition.interpretation)}</td>
+        </tr>`;
+    });
+    const unavailableRows = (state.analysis.unavailableCandidates || []).map((candidate) => `
+      <tr>
+        <td><strong>${escapeHtml(candidate.label)}</strong></td>
+        <td>n/a</td>
+        <td>Not fitted</td>
+        <td>${escapeHtml(candidate.reason)}</td>
+      </tr>`);
+    $('#candidateComparisonTable').innerHTML = `<thead><tr><th>Candidate model</th><th>Average CV RMSE</th><th>Model terms</th><th>Interpretation</th></tr></thead><tbody>${[...candidateRows, ...unavailableRows].join('')}</tbody>`;
     $('#diagnosticsTable').innerHTML = `<thead><tr><th>Output</th><th>R2</th><th>Adjusted R2</th><th>RMSE</th><th>MAE</th><th>CV RMSE</th><th>Observations</th></tr></thead><tbody>${model.outputs.map((output) => `
       <tr><td><strong>${escapeHtml(output.name)}</strong></td><td>${formatPercent(output.rSquared)}</td><td>${output.adjustedRSquared === null ? 'n/a' : formatPercent(output.adjustedRSquared)}</td><td>${formatNumber(output.rmse)}</td><td>${formatNumber(output.mae)}</td><td>${formatNumber(output.crossValidatedRmse)}</td><td>${model.rows.length}</td></tr>`).join('')}</tbody>`;
     const termSummary = model.modelType === 'polynomial'
       ? 'Polynomial degree 2 uses the linear input terms, squared input terms, and pairwise interaction terms after standardising each input.'
-      : 'Linear regression uses one intercept and one coefficient for each selected input after standardising each input.';
+      : model.modelType === 'knn'
+        ? `k-Nearest Neighbour uses the ${model.k} most similar historical observations in the standardised input space and estimates each output from their distance-weighted values.`
+        : model.modelType === 'robust'
+          ? 'Robust regression uses one intercept and one coefficient for each selected input, then reduces the influence of observations with unusually large residuals.'
+          : model.modelType === 'lasso'
+            ? `Lasso regression uses one intercept and one coefficient for each selected input, then adds an absolute-value coefficient penalty of ${formatNumber(model.penalty)} to shrink weak effects.`
+      : model.modelType === 'ridge'
+        ? `Ridge regression uses one intercept and one coefficient for each selected input after standardising each input, then adds a coefficient penalty of ${formatNumber(model.penalty)} to stabilise the fitted coefficients.`
+        : 'Linear regression uses one intercept and one coefficient for each selected input after standardising each input.';
     $('#equationList').innerHTML = `
       <article class="formula-block">
-        <span>Model form</span>
+        <span>Candidate model formulas</span>
+        <p><strong>Linear:</strong> one straight-line equation is fitted for each output.</p>
+        <code>Y_k = beta_0 + beta_1 X_1 + ... + beta_p X_p</code>
+        <code>Minimise sum((Y_i - Yhat_i)^2)</code>
+        <p><strong>Ridge:</strong> keeps the same linear prediction equation but adds a penalty to reduce unstable large coefficients. The intercept is not penalised.</p>
+        <code>Minimise sum((Y_i - Yhat_i)^2) + lambda * sum(beta_j^2), for j = 1...p</code>
+        <p><strong>Lasso:</strong> keeps the same linear prediction equation but uses an absolute-value penalty that can shrink weak coefficients to zero.</p>
+        <code>Minimise sum((Y_i - Yhat_i)^2) + lambda * sum(abs(beta_j)), for j = 1...p</code>
+        <p><strong>Robust regression:</strong> fits a linear equation with Huber-style residual weights so unusual observations have less influence.</p>
+        <code>Minimise sum(w_i * (Y_i - Yhat_i)^2), where large residuals receive smaller w_i</code>
+        <p><strong>Polynomial degree 2:</strong> adds squared input terms and pairwise interactions.</p>
+        <code>Y_k = beta_0 + sum(beta_j X_j) + sum(gamma_j X_j^2) + sum(delta_jm X_j X_m)</code>
+        <p><strong>kNN:</strong> estimates from the most similar historical input patterns instead of fitting coefficients.</p>
+        <code>Yhat = sum(weight_i * Y_i) / sum(weight_i), where weight_i = 1 / distance_i for the k nearest neighbours</code>
+      </article>
+      <article class="formula-block">
+        <span>Selected model form</span>
         <p>${escapeHtml(termSummary)}</p>
         ${model.outputs.map((output) => `<code>${escapeHtml(window.ATHMultivariateEstimator.formatEquation(output, model.terms, model.inputNames))}</code>`).join('')}
       </article>
       <article class="formula-block">
         <span>Cross-validation</span>
-        <p>Rows are split into up to five folds. Each fold is predicted by a model fitted on the remaining rows.</p>
+        <p>Rows are split into up to five folds. Auto Select compares linear, ridge, lasso, robust, polynomial, and kNN candidates using held-out prediction error.</p>
         <code>CV RMSE = sqrt(mean((Actual - Predicted)^2 across held-out rows))</code>
       </article>
       <article class="formula-block">
@@ -363,17 +408,27 @@
   function renderModelInterpretation() {
     const model = state.analysis.selected;
     const firstOutput = model.outputs[0];
-    const coefficientRows = firstOutput.coefficients
-      .map((coefficient, index) => ({ coefficient, term: model.terms[index] }))
-      .filter((item) => item.term.type !== 'intercept')
-      .sort((a, b) => Math.abs(b.coefficient) - Math.abs(a.coefficient))
-      .slice(0, 3);
-    const strongest = coefficientRows[0];
-    $('#driverInsight').innerHTML = `
-      <span>Driver Insight</span>
-      <h4>${strongest ? escapeHtml(strongest.term.label) : 'Not available'}</h4>
-      <p>${strongest ? `For ${escapeHtml(firstOutput.name)}, ${escapeHtml(strongest.term.label)} has the largest standardised association in the selected model. Treat this as association, not proof of causality.` : 'Fit a model with varying inputs to review driver signals.'}</p>
-    `;
+    if (firstOutput.coefficients) {
+      const coefficientRows = firstOutput.coefficients
+        .map((coefficient, index) => ({ coefficient, term: model.terms[index] }))
+        .filter((item) => item.term.type !== 'intercept')
+        .sort((a, b) => Math.abs(b.coefficient) - Math.abs(a.coefficient))
+        .slice(0, 3);
+      const strongest = coefficientRows[0];
+      $('#driverInsight').innerHTML = `
+        <span>Driver Insight</span>
+        <h4>${strongest ? escapeHtml(strongest.term.label) : 'Not available'}</h4>
+        <p>${strongest ? `For ${escapeHtml(firstOutput.name)}, ${escapeHtml(strongest.term.label)} has the largest standardised association in the selected model. Treat this as association, not proof of causality.` : 'Fit a model with varying inputs to review driver signals.'}</p>
+      `;
+    } else {
+      const neighbours = state.estimate?.outputs?.[0]?.neighbours || [];
+      const nearest = neighbours[0];
+      $('#driverInsight').innerHTML = `
+        <span>Local Evidence</span>
+        <h4>${nearest ? escapeHtml(nearest.label) : 'Nearest observations'}</h4>
+        <p>${nearest ? `For ${escapeHtml(firstOutput.name)}, kNN estimates the scenario from nearby historical observations such as ${escapeHtml(nearest.label)}. Treat this as local similarity evidence, not a causal driver ranking.` : 'Estimate a scenario to review the nearest historical observations used by kNN.'}</p>
+      `;
+    }
 
     const residuals = firstOutput.actual.map((actual, index) => actual - firstOutput.predicted[index]);
     const avgResidual = residuals.reduce((sum, value) => sum + value, 0) / residuals.length;
@@ -405,7 +460,7 @@
     const outputs = state.estimate.outputs;
     $('#summaryCards').innerHTML = [
       ['Scenario classification', `<span class="status-pill ${supportLabel(support)}">${support.classification}</span>`],
-      ['Selected model', model.modelType === 'polynomial' ? 'Polynomial degree 2' : 'Linear regression'],
+      ['Selected model', window.ATHMultivariateEstimator.modelDisplayName(model.modelType)],
       ['Outputs estimated', outputs.length],
       ['Nearest support', `${support.nearest[0].label} (${support.nearestDistance.toFixed(2)})`],
       ['Historical observations', model.rows.length],
@@ -548,10 +603,9 @@
       ctx.font = '13px Inter, sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(item.label.slice(0, 18), padding.left - 8, y + rowHeight * .33);
-      ctx.textAlign = 'left';
-      ctx.fillText(formatNumber(item.value, 0), padding.left + barWidth + 6, y + rowHeight * .33);
     });
-    $(summaryId).textContent = options.summary;
+    const valueRows = values.map((item) => `<li><strong>${escapeHtml(item.label)}</strong><span>${escapeHtml(options.valueFormatter ? options.valueFormatter(item.value, item) : formatNumber(item.value, 0))}</span></li>`).join('');
+    $(summaryId).innerHTML = `${escapeHtml(options.summary)}${valueRows ? `<ul class="chart-value-list">${valueRows}</ul>` : ''}`;
   }
 
   function drawRangeChart(canvas, summaryId) {
@@ -608,11 +662,19 @@
       const yLow = scale(item.low, min, max, height - padding.bottom, padding.top);
       const yHigh = scale(item.high, min, max, height - padding.bottom, padding.top);
       const yEstimate = scale(item.estimate, min, max, height - padding.bottom, padding.top);
-      ctx.strokeStyle = '#98a2b3';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#667085';
+      ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(x, yLow);
       ctx.lineTo(x, yHigh);
+      ctx.stroke();
+      ctx.strokeStyle = '#667085';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x - 8, yLow);
+      ctx.lineTo(x + 8, yLow);
+      ctx.moveTo(x - 8, yHigh);
+      ctx.lineTo(x + 8, yHigh);
       ctx.stroke();
       ctx.fillStyle = '#1f6feb';
       ctx.beginPath();
@@ -622,11 +684,9 @@
       ctx.font = '13px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(item.label.slice(0, 12), x, height - 28);
-      ctx.fillStyle = '#101828';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.fillText(formatNumber(item.estimate, 0), x, Math.max(padding.top + 12, yEstimate - 10));
     });
-    $(summaryId).textContent = 'Dots show estimated outputs. Vertical ranges show an approximate planning band using cross-validated error where available.';
+    const valueRows = values.map((item) => `<li><strong>${escapeHtml(item.label)}</strong><span>Estimate ${formatNumber(item.estimate, 0)}; planning band ${formatNumber(item.low, 0)} to ${formatNumber(item.high, 0)}</span></li>`).join('');
+    $(summaryId).innerHTML = `Dots show estimated outputs. Vertical ranges show an approximate planning band using cross-validated error where available.<ul class="chart-value-list">${valueRows}</ul>`;
   }
 
   function renderChartSelectors() {
@@ -676,17 +736,29 @@
     });
     drawRangeChart($('#rangeSupportChart'), '#rangeSupportSummary');
     drawPlanningRangeChart($('#planningRangeChart'), '#planningRangeSummary');
-    const driverValues = selectedOutput.coefficients
-      .map((coefficient, index) => ({ coefficient, term: model.terms[index] }))
-      .filter((item) => item.term.type !== 'intercept')
-      .sort((a, b) => Math.abs(b.coefficient) - Math.abs(a.coefficient))
-      .slice(0, 5)
-      .map((item) => ({ label: item.term.label, value: Math.abs(item.coefficient) }));
-    drawHorizontalBar($('#driverStrengthChart'), driverValues, '#driverStrengthSummary', {
-      xLabel: 'Relative association strength',
-      yLabel: 'Model term',
-      summary: `Largest bars show the strongest relative associations for ${selectedOutput.name} within the fitted model. Use this as a diagnostic signal, not as causal proof or an absolute operational effect.`
-    });
+    if (selectedOutput.coefficients) {
+      const driverValues = selectedOutput.coefficients
+        .map((coefficient, index) => ({ coefficient, term: model.terms[index] }))
+        .filter((item) => item.term.type !== 'intercept')
+        .sort((a, b) => Math.abs(b.coefficient) - Math.abs(a.coefficient))
+        .slice(0, 5)
+        .map((item) => ({ label: item.term.label, value: Math.abs(item.coefficient) }));
+      drawHorizontalBar($('#driverStrengthChart'), driverValues, '#driverStrengthSummary', {
+        xLabel: 'Relative association strength',
+        yLabel: 'Model term',
+        summary: `Largest bars show the strongest relative associations for ${selectedOutput.name} within the fitted model. Use this as a diagnostic signal, not as causal proof or an absolute operational effect.`,
+        valueFormatter: (value) => `Relative strength ${formatNumber(value, 2)}`
+      });
+    } else {
+      const neighbourValues = (state.estimate.outputs[selectedOutputIndex].neighbours || [])
+        .map((neighbour) => ({ label: neighbour.label, value: 1 / Math.max(neighbour.distance, 0.001) }));
+      drawHorizontalBar($('#driverStrengthChart'), neighbourValues, '#driverStrengthSummary', {
+        xLabel: 'Similarity weight',
+        yLabel: 'Nearest observation',
+        summary: `For kNN, this chart shows the closest historical observations used to estimate ${selectedOutput.name}. Higher bars indicate stronger local similarity, not a causal input effect.`,
+        valueFormatter: (value, item) => `${escapeHtml(item.label)} similarity weight ${formatNumber(value, 2)}`
+      });
+    }
   }
 
   function exportCsv() {

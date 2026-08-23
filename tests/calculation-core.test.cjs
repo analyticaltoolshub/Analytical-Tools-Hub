@@ -805,6 +805,94 @@ test("Multivariate auto select prefers cross-validated performance over fitted R
   assert.match(result.reason, /cross-validated RMSE|simpler/);
 });
 
+test("Multivariate ridge regression keeps a stable penalised linear estimate", () => {
+  const result = multivariateEstimator.analyse({
+    modelType: "ridge",
+    inputNames: ["Labour"],
+    outputNames: ["Orders"],
+    rows: [
+      { label: "A", inputs: [1], outputs: [12] },
+      { label: "B", inputs: [2], outputs: [14] },
+      { label: "C", inputs: [3], outputs: [16] },
+      { label: "D", inputs: [4], outputs: [18] },
+      { label: "E", inputs: [5], outputs: [20] },
+    ],
+  });
+  const analysis = result.selected;
+  const estimate = multivariateEstimator.estimateScenario(analysis, [4]);
+
+  assert.equal(analysis.modelType, "ridge");
+  assert.equal(analysis.penalty > 0, true);
+  approximatelyEqual(analysis.outputs[0].coefficients[0], 16, 1e-9);
+  approximatelyEqual(analysis.outputs[0].coefficients[1], 2.874797872880345, 1e-9);
+  approximatelyEqual(estimate.outputs[0].estimate, 17.818181818181817, 1e-9);
+});
+
+test("Multivariate lasso regression keeps a deterministic sparse linear estimate", () => {
+  const result = multivariateEstimator.analyse({
+    modelType: "lasso",
+    inputNames: ["Labour"],
+    outputNames: ["Orders"],
+    rows: [
+      { label: "A", inputs: [1], outputs: [12] },
+      { label: "B", inputs: [2], outputs: [14] },
+      { label: "C", inputs: [3], outputs: [16] },
+      { label: "D", inputs: [4], outputs: [18] },
+      { label: "E", inputs: [5], outputs: [20] },
+    ],
+  });
+  const analysis = result.selected;
+  const estimate = multivariateEstimator.estimateScenario(analysis, [4]);
+
+  assert.equal(analysis.modelType, "lasso");
+  assert.equal(analysis.penalty > 0, true);
+  approximatelyEqual(analysis.outputs[0].coefficients[0], 16, 1e-9);
+  approximatelyEqual(analysis.outputs[0].coefficients[1], 3.0997776601683795, 1e-9);
+  approximatelyEqual(estimate.outputs[0].estimate, 17.960471529247897, 1e-9);
+});
+
+test("Multivariate robust regression reduces the influence of an unusual observation", () => {
+  const rows = [
+    { label: "A", inputs: [1], outputs: [12] },
+    { label: "B", inputs: [2], outputs: [14] },
+    { label: "C", inputs: [3], outputs: [16] },
+    { label: "D", inputs: [4], outputs: [18] },
+    { label: "E", inputs: [5], outputs: [20] },
+    { label: "F", inputs: [6], outputs: [80] },
+    { label: "G", inputs: [7], outputs: [24] },
+    { label: "H", inputs: [8], outputs: [26] },
+  ];
+  const linear = multivariateEstimator.analyse({ modelType: "linear", inputNames: ["Labour"], outputNames: ["Orders"], rows }).selected;
+  const robust = multivariateEstimator.analyse({ modelType: "robust", inputNames: ["Labour"], outputNames: ["Orders"], rows }).selected;
+  const linearEstimate = multivariateEstimator.estimateScenario(linear, [6.5]).outputs[0].estimate;
+  const robustEstimate = multivariateEstimator.estimateScenario(robust, [6.5]).outputs[0].estimate;
+
+  assert.equal(robust.modelType, "robust");
+  approximatelyEqual(linearEstimate, 34.39285713122449, 1e-9);
+  approximatelyEqual(robustEstimate, 29.115404618437594, 1e-9);
+  assert.equal(robustEstimate < linearEstimate, true);
+});
+
+test("Multivariate kNN estimates from nearest historical observations", () => {
+  const rows = Array.from({ length: 12 }, (_, index) => {
+    const x = index + 1;
+    return { label: `Obs ${x}`, inputs: [x], outputs: [10 + 4 * x] };
+  });
+  const analysis = multivariateEstimator.analyse({
+    modelType: "knn",
+    inputNames: ["Labour"],
+    outputNames: ["Orders"],
+    rows,
+  }).selected;
+  const estimate = multivariateEstimator.estimateScenario(analysis, [8.5]).outputs[0];
+
+  assert.equal(analysis.modelType, "knn");
+  assert.equal(analysis.k, 3);
+  assert.equal(analysis.outputs[0].coefficients, null);
+  approximatelyEqual(estimate.estimate, 43.14285714285714, 1e-9);
+  assert.deepEqual(estimate.neighbours.map((neighbour) => neighbour.label), ["Obs 8", "Obs 9", "Obs 7"]);
+});
+
 test("Multivariate auto select chooses polynomial when curvature improves held-out error", () => {
   const rows = Array.from({ length: 18 }, (_, index) => {
     const x = index + 1;
@@ -869,6 +957,81 @@ test("Multivariate estimator validates constant and incomplete columns", () => {
       { label: "E", inputs: [5], outputs: [6] },
     ],
   }), /C: Input is required/);
+});
+
+test("Multivariate estimator keeps explicit model selections isolated", () => {
+  const rows = Array.from({ length: 12 }, (_, index) => {
+    const x = index + 1;
+    return { label: `Obs ${x}`, inputs: [x], outputs: [10 + 4 * x] };
+  });
+  const baseConfig = {
+    inputNames: ["Labour"],
+    outputNames: ["Orders"],
+    rows,
+  };
+
+  const linear = multivariateEstimator.analyse({ ...baseConfig, modelType: "linear" }).selected;
+  const ridge = multivariateEstimator.analyse({ ...baseConfig, modelType: "ridge" }).selected;
+  const lasso = multivariateEstimator.analyse({ ...baseConfig, modelType: "lasso" }).selected;
+  const robust = multivariateEstimator.analyse({ ...baseConfig, modelType: "robust" }).selected;
+  const polynomial = multivariateEstimator.analyse({ ...baseConfig, modelType: "polynomial" }).selected;
+  const knn = multivariateEstimator.analyse({ ...baseConfig, modelType: "knn" }).selected;
+  const linearEstimate = multivariateEstimator.estimateScenario(linear, [8.5]);
+  const ridgeEstimate = multivariateEstimator.estimateScenario(ridge, [8.5]);
+  const lassoEstimate = multivariateEstimator.estimateScenario(lasso, [8.5]);
+  const robustEstimate = multivariateEstimator.estimateScenario(robust, [8.5]);
+  const polynomialEstimate = multivariateEstimator.estimateScenario(polynomial, [8.5]);
+  const knnEstimate = multivariateEstimator.estimateScenario(knn, [8.5]);
+
+  assert.equal(linear.modelType, "linear");
+  assert.equal(ridge.modelType, "ridge");
+  assert.equal(lasso.modelType, "lasso");
+  assert.equal(robust.modelType, "robust");
+  assert.equal(polynomial.modelType, "polynomial");
+  assert.equal(knn.modelType, "knn");
+  assert.equal(linear.terms.length, 2);
+  assert.equal(ridge.terms.length, 2);
+  assert.equal(lasso.terms.length, 2);
+  assert.equal(robust.terms.length, 2);
+  assert.equal(polynomial.terms.length, 3);
+  assert.equal(knn.terms.length, 2);
+  approximatelyEqual(linearEstimate.outputs[0].estimate, 44, 1e-7);
+  approximatelyEqual(polynomialEstimate.outputs[0].estimate, 44, 1e-6);
+  approximatelyEqual(ridgeEstimate.outputs[0].estimate, 43.357859531772576, 1e-9);
+  approximatelyEqual(lassoEstimate.outputs[0].estimate, 43.96974362566044, 1e-9);
+  approximatelyEqual(robustEstimate.outputs[0].estimate, 44, 1e-7);
+  approximatelyEqual(knnEstimate.outputs[0].estimate, 43.14285714285714, 1e-9);
+  assert.equal(ridge.penalty > 0, true);
+  assert.equal(lasso.penalty > 0, true);
+  assert.equal(linear.penalty, 0);
+  assert.equal(polynomial.penalty, 0);
+  assert.equal(robust.penalty, 0);
+  assert.equal(knn.penalty, 0);
+});
+
+test("Multivariate auto select compares the registered candidate model set", () => {
+  const rows = Array.from({ length: 18 }, (_, index) => {
+    const x = index + 1;
+    return { label: `Obs ${x}`, inputs: [x], outputs: [5 + 2 * x + x ** 2] };
+  });
+  const result = multivariateEstimator.analyse({
+    modelType: "auto",
+    inputNames: ["Machine Hours"],
+    outputNames: ["Units Produced"],
+    rows,
+  });
+  const candidateTypes = result.candidates.map((candidate) => candidate.modelType).sort();
+  const availableTypes = multivariateEstimator.availableModels().map((model) => model.id).sort();
+
+  assert.deepEqual(candidateTypes, availableTypes);
+  result.candidates.forEach((candidate) => {
+    assert.equal(Number.isFinite(candidate.averageCvRmse), true);
+    assert.equal(typeof candidate.label, "string");
+    assert.equal(candidate.available, true);
+  });
+  assert.equal(result.unavailableCandidates.length, 0);
+  assert.equal(result.selected.modelType, "polynomial");
+  assert.match(result.reason, /cross-validated RMSE/);
 });
 
 test("Gantt day arithmetic remains stable across daylight-saving transitions", () => {

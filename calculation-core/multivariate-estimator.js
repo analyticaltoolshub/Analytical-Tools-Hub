@@ -6,6 +6,65 @@
   'use strict';
 
   const EPSILON = 1e-9;
+  const MODEL_REGISTRY = Object.freeze({
+    linear: Object.freeze({
+      id: 'linear',
+      label: 'Linear regression',
+      featureFamily: 'linear',
+      selectionThreshold: 1,
+      termSummary: 'linear terms',
+      interpretation: 'Simplest and easiest to explain'
+    }),
+    ridge: Object.freeze({
+      id: 'ridge',
+      label: 'Ridge regression',
+      featureFamily: 'linear',
+      selectionThreshold: 0.995,
+      termSummary: 'linear terms with coefficient penalty',
+      interpretation: 'Stable linear estimate for correlated inputs'
+    }),
+    lasso: Object.freeze({
+      id: 'lasso',
+      label: 'Lasso regression',
+      featureFamily: 'linear',
+      selectionThreshold: 0.995,
+      termSummary: 'linear terms with coefficient selection penalty',
+      interpretation: 'Sparse linear estimate that can reduce weak input effects'
+    }),
+    robust: Object.freeze({
+      id: 'robust',
+      label: 'Robust regression',
+      featureFamily: 'linear',
+      selectionThreshold: 0.995,
+      termSummary: 'linear terms with outlier-resistant weighting',
+      interpretation: 'Linear estimate with reduced influence from unusual observations'
+    }),
+    polynomial: Object.freeze({
+      id: 'polynomial',
+      label: 'Polynomial degree 2',
+      featureFamily: 'polynomial',
+      selectionThreshold: 0.98,
+      termSummary: 'terms including squares and interactions',
+      interpretation: 'Most flexible; higher overfitting risk'
+    }),
+    knn: Object.freeze({
+      id: 'knn',
+      label: 'k-Nearest Neighbour estimator',
+      featureFamily: 'distance',
+      selectionThreshold: 0.99,
+      termSummary: 'nearest-neighbour distance weights',
+      interpretation: 'Local estimate based on the most similar historical observations'
+    })
+  });
+  const AUTO_SELECT_MODEL_IDS = Object.freeze(['linear', 'ridge', 'lasso', 'robust', 'polynomial', 'knn']);
+
+  function getModelDefinition(modelType) {
+    return MODEL_REGISTRY[modelType] || MODEL_REGISTRY.linear;
+  }
+
+  function availableModels() {
+    return AUTO_SELECT_MODEL_IDS.map((id) => MODEL_REGISTRY[id]);
+  }
 
   function toNumber(value, label) {
     if (value === null || value === undefined || String(value).trim() === '') {
@@ -23,6 +82,12 @@
   function variance(values) {
     const avg = mean(values);
     return values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / Math.max(1, values.length - 1);
+  }
+
+  function median(values) {
+    const sorted = [...values].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
   }
 
   function transpose(matrix) {
@@ -76,9 +141,10 @@
   }
 
   function createFeatureSpec(inputNames, modelType) {
+    const definition = getModelDefinition(modelType);
     const terms = [{ type: 'intercept', label: 'Intercept' }];
     inputNames.forEach((name, index) => terms.push({ type: 'linear', indexes: [index], label: name }));
-    if (modelType === 'polynomial') {
+    if (definition.featureFamily === 'polynomial') {
       inputNames.forEach((name, index) => terms.push({ type: 'square', indexes: [index], label: `${name}^2` }));
       for (let i = 0; i < inputNames.length; i += 1) {
         for (let j = i + 1; j < inputNames.length; j += 1) {
@@ -102,17 +168,110 @@
     return rows.map((row) => row.map((value, index) => (value - stats[index].mean) / stats[index].sd));
   }
 
-  function fitOutputModel(featureMatrix, y) {
+  function modelDisplayName(modelType) {
+    return getModelDefinition(modelType).label;
+  }
+
+  function fitOutputModel(featureMatrix, y, options = {}) {
     const xT = transpose(featureMatrix);
     const xTx = multiplyMatrices(xT, featureMatrix);
     const xTy = multiplyMatrixVector(xT, y);
-    const lambda = 1e-8;
+    const lambda = Number.isFinite(options.penalty) ? options.penalty : 1e-8;
     for (let i = 1; i < xTx.length; i += 1) xTx[i][i] += lambda;
     return solveLinearSystem(xTx, xTy);
   }
 
+  function fitWeightedOutputModel(featureMatrix, y, weights, options = {}) {
+    const lambda = Number.isFinite(options.penalty) ? options.penalty : 1e-8;
+    const p = featureMatrix[0].length;
+    const xTx = Array.from({ length: p }, () => Array(p).fill(0));
+    const xTy = Array(p).fill(0);
+    featureMatrix.forEach((features, rowIndex) => {
+      const weight = weights[rowIndex];
+      for (let i = 0; i < p; i += 1) {
+        xTy[i] += weight * features[i] * y[rowIndex];
+        for (let j = 0; j < p; j += 1) {
+          xTx[i][j] += weight * features[i] * features[j];
+        }
+      }
+    });
+    for (let i = 1; i < xTx.length; i += 1) xTx[i][i] += lambda;
+    return solveLinearSystem(xTx, xTy);
+  }
+
+  function softThreshold(value, lambda) {
+    if (value > lambda) return value - lambda;
+    if (value < -lambda) return value + lambda;
+    return 0;
+  }
+
+  function fitLassoOutputModel(featureMatrix, y, penalty) {
+    const coefficients = Array(featureMatrix[0].length).fill(0);
+    coefficients[0] = mean(y);
+    const z = coefficients.map((_, column) => featureMatrix.reduce((sum, row) => sum + row[column] ** 2, 0));
+    for (let iteration = 0; iteration < 250; iteration += 1) {
+      let maxChange = 0;
+      coefficients[0] = mean(y.map((value, rowIndex) => {
+        const nonIntercept = coefficients.slice(1).reduce((sum, coefficient, index) => sum + coefficient * featureMatrix[rowIndex][index + 1], 0);
+        return value - nonIntercept;
+      }));
+      for (let column = 1; column < coefficients.length; column += 1) {
+        let rho = 0;
+        for (let row = 0; row < featureMatrix.length; row += 1) {
+          const predictedWithoutColumn = coefficients.reduce((sum, coefficient, index) => (
+            index === column ? sum : sum + coefficient * featureMatrix[row][index]
+          ), 0);
+          rho += featureMatrix[row][column] * (y[row] - predictedWithoutColumn);
+        }
+        const next = softThreshold(rho, penalty) / Math.max(z[column], EPSILON);
+        maxChange = Math.max(maxChange, Math.abs(next - coefficients[column]));
+        coefficients[column] = next;
+      }
+      if (maxChange < 1e-8) break;
+    }
+    return coefficients;
+  }
+
+  function fitRobustOutputModel(featureMatrix, y, options = {}) {
+    let coefficients = fitOutputModel(featureMatrix, y, { penalty: options.penalty || 1e-8 });
+    for (let iteration = 0; iteration < 20; iteration += 1) {
+      const residuals = featureMatrix.map((features, index) => y[index] - predictRow(coefficients, features));
+      const centre = median(residuals);
+      const mad = median(residuals.map((residual) => Math.abs(residual - centre)));
+      const scale = Math.max(1.4826 * mad, Math.sqrt(residuals.reduce((sum, residual) => sum + residual ** 2, 0) / residuals.length), EPSILON);
+      const delta = 1.345 * scale;
+      const weights = residuals.map((residual) => {
+        const magnitude = Math.abs(residual);
+        return magnitude <= delta ? 1 : delta / magnitude;
+      });
+      const next = fitWeightedOutputModel(featureMatrix, y, weights, { penalty: options.penalty || 1e-8 });
+      const change = next.reduce((max, coefficient, index) => Math.max(max, Math.abs(coefficient - coefficients[index])), 0);
+      coefficients = next;
+      if (change < 1e-7) break;
+    }
+    return coefficients;
+  }
+
   function predictRow(coefficients, features) {
     return coefficients.reduce((sum, coefficient, index) => sum + coefficient * features[index], 0);
+  }
+
+  function chooseK(rowCount) {
+    return Math.max(1, Math.min(5, Math.round(Math.sqrt(rowCount))));
+  }
+
+  function kNearestPrediction(trainingFeatures, outputValues, scenarioFeatures, k) {
+    const neighbours = trainingFeatures.map((features, index) => ({
+      index,
+      distance: Math.sqrt(features.reduce((sum, value, column) => sum + (value - scenarioFeatures[column]) ** 2, 0))
+    })).sort((a, b) => a.distance - b.distance || a.index - b.index).slice(0, k);
+    if (neighbours[0]?.distance <= EPSILON) {
+      return { estimate: outputValues[neighbours[0].index], neighbours: [neighbours[0]] };
+    }
+    const weights = neighbours.map((neighbour) => 1 / Math.max(neighbour.distance, EPSILON));
+    const totalWeight = weights.reduce((sum, value) => sum + value, 0);
+    const estimate = neighbours.reduce((sum, neighbour, index) => sum + outputValues[neighbour.index] * weights[index] / totalWeight, 0);
+    return { estimate, neighbours };
   }
 
   function metrics(actual, predicted, parameterCount) {
@@ -193,25 +352,45 @@
       return { mean: mean(values), sd: sd > EPSILON ? sd : 1 };
     });
     const standardisedInputs = standardiseInputs(dataset.rows.map((row) => row.inputs), inputStats);
-    const modelType = requestedModel === 'polynomial' ? 'polynomial' : 'linear';
+    const modelType = getModelDefinition(requestedModel).id;
     const terms = createFeatureSpec(dataset.inputNames, modelType);
-    if (dataset.rows.length <= terms.length) {
-      throw new Error(`${modelType === 'polynomial' ? 'Polynomial' : 'Linear'} regression needs more observations than model terms.`);
+    if (modelType !== 'knn' && dataset.rows.length <= terms.length) {
+      throw new Error(`${modelDisplayName(modelType)} needs more observations than model terms.`);
     }
     const featureMatrix = standardisedInputs.map((row) => transformRow(row, terms));
+    const penalty = modelType === 'ridge'
+      ? Math.max(0.1, dataset.rows.length * 0.08)
+      : modelType === 'lasso'
+        ? Math.max(0.05, dataset.rows.length * 0.05)
+        : 1e-8;
     const outputIndexes = options.singleOutputIndex !== undefined ? [options.singleOutputIndex] : dataset.outputNames.map((_, index) => index);
+    const k = chooseK(dataset.rows.length);
     const outputs = outputIndexes.map((outputIndex) => {
       const y = dataset.rows.map((row) => row.outputs[outputIndex]);
-      const coefficients = fitOutputModel(featureMatrix, y);
-      const predicted = featureMatrix.map((features) => predictRow(coefficients, features));
-      return {
+      const coefficients = modelType === 'knn'
+        ? null
+        : modelType === 'lasso'
+          ? fitLassoOutputModel(featureMatrix, y, penalty)
+          : modelType === 'robust'
+            ? fitRobustOutputModel(featureMatrix, y, { penalty })
+            : fitOutputModel(featureMatrix, y, { penalty });
+      const predicted = modelType === 'knn'
+        ? featureMatrix.map((features, rowIndex) => {
+          const trainingFeatures = featureMatrix.filter((_, index) => index !== rowIndex);
+          const trainingOutput = y.filter((_, index) => index !== rowIndex);
+          return kNearestPrediction(trainingFeatures, trainingOutput, features, chooseK(trainingFeatures.length)).estimate;
+        })
+        : featureMatrix.map((features) => predictRow(coefficients, features));
+      const result = {
         name: dataset.outputNames[outputIndex],
         outputIndex,
         coefficients,
         predicted,
         actual: y,
-        ...metrics(y, predicted, terms.length)
+        ...metrics(y, predicted, modelType === 'knn' ? 0 : terms.length)
       };
+      if (modelType === 'knn') result.adjustedRSquared = null;
+      return result;
     });
     return {
       modelType,
@@ -220,23 +399,26 @@
       rows: dataset.rows,
       inputStats,
       terms,
+      penalty: modelType === 'ridge' || modelType === 'lasso' ? penalty : 0,
+      k: modelType === 'knn' ? k : null,
       outputs,
       warnings: dataset.rows.length < terms.length * 5
-        ? [`The ${modelType} model uses ${terms.length} terms with ${dataset.rows.length} observations. Treat diagnostics cautiously and prefer cross-validation over fitted R-squared.`]
+        ? [`The ${modelDisplayName(modelType)} model uses ${terms.length} terms with ${dataset.rows.length} observations. Treat diagnostics cautiously and prefer cross-validation over fitted R-squared.`]
         : []
     };
   }
 
   function autoSelectModel(config) {
     const dataset = validateDataset(config);
-    const linear = fitModel(dataset, 'linear', { skipValidation: true });
-    let polynomial = null;
-    let polynomialError = null;
-    try {
-      polynomial = fitModel(dataset, 'polynomial', { skipValidation: true });
-    } catch (error) {
-      polynomialError = error.message;
-    }
+    const fitErrors = {};
+    const candidateModels = AUTO_SELECT_MODEL_IDS.map((modelType) => {
+      try {
+        return fitModel(dataset, modelType, { skipValidation: true });
+      } catch (error) {
+        fitErrors[modelType] = error.message;
+        return null;
+      }
+    }).filter(Boolean);
 
     function attachCv(model) {
       model.outputs.forEach((output) => {
@@ -246,22 +428,46 @@
       return model;
     }
 
-    attachCv(linear);
-    if (polynomial) {
+    const candidates = candidateModels.map((model) => {
       try {
-        attachCv(polynomial);
+        return attachCv(model);
       } catch (error) {
-        polynomialError = error.message;
-        polynomial = null;
+        fitErrors[model.modelType] = error.message;
+        return null;
       }
-    }
-    const selected = polynomial && polynomial.averageCvRmse < linear.averageCvRmse * 0.98 ? polynomial : linear;
+    }).filter(Boolean);
+    const linear = candidates.find((model) => model.modelType === 'linear');
+    if (!linear) throw new Error(`Linear regression could not be fitted: ${fitErrors.linear || 'unknown error'}`);
+    const selected = candidates.reduce((best, model) => {
+      const needsMaterialGain = getModelDefinition(model.modelType).selectionThreshold;
+      return model.averageCvRmse < best.averageCvRmse * needsMaterialGain ? model : best;
+    }, linear);
+    const unavailable = Object.entries(fitErrors)
+      .map(([modelType, message]) => `${modelDisplayName(modelType)} could not be fitted: ${message}`)
+      .join('; ');
+    const reasonMap = {
+      polynomial: 'Polynomial regression was selected because its cross-validated RMSE was materially lower than the simpler models.',
+      ridge: 'Ridge regression was selected because its cross-validated RMSE was lower while keeping a stable linear form.',
+      lasso: 'Lasso regression was selected because its cross-validated RMSE was lower while keeping a sparse linear form.',
+      robust: 'Robust regression was selected because its cross-validated RMSE was lower while reducing the influence of unusual observations.',
+      knn: 'k-Nearest Neighbour was selected because local historical neighbours produced materially lower cross-validated RMSE.',
+      linear: `Linear regression was selected because it had comparable or better cross-validated RMSE${unavailable ? `; ${unavailable}` : ' and is simplest to interpret.'}`
+    };
     return {
       selected,
-      candidates: [linear, polynomial].filter(Boolean).map((model) => ({ modelType: model.modelType, averageCvRmse: model.averageCvRmse })),
-      reason: selected.modelType === 'polynomial'
-        ? 'Polynomial regression was selected because its cross-validated RMSE was materially lower than the linear model.'
-        : `Linear regression was selected because it had comparable or better cross-validated RMSE${polynomialError ? `; polynomial could not be fitted: ${polynomialError}` : ' and is simpler to interpret.'}`
+      candidates: candidates.map((model) => ({
+        modelType: model.modelType,
+        label: modelDisplayName(model.modelType),
+        averageCvRmse: model.averageCvRmse,
+        penalty: model.penalty,
+        available: true
+      })),
+      unavailableCandidates: Object.entries(fitErrors).map(([modelType, message]) => ({
+        modelType,
+        label: modelDisplayName(modelType),
+        reason: message
+      })),
+      reason: reasonMap[selected.modelType]
     };
   }
 
@@ -284,8 +490,15 @@
     }
     return {
       selected,
-      candidates: [{ modelType: selected.modelType, averageCvRmse: selected.averageCvRmse }],
-      reason: `${selected.modelType === 'polynomial' ? 'Polynomial' : 'Linear'} regression was selected by the user. Cross-validated RMSE is shown to support judgement.`
+      candidates: [{
+        modelType: selected.modelType,
+        label: modelDisplayName(selected.modelType),
+        averageCvRmse: selected.averageCvRmse,
+        penalty: selected.penalty,
+        available: true
+      }],
+      unavailableCandidates: [],
+      reason: `${modelDisplayName(selected.modelType)} was selected by the user. Cross-validated RMSE is shown to support judgement.`
     };
   }
 
@@ -374,6 +587,26 @@
     const support = assessScenarioSupport(model, rawScenarioInputs);
     const standardised = standardiseInputs([support.scenarioInputs], model.inputStats)[0];
     const features = transformRow(standardised, model.terms);
+    if (model.modelType === 'knn') {
+      const trainingFeatures = standardiseInputs(model.rows.map((row) => row.inputs), model.inputStats)
+        .map((row) => transformRow(row, model.terms));
+      return {
+        support,
+        outputs: model.outputs.map((output) => {
+          const prediction = kNearestPrediction(trainingFeatures, output.actual, features, model.k || chooseK(model.rows.length));
+          return {
+            name: output.name,
+            estimate: prediction.estimate,
+            crossValidatedRmse: output.crossValidatedRmse,
+            rmse: output.rmse,
+            neighbours: prediction.neighbours.map((neighbour) => ({
+              label: model.rows[neighbour.index].label,
+              distance: neighbour.distance
+            }))
+          };
+        })
+      };
+    }
     return {
       support,
       outputs: model.outputs.map((output) => ({
@@ -386,6 +619,7 @@
   }
 
   function formatEquation(output, terms, inputNames) {
+    if (!output.coefficients) return `${output.name} = distance-weighted average of nearest historical observations`;
     const pieces = output.coefficients.map((coefficient, index) => {
       const sign = coefficient >= 0 ? '+' : '-';
       const value = Math.abs(coefficient).toFixed(4);
@@ -400,6 +634,9 @@
     estimateScenario,
     validateDataset,
     createFeatureSpec,
+    availableModels,
+    getModelDefinition,
+    modelDisplayName,
     formatEquation
   };
 }));
