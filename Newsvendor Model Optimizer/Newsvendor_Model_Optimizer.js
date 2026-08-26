@@ -50,6 +50,7 @@ const distributionHelp = {
 let empiricalDemand = [];
 let empiricalImportIssues = { invalidRows: 0, blankRows: 0 };
 let latestResult = null;
+let latestDiagnostics = [];
 let resizeTimer = null;
 
 function numberValue(input) {
@@ -703,6 +704,9 @@ function renderDecisionConfidence(result) {
 }
 
 function renderResults(result) {
+  latestDiagnostics = ATHNewsvendor.diagnoseNewsvendor(result.demand, result.economics, result, {
+    historyType: elements.historyType.value,
+  });
   setText("optimalQuantity", `${formatNumber(result.optimalQuantity, 0)} units`);
   setText("expectedProfit", formatCurrency(result.optimized.expectedProfit));
   setText("serviceLevel", formatPercent(result.optimized.serviceLevel));
@@ -727,6 +731,9 @@ function renderResults(result) {
   setText("expectedLostSales", `${formatNumber(result.optimized.expectedLostSales)} units`);
   setText("expectedRevenue", formatCurrency(result.optimized.expectedRevenue));
   document.getElementById("interpretation").innerHTML = buildInterpretation(result);
+  window.ATHDiagnostics?.render("#resultDiagnostics", latestDiagnostics, {
+    heading: "Decision Diagnostics",
+  });
   renderComparison(result);
   renderDecisionConfidence(result);
 
@@ -923,6 +930,8 @@ function reset() {
   empiricalDemand = [];
   empiricalImportIssues = { invalidRows: 0, blankRows: 0 };
   latestResult = null;
+  latestDiagnostics = [];
+  window.ATHDiagnostics?.render("#resultDiagnostics", latestDiagnostics);
   clearError();
   elements.results.classList.add("hidden");
   elements.charts.classList.add("hidden");
@@ -1177,6 +1186,7 @@ function exportCsv() {
   const result = latestResult;
   const rows = [
     ["Newsvendor Model Optimizer", "Generated locally in the browser"],
+    ["Generated at", new Date().toISOString()],
     ["Demand distribution", result.model.distribution],
     ["Demand model", result.model.description],
     ["Underage cost", result.underageCost],
@@ -1195,6 +1205,8 @@ function exportCsv() {
     ["Expected leftovers", result.optimized.expectedLeftovers],
     ["Expected lost sales", result.optimized.expectedLostSales]
   ];
+  rows.push([], ["Decision diagnostics"]);
+  (window.ATHDiagnostics?.summarize(latestDiagnostics) || []).forEach((item) => rows.push([item]));
   if (result.opportunity) {
     rows.push(["Near-optimal quantity range", `${result.opportunity.minimum} to ${result.opportunity.maximum}`]);
     rows.push(["Current policy opportunity loss", result.opportunity.currentLoss ?? "Not available"]);

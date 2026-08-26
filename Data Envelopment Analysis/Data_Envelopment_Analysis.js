@@ -867,6 +867,9 @@ function renderExecutiveBenchmarkPanel() {
 
 function renderResults() {
   const { summary, results, model, orientation, adequacy } = state.analysis;
+  const diagnostics = window.ATHDea?.diagnoseAnalysis
+    ? window.ATHDea.diagnoseAnalysis(state.analysis)
+    : [];
   $('#summaryCards').innerHTML = [
     ['DMUs compared', summary.dmuCount],
     ['Efficient units', summary.efficientCount],
@@ -887,6 +890,9 @@ function renderResults() {
     <p><strong>Management use:</strong> Treat frontier scores as a screening signal. Validate comparability, data definitions, operating constraints, and peer practices before assigning targets or accountability.</p>
   `;
   renderExecutiveBenchmarkPanel();
+  window.ATHDiagnostics?.render('#resultDiagnostics', diagnostics, {
+    heading: 'DEA Diagnostics',
+  });
 
   $('#rankingTable').innerHTML = `<thead><tr><th>Rank</th><th>DMU</th><th>Efficiency</th><th>Status</th><th>Benchmark peers</th></tr></thead><tbody>${results.slice().sort((a,b) => a.rank-b.rank).map((result) => `
     <tr><td>${result.rank}</td><td><strong>${escapeHtml(result.name)}</strong></td><td>${formatPercent(result.efficiency)}</td><td><span class="status-pill${result.efficient ? '' : ' review'}">${result.efficient ? 'Efficient frontier' : 'Improvement opportunity'}</span></td><td>${escapeHtml(result.peers.map((peer) => peer.name).join(', ') || 'None')}</td></tr>
@@ -1073,9 +1079,13 @@ function csvField(value) {
 function exportResultsCsv() {
   if (!state.analysis) return;
   const generatedAt = new Date().toISOString();
+  const diagnostics = window.ATHDea?.diagnoseAnalysis
+    ? window.ATHDea.diagnoseAnalysis(state.analysis)
+    : [];
+  const diagnosticSummary = (window.ATHDiagnostics?.summarize(diagnostics) || []).join(' | ');
   const headers = [
     'Rank', 'DMU', 'Model', 'Orientation', 'Efficiency', 'Radial Factor', 'Efficient', 'Peers',
-    'Management Priority', 'Suggested Action', 'DMUs Compared', 'Recommended Minimum DMUs', 'Sample Heuristic Met', 'Generated At',
+    'Management Priority', 'Suggested Action', 'DMUs Compared', 'Recommended Minimum DMUs', 'Sample Heuristic Met', 'Diagnostics', 'Generated At',
     ...state.inputNames.flatMap((name) => [`Actual Input: ${name}`, `Target Input: ${name}`, `Input Slack: ${name}`]),
     ...state.outputNames.flatMap((name) => [`Actual Output: ${name}`, `Target Output: ${name}`, `Output Slack: ${name}`])
   ];
@@ -1089,7 +1099,7 @@ function exportResultsCsv() {
       result.peers.map((peer) => `${peer.name} (${peer.lambda.toFixed(4)})`).join('; '),
       guidance.priority, guidance.action,
       state.analysis.adequacy.dmuCount, state.analysis.adequacy.recommendedMinimum,
-      state.analysis.adequacy.meetsHeuristic ? 'Yes' : 'No', generatedAt,
+      state.analysis.adequacy.meetsHeuristic ? 'Yes' : 'No', diagnosticSummary, generatedAt,
       ...state.inputNames.flatMap((_, index) => [source.inputs[index], result.inputTargets[index], result.inputSlacks[index]]),
       ...state.outputNames.flatMap((_, index) => [source.outputs[index], result.outputTargets[index], result.outputSlacks[index]])
     ];

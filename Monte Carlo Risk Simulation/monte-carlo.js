@@ -191,6 +191,7 @@ const state = {
   running: false,
   lastConfig: null,
   lastResult: null,
+  lastDiagnostics: [],
   scenarios: [],
   modalReturnFocus: null,
   pendingTemplateKey: null
@@ -509,6 +510,9 @@ function runSimulation() {
   const config = buildConfig();
   if (!config || state.running) return;
   state.lastConfig = config;
+  state.lastDiagnostics = window.ATHMonteCarlo?.diagnoseConfig
+    ? window.ATHMonteCarlo.diagnoseConfig(config)
+    : [];
   state.running = true;
   setSimulationInputsDisabled(true);
   $('#runSimulationButton').disabled = true;
@@ -645,6 +649,9 @@ function renderResults(result) {
     $(`#${id}`).disabled = false;
   });
   renderMetricCards(result);
+  window.ATHDiagnostics?.render('#resultDiagnostics', state.lastDiagnostics, {
+    heading: 'Simulation Diagnostics',
+  });
   renderPercentiles(result);
   renderHistogram(result);
   renderCumulative(result);
@@ -911,12 +918,17 @@ function clearScenarios() {
 function exportCsv() {
   if (!state.lastResult || !state.lastConfig) return;
   const rows = [
+    ['Analytical Tools Hub', 'Monte Carlo Risk Simulation'],
+    ['Generated at', new Date().toISOString()],
     ['Model', state.lastConfig.modelName],
     ['Output', state.lastConfig.outputName],
     ['Iterations', state.lastConfig.iterations],
     ['Seed', state.lastConfig.seed],
     ['Target condition', state.lastConfig.targetCondition],
     ['Target value', state.lastConfig.targetValue],
+    [],
+    ['Simulation diagnostics'],
+    ...(window.ATHDiagnostics?.summarize(state.lastDiagnostics) || []).map((item) => [item]),
     [],
     ['Variables'],
     ['Name', 'Identifier', 'Distribution', 'Unit', 'Parameters']
@@ -981,6 +993,8 @@ function saveSvgChartAsPng(containerId, filename) {
 function clearResults() {
   state.lastResult = null;
   state.lastConfig = null;
+  state.lastDiagnostics = [];
+  window.ATHDiagnostics?.render('#resultDiagnostics', state.lastDiagnostics);
   $('#results')?.classList.add('hidden');
   $('#simulationProgress') && ($('#simulationProgress').value = 0);
   $('#simulationProgressText') && ($('#simulationProgressText').textContent = '0%');

@@ -629,6 +629,86 @@
     return `${output.name} = ${pieces.join(' ')}`.replace(/\+ -/g, '- ');
   }
 
+  function diagnoseEstimator(analysis, estimate) {
+    const model = analysis?.selected || analysis;
+    const diagnostics = [];
+    if (!model) return diagnostics;
+    const observations = model.rows?.length || 0;
+    const predictorCount = model.inputNames?.length || 0;
+    const termCount = model.terms?.length || predictorCount + 1;
+    if (observations < Math.max(10, termCount * 2)) {
+      diagnostics.push({
+        level: observations <= termCount ? 'high-risk' : 'caution',
+        title: 'Limited observations for model complexity',
+        detected: `${observations} observations for ${termCount} fitted term${termCount === 1 ? '' : 's'}.`,
+        why: 'Small samples can fit historical rows but perform poorly for new scenarios.',
+        consider: 'Use simpler models, add more comparable observations, or treat scenario estimates as directional.'
+      });
+    }
+    if (model.modelType === 'polynomial' && observations < termCount * 4) {
+      diagnostics.push({
+        level: 'caution',
+        title: 'Polynomial overfitting risk',
+        detected: `Degree-2 model uses ${termCount} terms with ${observations} observations.`,
+        why: 'Squared and interaction terms can capture noise when there are few rows.',
+        consider: 'Compare cross-validated RMSE against linear, ridge, robust, lasso, and kNN estimates.'
+      });
+    }
+    if (['ridge', 'lasso'].includes(model.modelType)) {
+      diagnostics.push({
+        level: 'info',
+        title: `${model.modelType === 'ridge' ? 'Ridge' : 'Lasso'} tuning note`,
+        detected: `Penalty parameter ${Number(model.penalty || 0).toFixed(3)} is selected by the browser tool.`,
+        why: 'Penalised models trade a small amount of fitted accuracy for more stable coefficients.',
+        consider: 'Use the candidate comparison table to confirm the penalty improves cross-validated error.'
+      });
+    }
+    if (model.modelType === 'knn') {
+      diagnostics.push({
+        level: 'info',
+        title: 'kNN local-support note',
+        detected: `${model.k || 0} nearest historical observations are used for each output estimate.`,
+        why: 'kNN has no coefficient equation and depends strongly on local historical similarity.',
+        consider: 'Review nearest neighbours and scenario support before using the estimate for planning.'
+      });
+    }
+    const weakOutputs = (model.outputs || []).filter((output) => Number.isFinite(output.rSquared) && output.rSquared < 0.35);
+    if (weakOutputs.length) {
+      diagnostics.push({
+        level: 'caution',
+        title: 'Weak fitted relationship',
+        detected: `${weakOutputs.map((output) => output.name).join(', ')} has low fitted R-squared.`,
+        why: 'The selected inputs explain only a limited share of historical output variation.',
+        consider: 'Add relevant operational drivers, segment the data, or avoid using the estimate as a planning target.'
+      });
+    }
+    if (estimate?.support?.level === 'extrapolation') {
+      diagnostics.push({
+        level: 'high-risk',
+        title: 'Scenario extrapolation',
+        detected: 'The scenario is outside the historical multivariate input space.',
+        why: 'Predictions beyond observed operating conditions are less reliable than interpolation.',
+        consider: 'Adjust the scenario toward observed conditions or collect comparable historical examples.'
+      });
+    } else if (estimate?.support?.level === 'limited') {
+      diagnostics.push({
+        level: 'caution',
+        title: 'Limited local support',
+        detected: 'Few similar historical observations are close to this scenario.',
+        why: 'The estimate may depend on distant comparison rows.',
+        consider: 'Review nearest neighbours and use a planning range rather than a single point estimate.'
+      });
+    }
+    diagnostics.push({
+      level: 'info',
+      title: 'Interpretation boundary',
+      detected: 'This is a supervised estimator.',
+      why: 'Regression and kNN estimate relationships in historical data; they do not prove causality or operational efficiency.',
+      consider: 'Use DEA for relative efficiency benchmarking and this estimator for expected-output planning.'
+    });
+    return diagnostics;
+  }
+
   return {
     analyse,
     estimateScenario,
@@ -637,6 +717,7 @@
     availableModels,
     getModelDefinition,
     modelDisplayName,
-    formatEquation
+    formatEquation,
+    diagnoseEstimator
   };
 }));

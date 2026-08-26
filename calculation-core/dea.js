@@ -47,6 +47,63 @@
     return Math.min(1, ccr / bcc);
   }
 
+  function diagnoseAnalysis(analysis) {
+    const diagnostics = [];
+    if (!analysis || !analysis.summary) return diagnostics;
+    const adequacy = analysis.adequacy || assessSampleAdequacy(analysis.dmus.length, analysis.inputNames.length, analysis.outputNames.length);
+    const efficientShare = analysis.summary.dmuCount ? analysis.summary.efficientCount / analysis.summary.dmuCount : 0;
+    if (!adequacy.meetsHeuristic) {
+      diagnostics.push({
+        level: 'caution',
+        title: 'Weak sample discrimination',
+        detected: `${adequacy.dmuCount} DMUs for ${adequacy.measureCount} measures; common heuristic suggests at least ${adequacy.recommendedMinimum}.`,
+        why: 'DEA can classify too many units as efficient when the sample is small relative to the number of inputs and outputs.',
+        consider: 'Add comparable DMUs, reduce measures, or treat frontier membership as a diagnostic signal rather than a firm benchmark.'
+      });
+    }
+    if (efficientShare > 0.6) {
+      diagnostics.push({
+        level: 'caution',
+        title: 'Many frontier units',
+        detected: `${Math.round(efficientShare * 100)}% of DMUs are efficient under the selected model.`,
+        why: 'High frontier share can mean genuine similarity, too many measures, too few DMUs, or weak discrimination.',
+        consider: 'Review sample size and measure selection before using targets for performance accountability.'
+      });
+    }
+    const vectors = new Map();
+    (analysis.dmus || []).forEach((dmu) => {
+      const key = [...dmu.inputs, ...dmu.outputs].map((value) => Number(value).toPrecision(10)).join('|');
+      const existing = vectors.get(key) || [];
+      existing.push(dmu.name);
+      vectors.set(key, existing);
+    });
+    const duplicates = [...vectors.values()].filter((names) => names.length > 1);
+    if (duplicates.length) {
+      diagnostics.push({
+        level: 'info',
+        title: 'Duplicate performance vectors',
+        detected: duplicates.map((names) => names.join(' / ')).join('; '),
+        why: 'Identical input-output records will naturally tie and may share the same benchmark status.',
+        consider: 'Confirm these are genuinely separate comparable units and not duplicate records.'
+      });
+    }
+    const referenced = new Map();
+    (analysis.results || []).forEach((result) => {
+      (result.peers || []).forEach((peer) => referenced.set(peer.name, (referenced.get(peer.name) || 0) + 1));
+    });
+    const topPeer = [...referenced.entries()].sort((a, b) => b[1] - a[1])[0];
+    if (topPeer && topPeer[1] > Math.max(2, analysis.summary.dmuCount * 0.5)) {
+      diagnostics.push({
+        level: 'info',
+        title: 'High peer leverage',
+        detected: `${topPeer[0]} appears in ${topPeer[1]} reference sets.`,
+        why: 'A frequently used peer has strong influence on suggested targets.',
+        consider: 'Check whether this unit is comparable and whether its data contains an outlier or exceptional operating context.'
+      });
+    }
+    return diagnostics;
+  }
+
   function validateDataset(dmus, inputNames, outputNames) {
     if (!Array.isArray(dmus) || dmus.length < 2) throw new Error('DEA requires at least two decision-making units.');
     if (!Array.isArray(inputNames) || inputNames.length < 1) throw new Error('DEA requires at least one input.');
@@ -541,5 +598,5 @@
     };
   }
 
-  return { analyseDea, evaluateScenario, evaluateScenarioBenchmark, assessSampleAdequacy, calculateScaleEfficiency, solveLinearProgram };
+  return { analyseDea, evaluateScenario, evaluateScenarioBenchmark, assessSampleAdequacy, diagnoseAnalysis, calculateScaleEfficiency, solveLinearProgram };
 }));

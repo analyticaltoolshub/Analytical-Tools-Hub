@@ -458,6 +458,7 @@
     const model = state.analysis.selected;
     const support = state.estimate.support;
     const outputs = state.estimate.outputs;
+    const diagnostics = window.ATHMultivariateEstimator.diagnoseEstimator(state.analysis, state.estimate);
     $('#summaryCards').innerHTML = [
       ['Scenario classification', `<span class="status-pill ${supportLabel(support)}">${support.classification}</span>`],
       ['Selected model', window.ATHMultivariateEstimator.modelDisplayName(model.modelType)],
@@ -488,6 +489,9 @@
       const spread = Number.isFinite(output.crossValidatedRmse) ? 1.96 * output.crossValidatedRmse : 1.96 * output.rmse;
       return `<tr><td><strong>${escapeHtml(output.name)}</strong></td><td>${formatNumber(output.estimate)}</td><td>${formatNumber(output.estimate - spread)} to ${formatNumber(output.estimate + spread)}</td><td>${formatNumber(output.rmse)}</td><td>${formatNumber(output.crossValidatedRmse)}</td></tr>`;
     }).join('')}</tbody>`;
+    window.ATHDiagnostics?.render('#resultDiagnostics', diagnostics, {
+      heading: 'Estimator Diagnostics',
+    });
     renderDiagnostics();
     renderModelInterpretation();
     renderChartSelectors();
@@ -764,10 +768,13 @@
   function exportCsv() {
     if (!state.analysis || !state.estimate) return;
     const model = state.analysis.selected;
+    const diagnostics = window.ATHMultivariateEstimator.diagnoseEstimator(state.analysis, state.estimate);
     const lines = [
       ['Multivariate Input-Output Estimator'],
+      ['Generated at', new Date().toISOString()],
       ['Model', model.modelType],
       ['Scenario Classification', state.estimate.support.classification],
+      ['Diagnostics', (window.ATHDiagnostics?.summarize(diagnostics) || []).join(' | ')],
       [],
       ['Output', 'Estimate', 'RMSE', 'CV RMSE'],
       ...state.estimate.outputs.map((output) => [output.name, output.estimate, output.rmse, output.crossValidatedRmse]),

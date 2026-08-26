@@ -474,6 +474,7 @@ h3 {
 .preview-result-card,
 .tool-interface,
 .discovery-grid article,
+.decision-pathway-grid article,
 .category-card,
 .tool-card,
 .trust-card,
@@ -1131,6 +1132,32 @@ h3 {
 
 .discovery-grid article {
   padding: 24px;
+}
+
+.decision-pathway-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.decision-pathway-grid article {
+  padding: 22px;
+}
+
+.decision-pathway-grid p {
+  margin-top: 10px;
+  color: var(--text-secondary);
+}
+
+.decision-pathway-grid a {
+  color: var(--blue-600);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.decision-pathway-grid a:hover {
+  text-decoration: underline;
 }
 
 .problem-list {
@@ -2234,6 +2261,10 @@ h3 {
   }
 
   .discovery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .decision-pathway-grid {
     grid-template-columns: 1fr;
   }
 

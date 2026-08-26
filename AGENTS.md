@@ -275,6 +275,21 @@ Interpretation must change with the selected mode, model, scenario, and availabl
 inputs. Never mention XYZ risk in ABC-only mode, supplier attributes that were not
 entered, or confidence levels that were not calculated.
 
+### Diagnostics
+
+Quantitative and judgement-based tools should use the shared `diagnostics.js`
+renderer when surfacing reliability, assumption, or data-quality warnings. Generate
+diagnostics from actual calculation conditions, not generic static advice. Use the
+standard levels `Information`, `Caution`, and `High risk`, and explain:
+
+- the detected condition
+- why it matters
+- what the user should consider before acting
+
+When adding or changing diagnostics, update calculation-core tests for the diagnostic
+logic and browser smoke tests for the visible diagnostic panel where the tool renders
+one. Diagnostics must not contradict the result interpretation or exports.
+
 ### Exports and Persistence
 
 - Use CSV/XLSX for tabular results, image export for individual charts, PDF only when

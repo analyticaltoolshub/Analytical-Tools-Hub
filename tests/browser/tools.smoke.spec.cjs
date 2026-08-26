@@ -81,6 +81,7 @@ for (const entry of pages) {
       await expect(page.locator('#lpFormulation')).toContainText('BCC convexity');
       await expect(page.locator('#lpFormulation')).toContainText('Non-zero peer weights');
       await expect(page.locator('#executiveBenchmarkPanel')).toContainText('Executive benchmark summary');
+      await expect(page.locator('#resultDiagnostics')).toContainText('DEA Diagnostics');
       await expect(page.locator('#peerProfilePanel')).toContainText('Peer mix');
       await expect(page.locator('#roleInterpretationPanel')).toHaveCount(0);
       await expect(page.locator('#printReportButton')).toBeVisible();
@@ -187,6 +188,7 @@ for (const entry of pages) {
       await page.locator('#estimateButton').click();
       await expect(page.locator('#results')).toBeVisible();
       await expect(page.locator('#executiveSummary')).toContainText('historical input-output relationships');
+      await expect(page.locator('#resultDiagnostics')).toContainText('Estimator Diagnostics');
       await expect(page.locator('#diagnosticsTable')).toContainText('CV RMSE');
       await expect(page.locator('#estimateTable tbody tr')).toHaveCount(2);
       await expect(page.locator('#equationList')).toContainText('Cross-validation');
@@ -205,6 +207,13 @@ for (const entry of pages) {
       await calculate.click({ force: true });
       if (entry.name === 'Monte Carlo Risk Simulation') {
         await expect(page.locator('#simulationStatus')).not.toContainText('running', { timeout: 20000 });
+        await expect(page.locator('#resultDiagnostics')).toContainText('Simulation Diagnostics');
+      }
+      if (entry.name === 'Exponential Smoothing') {
+        await expect(page.locator('#forecastDiagnostics')).toContainText('Forecast Diagnostics');
+      }
+      if (entry.name === 'Newsvendor Model Optimizer') {
+        await expect(page.locator('#resultDiagnostics')).toContainText('Decision Diagnostics');
       }
     }
 

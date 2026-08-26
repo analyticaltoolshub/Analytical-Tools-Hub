@@ -1,5 +1,6 @@
 let chart;
 let uploadedRawData = [];
+let latestDiagnostics = [];
 
 const alphaInput = document.getElementById("alpha");
 const betaInput = document.getElementById("beta");
@@ -292,6 +293,15 @@ function calculate() {
 
     showResults();
     displayResults(actual, result.forecast, result.nextForecast, mae);
+    latestDiagnostics = ATHExponentialSmoothing.diagnoseForecast(actual, {
+        method,
+        seasonLength,
+        seasonalType: seasonalTypeInput.value,
+        horizon: 1,
+    });
+    window.ATHDiagnostics?.render("#forecastDiagnostics", latestDiagnostics, {
+        heading: "Forecast Diagnostics",
+    });
     drawChart(actual, result.forecast);
 }
 
@@ -418,6 +428,8 @@ function hideResults() {
     finalForecast.textContent = "";
     errorMetric.textContent = "";
     chartSummary.textContent = "";
+    latestDiagnostics = [];
+    window.ATHDiagnostics?.render("#forecastDiagnostics", latestDiagnostics);
 
     if (chart) {
         chart.destroy();
@@ -458,7 +470,20 @@ function exportCSV() {
         return;
     }
 
-    const csv = [];
+    const csv = [
+        ["Analytical Tools Hub", "Exponential Smoothing"],
+        ["Generated at", new Date().toISOString()],
+        ["Method", methodInput.options[methodInput.selectedIndex]?.textContent || methodInput.value],
+        ["Alpha", alphaInput.value],
+        ["Beta", betaInput.value],
+        ["Gamma", gammaInput.value],
+        ["Season length", seasonLengthInput.value],
+        ["Seasonal type", seasonalTypeInput.value],
+        [],
+        ["Diagnostics"],
+        ...(window.ATHDiagnostics?.summarize(latestDiagnostics) || []).map((item) => [item]),
+        [],
+    ];
 
     rows.forEach((row) => {
         const cols = row.querySelectorAll("td, th");

@@ -205,6 +205,66 @@
     return false;
   }
 
+  function diagnoseConfig(config) {
+    const diagnostics = [];
+    const variables = config.variables || [];
+    const iterations = Number(config.iterations);
+    if (!Number.isFinite(iterations) || iterations < 1000) {
+      diagnostics.push({
+        level: "caution",
+        title: "Low simulation count",
+        detected: `${Number.isFinite(iterations) ? iterations : 0} iterations selected.`,
+        why: "Small runs can make tail percentiles and target probabilities unstable.",
+        consider: "Use at least 10,000 iterations for practical planning when browser performance allows.",
+      });
+    }
+    variables.forEach((variable) => {
+      const p = variable.params || {};
+      if (variable.distribution === "triangular") {
+        const min = Number(p.min);
+        const mode = Number(p.mode);
+        const max = Number(p.max);
+        if (!(Number.isFinite(min) && Number.isFinite(mode) && Number.isFinite(max) && min <= mode && mode <= max && min < max)) {
+          diagnostics.push({
+            level: "high-risk",
+            title: "Invalid triangular distribution",
+            detected: `${variable.name || variable.id} does not satisfy minimum <= most likely <= maximum.`,
+            why: "Triangular sampling needs ordered bounds to represent the intended uncertainty.",
+            consider: "Correct the minimum, most likely, and maximum values before running the simulation.",
+          });
+        }
+      }
+      if (variable.distribution === "normal" && Number(p.sd) <= 0) {
+        diagnostics.push({
+          level: "high-risk",
+          title: "Invalid Normal uncertainty",
+          detected: `${variable.name || variable.id} has a non-positive standard deviation.`,
+          why: "Normal sampling requires a positive standard deviation.",
+          consider: "Enter a positive standard deviation or use a fixed value.",
+        });
+      }
+      if (variable.distribution === "uniform" && Number(p.max) <= Number(p.min)) {
+        diagnostics.push({
+          level: "high-risk",
+          title: "Invalid Uniform range",
+          detected: `${variable.name || variable.id} has maximum less than or equal to minimum.`,
+          why: "Uniform sampling requires a positive interval.",
+          consider: "Correct the range before running the simulation.",
+        });
+      }
+    });
+    if (variables.length > 1) {
+      diagnostics.push({
+        level: "info",
+        title: "Independent input assumption",
+        detected: `${variables.length} uncertain inputs are sampled independently.`,
+        why: "The current tool does not model correlations between uncertain variables.",
+        consider: "If inputs move together, compare scenarios or use conservative ranges before acting on the result.",
+      });
+    }
+    return diagnostics;
+  }
+
   async function runSimulation(config, emit = () => {}, isCancelled = () => false) {
     const variables = config.variables || [];
     const rpn = toRpn(tokenize(config.formula || ""), new Set(variables.map((variable) => variable.id)));
@@ -262,5 +322,5 @@
     return result;
   }
 
-  return { createRng, normalSample, sampleVariable, tokenize, toRpn, evaluateRpn, evaluateFormula, percentile, buildHistogram, pearson, targetPass, runSimulation };
+  return { createRng, normalSample, sampleVariable, tokenize, toRpn, evaluateRpn, evaluateFormula, percentile, buildHistogram, pearson, targetPass, diagnoseConfig, runSimulation };
 }));

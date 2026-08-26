@@ -278,6 +278,96 @@
     };
   }
 
+  function diagnoseNewsvendor(demand, economics, result, options = {}) {
+    const diagnostics = [];
+    const values = Array.isArray(demand.values) ? demand.values.map(Number).filter(Number.isFinite) : [];
+    const distribution = demand.distribution;
+    const underageCost = result ? result.underageCost : economics.sellingPrice - economics.unitCost + economics.shortageCost;
+    const overageCost = result ? result.overageCost : economics.unitCost - economics.salvageValue + economics.holdingCost;
+
+    if (distribution === "empirical") {
+      if (values.length < 12) {
+        diagnostics.push({
+          level: values.length < 6 ? "high-risk" : "caution",
+          title: "Limited empirical history",
+          detected: `${values.length} demand observations.`,
+          why: "Small empirical samples make tail quantiles and expected leftovers/lost sales unstable.",
+          consider: "Use this as a directional policy screen and add more comparable selling periods where possible.",
+        });
+      } else if (values.length < 24) {
+        diagnostics.push({
+          level: "caution",
+          title: "Moderate empirical history",
+          detected: `${values.length} demand observations.`,
+          why: "The observed distribution is useful, but may still miss rare high-demand or low-demand periods.",
+          consider: "Compare the empirical result with simple distribution assumptions before finalising the order.",
+        });
+      }
+      if (values.some((value) => value < 0)) {
+        diagnostics.push({
+          level: "high-risk",
+          title: "Negative demand values",
+          detected: "One or more empirical observations are below zero.",
+          why: "Demand cannot be negative in the standard Newsvendor model.",
+          consider: "Correct returns/adjustments separately before using the demand history.",
+        });
+      }
+    }
+    if (economics.salvageValue >= economics.unitCost) {
+      diagnostics.push({
+        level: "high-risk",
+        title: "Invalid overage economics",
+        detected: "Salvage value is greater than or equal to unit cost before holding/disposal cost.",
+        why: "The model needs a positive cost for ordering one unit too many.",
+        consider: "Check whether salvage value, disposal cost, or unit cost has been entered in the same unit and currency.",
+      });
+    }
+    if (underageCost <= 0 || overageCost <= 0) {
+      diagnostics.push({
+        level: "high-risk",
+        title: "Critical-ratio economics invalid",
+        detected: `Underage cost ${underageCost.toFixed(2)}, overage cost ${overageCost.toFixed(2)}.`,
+        why: "The optimal quantile is only meaningful when both marginal costs are positive.",
+        consider: "Review selling price, unit cost, shortage cost, salvage value, and holding/disposal cost.",
+      });
+    }
+    if (options.historyType === "sales-censored") {
+      diagnostics.push({
+        level: "caution",
+        title: "Possible censored demand",
+        detected: "History is recorded sales with known or possible stockouts.",
+        why: "Sales can understate true demand when inventory was not available.",
+        consider: "Estimate lost demand separately or treat the optimized quantity as a lower-bound planning signal.",
+      });
+    }
+    if (distribution !== "empirical" && Number(demand.demandStdDev) === 0) {
+      diagnostics.push({
+        level: "info",
+        title: "Deterministic demand assumption",
+        detected: "Demand standard deviation is zero.",
+        why: "The model collapses to a fixed-demand case rather than an uncertain demand distribution.",
+        consider: "Confirm that zero variability is realistic before relying on the result.",
+      });
+    }
+    if (result?.constraintResult?.binding?.length) {
+      diagnostics.push({
+        level: "caution",
+        title: "Operational constraint changed the optimum",
+        detected: `${result.constraintResult.binding.join(", ")} is binding.`,
+        why: "The reported order quantity is practical under constraints, not the unconstrained economic quantile.",
+        consider: "Review whether the binding constraint is negotiable before accepting lower expected profit or service.",
+      });
+    }
+    diagnostics.push({
+      level: "info",
+      title: "Distribution comparison wording",
+      detected: "Alternative demand models are approximations.",
+      why: "Lower expected profit or RMSE under a model does not prove the true demand distribution.",
+      consider: "Describe any selected model as best supported among evaluated assumptions, not as the best distribution.",
+    });
+    return diagnostics;
+  }
+
   return {
     mean,
     populationStdDev,
@@ -297,5 +387,6 @@
     getFeasibleBounds,
     applyOperationalConstraints,
     calculateNewsvendor,
+    diagnoseNewsvendor,
   };
 }));

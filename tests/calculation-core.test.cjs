@@ -134,6 +134,16 @@ test("Holt-Winters preserves a constant seasonal series", () => {
   });
 });
 
+test("Forecast diagnostics identify weak seasonal history and multiplicative invalidity", () => {
+  const diagnostics = forecasting.diagnoseForecast([10, 0, 12, 13, 11, 10], {
+    method: "triple",
+    seasonLength: 4,
+    seasonalType: "multiplicative",
+  });
+  assert.ok(diagnostics.some((item) => item.title === "Seasonality cannot be estimated"));
+  assert.ok(diagnostics.some((item) => item.title === "Multiplicative seasonality invalid"));
+});
+
 test("AHP builds reciprocal Saaty matrices", () => {
   const matrix = ahp.matrixFromAnswers(3, {
     "c-0-1": 3,
@@ -313,6 +323,20 @@ test("Monte Carlo seeded simulation is deterministic and reports target probabil
   assert.equal(first.valid, 1000);
 });
 
+test("Monte Carlo diagnostics flag low iterations, invalid distributions, and independence assumptions", () => {
+  const diagnostics = monteCarlo.diagnoseConfig({
+    iterations: 500,
+    variables: [
+      { name: "Demand", id: "Demand", distribution: "normal", params: { mean: 10, sd: -1 } },
+      { name: "Cost", id: "Cost", distribution: "triangular", params: { min: 10, mode: 4, max: 8 } },
+    ],
+  });
+  assert.ok(diagnostics.some((item) => item.title === "Low simulation count"));
+  assert.ok(diagnostics.some((item) => item.title === "Invalid Normal uncertainty"));
+  assert.ok(diagnostics.some((item) => item.title === "Invalid triangular distribution"));
+  assert.ok(diagnostics.some((item) => item.title === "Independent input assumption"));
+});
+
 test("Newsvendor reproduces the critical-ratio optimum for symmetric Uniform demand", () => {
   const demand = {
     distribution: "uniform",
@@ -377,6 +401,30 @@ test("Newsvendor applies pack sizes and operational constraints explicitly", () 
   assert.equal(constrained.quantity, 36);
   assert.ok(constrained.binding.includes("maximum order quantity"));
   approximatelyEqual(newsvendor.poissonOutcomes(8).reduce((sum, row) => sum + row.probability, 0), 1);
+});
+
+test("Newsvendor diagnostics flag weak history, censored sales, and binding constraints", () => {
+  const demand = { distribution: "empirical", values: [40, 50, 60, 55, 45], demandMean: 50, demandStdDev: 7 };
+  const economics = {
+    sellingPrice: 20,
+    unitCost: 10,
+    salvageValue: 4,
+    shortageCost: 0,
+    holdingCost: 1,
+    currentOrderQty: 40,
+    packSize: 10,
+    roundingMethod: "profit",
+    minimumOrderQty: null,
+    maximumOrderQty: null,
+    storageCapacity: null,
+    purchaseBudget: 450,
+    minimumServiceLevel: null,
+  };
+  const result = newsvendor.calculateNewsvendor(demand, economics);
+  const diagnostics = newsvendor.diagnoseNewsvendor(demand, economics, result, { historyType: "sales-censored" });
+  assert.ok(diagnostics.some((item) => item.title === "Limited empirical history"));
+  assert.ok(diagnostics.some((item) => item.title === "Possible censored demand"));
+  assert.ok(diagnostics.some((item) => item.title === "Operational constraint changed the optimum"));
 });
 
 test("DEA reproduces a hand-calculated one-input, one-output CCR frontier", () => {
@@ -561,6 +609,23 @@ test("DEA reports sample-size adequacy as guidance rather than a validity gate",
     meetsHeuristic: false,
   });
   assert.equal(dea.assessSampleAdequacy(12, 2, 2).meetsHeuristic, true);
+});
+
+test("DEA diagnostics flag weak discrimination and duplicate performance vectors", () => {
+  const analysis = dea.analyseDea({
+    model: "bcc",
+    orientation: "input",
+    inputNames: ["Labour", "Space"],
+    outputNames: ["Orders"],
+    dmus: [
+      { name: "A", inputs: [10, 20], outputs: [100] },
+      { name: "B", inputs: [10, 20], outputs: [100] },
+      { name: "C", inputs: [12, 21], outputs: [96] },
+    ],
+  });
+  const diagnostics = dea.diagnoseAnalysis(analysis);
+  assert.ok(diagnostics.some((item) => item.title === "Weak sample discrimination"));
+  assert.ok(diagnostics.some((item) => item.title === "Duplicate performance vectors"));
 });
 
 test("DEA evaluates a future scenario against historical references without adding a scenario lambda", () => {
@@ -919,6 +984,8 @@ test("Multivariate estimator flags extrapolated multivariate scenarios", () => {
     { label: "D", inputs: [10, 10], outputs: [40] },
     { label: "E", inputs: [5, 5], outputs: [25] },
     { label: "F", inputs: [4, 7], outputs: [26] },
+    { label: "G", inputs: [2, 8], outputs: [22] },
+    { label: "H", inputs: [8, 3], outputs: [31] },
   ];
   const analysis = multivariateEstimator.analyse({
     modelType: "linear",
@@ -930,6 +997,29 @@ test("Multivariate estimator flags extrapolated multivariate scenarios", () => {
 
   assert.equal(estimate.support.classification, "EXTRAPOLATION");
   assert.match(estimate.support.hull.method, /convex-hull/);
+});
+
+test("Multivariate diagnostics flag model complexity and extrapolated scenarios", () => {
+  const rows = [
+    { label: "A", inputs: [0, 0], outputs: [10] },
+    { label: "B", inputs: [0, 10], outputs: [20] },
+    { label: "C", inputs: [10, 0], outputs: [30] },
+    { label: "D", inputs: [10, 10], outputs: [40] },
+    { label: "E", inputs: [5, 5], outputs: [25] },
+    { label: "F", inputs: [4, 7], outputs: [26] },
+    { label: "G", inputs: [2, 8], outputs: [22] },
+    { label: "H", inputs: [8, 3], outputs: [31] },
+  ];
+  const analysis = multivariateEstimator.analyse({
+    modelType: "polynomial",
+    inputNames: ["Labour", "Distance"],
+    outputNames: ["Deliveries"],
+    rows,
+  });
+  const estimate = multivariateEstimator.estimateScenario(analysis.selected, [20, 20]);
+  const diagnostics = multivariateEstimator.diagnoseEstimator(analysis, estimate);
+  assert.ok(diagnostics.some((item) => item.title === "Limited observations for model complexity"));
+  assert.ok(diagnostics.some((item) => item.title === "Scenario extrapolation"));
 });
 
 test("Multivariate estimator validates constant and incomplete columns", () => {
