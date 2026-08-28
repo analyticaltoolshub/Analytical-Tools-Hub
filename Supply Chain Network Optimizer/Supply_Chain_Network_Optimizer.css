@@ -185,6 +185,16 @@
   font-weight: 650;
 }
 
+.map-privacy-note {
+  margin: .75rem 0 1rem;
+  padding: .75rem .9rem;
+  border: 1px solid rgba(31, 111, 235, .22);
+  border-radius: 8px;
+  background: #eff6ff;
+  color: var(--text-secondary);
+  font-weight: 650;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: minmax(180px, 260px) minmax(260px, 1fr) auto;
@@ -354,6 +364,63 @@ textarea {
   min-height: 420px;
 }
 
+.map-controls-card {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 520;
+  width: min(255px, calc(100% - 5.75rem));
+  padding: .9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 16px 36px rgba(6, 23, 43, .18);
+}
+
+.map-controls-card h3 {
+  margin: 0 0 .7rem;
+  color: var(--navy-950);
+  font-size: .95rem;
+  font-weight: 850;
+}
+
+.map-check {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  gap: .55rem;
+  color: var(--text-primary);
+  font-size: .88rem;
+  font-weight: 750;
+}
+
+.map-check input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--blue-600);
+}
+
+.map-select-label {
+  display: block;
+  margin: .75rem 0 .35rem;
+  color: var(--text-primary);
+  font-size: .82rem;
+  font-weight: 850;
+}
+
+.map-controls-card select {
+  width: 100%;
+  min-height: 40px;
+  padding: .55rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: .9rem;
+}
+
 .network-map-marker {
   background: transparent;
 }
@@ -382,6 +449,40 @@ textarea {
 .leaflet-marker-icon:focus-visible span {
   outline: 3px solid var(--blue-500);
   outline-offset: 3px;
+}
+
+.network-point-label {
+  padding: .18rem .45rem;
+  border: 1px solid rgba(16, 42, 71, .16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .95);
+  box-shadow: 0 6px 16px rgba(6, 23, 43, .14);
+  color: var(--navy-950);
+  font-size: .76rem;
+  font-weight: 850;
+}
+
+.route-map-label {
+  border: 0;
+  background: transparent;
+}
+
+.route-map-label span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  max-width: 128px;
+  padding: .2rem .45rem;
+  border-radius: 999px;
+  background: rgba(31, 111, 235, .92);
+  box-shadow: 0 8px 20px rgba(31, 111, 235, .24);
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 850;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
 }
 
 .map-fallback {
@@ -465,6 +566,16 @@ textarea {
 
   .network-workflow .workflow-step::after {
     display: none;
+  }
+
+  .map-controls-card {
+    position: static;
+    width: auto;
+    margin: .75rem;
+  }
+
+  .network-map {
+    min-height: 360px;
   }
 
   .import-columns div {

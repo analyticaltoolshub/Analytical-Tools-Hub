@@ -141,7 +141,7 @@
             <p><strong>What ATH does next:</strong> The tool tests feasible facility sets, allocates customer demand to open facilities, and selects the lowest-cost network within the capacity constraints.</p>
           </div>
 
-          <p class="privacy-note">All network data, optimization, diagnostics, and exports remain in your browser.</p>
+          <p class="privacy-note">Network data, optimization, diagnostics, and exports remain in your browser. The optional map view loads background map tiles from OpenStreetMap for the visible geographic area.</p>
 
           <div class="form-grid">
             <label>
@@ -226,8 +226,34 @@
 
         <section class="panel map-panel" id="network-map-section" hidden>
           <h2>4. Network Map</h2>
-          <p>Facilities, demand points, and optimized routes are shown as an illustrative map-based network view.</p>
+          <p>Facilities, demand points, and optimized routes are shown as an illustrative map-based network view. Use the map controls to adjust labels, route values, and line thickness.</p>
+          <p class="map-privacy-note">Map background tiles are requested from OpenStreetMap. Facility names, customer names, demand, capacity, cost, flow volumes, and optimization results are not sent by ATH.</p>
           <div id="networkMapShell" class="network-map-shell">
+            <div class="map-controls-card" role="group" aria-labelledby="mapControlsTitle">
+              <h3 id="mapControlsTitle">Map Controls</h3>
+              <label class="map-check" for="showFacilityLabels">
+                <input id="showFacilityLabels" type="checkbox" checked>
+                <span>Show facility labels</span>
+              </label>
+              <label class="map-check" for="showDemandLabels">
+                <input id="showDemandLabels" type="checkbox" checked>
+                <span>Show demand labels</span>
+              </label>
+              <label class="map-check" for="showFlowVolumes">
+                <input id="showFlowVolumes" type="checkbox" checked>
+                <span>Show flow volumes</span>
+              </label>
+              <label class="map-check" for="showRouteCosts">
+                <input id="showRouteCosts" type="checkbox">
+                <span>Show costs on routes</span>
+              </label>
+              <label class="map-select-label" for="lineThicknessMode">Line thickness</label>
+              <select id="lineThicknessMode">
+                <option value="flow">By flow volume</option>
+                <option value="cost">By route cost</option>
+                <option value="uniform">Uniform</option>
+              </select>
+            </div>
             <div id="networkMap" class="network-map" aria-label="Map of optimized supply chain network"></div>
             <div id="mapFallback" class="map-fallback" hidden></div>
           </div>
@@ -263,7 +289,7 @@
           <details><summary>Does the tool choose which facilities to open?</summary><p>Yes. For modest scenarios it tests feasible open-facility combinations and includes fixed facility cost in the objective.</p></details>
           <details><summary>Is this a full strategic network design solver?</summary><p>No. It is a practical browser-based allocation optimizer. Larger multi-echelon or mixed-integer models usually need a dedicated solver.</p></details>
           <details><summary>What if demand exceeds total capacity?</summary><p>The tool stops and shows a high-risk diagnostic because demand cannot be fully satisfied under the entered capacity constraints.</p></details>
-          <details><summary>Is my network data uploaded?</summary><p>No. CSV parsing, optimization, diagnostics, map rendering, and exports run locally in your browser.</p></details>
+          <details><summary>Is my network data uploaded?</summary><p>No. CSV parsing, optimization, diagnostics, route drawing, and exports run locally in your browser. The map background uses OpenStreetMap tiles, so tile requests are made for the visible map area, but ATH does not send your facility, customer, demand, capacity, cost, or optimization data.</p></details>
         </section>
       </div>
 

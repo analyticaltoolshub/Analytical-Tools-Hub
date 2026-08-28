@@ -28,6 +28,13 @@
     result: null,
     map: null,
     mapLayer: null,
+    mapControls: {
+      showFacilityLabels: true,
+      showDemandLabels: true,
+      showFlowVolumes: true,
+      showRouteCosts: false,
+      lineThicknessMode: "flow",
+    },
   };
 
   const selectors = {
@@ -46,6 +53,11 @@
     mapElement: document.getElementById("networkMap"),
     fallback: document.getElementById("mapFallback"),
     mapDetails: document.getElementById("mapDetails"),
+    showFacilityLabels: document.getElementById("showFacilityLabels"),
+    showDemandLabels: document.getElementById("showDemandLabels"),
+    showFlowVolumes: document.getElementById("showFlowVolumes"),
+    showRouteCosts: document.getElementById("showRouteCosts"),
+    lineThicknessMode: document.getElementById("lineThicknessMode"),
   };
 
   function setWorkflow(step) {
@@ -256,6 +268,45 @@
     });
   }
 
+  function routeWeight(allocation, result) {
+    if (state.mapControls.lineThicknessMode === "uniform") return 4;
+    const basis = state.mapControls.lineThicknessMode === "cost" ? allocation.transportCost : allocation.flow;
+    const values = result.optimized.allocations.map((item) => state.mapControls.lineThicknessMode === "cost" ? item.transportCost : item.flow);
+    const maxValue = Math.max(...values, 1);
+    return Math.max(2.5, Math.min(9, 2.5 + (basis / maxValue) * 6));
+  }
+
+  function bindMapLabel(marker, label, type) {
+    marker.bindTooltip(escapeHtml(label), {
+      permanent: true,
+      direction: type === "facility" ? "top" : "bottom",
+      offset: type === "facility" ? [0, -12] : [0, 12],
+      className: `network-point-label ${type}-point-label`,
+    });
+  }
+
+  function addRouteLabel(allocation, facility, customer) {
+    const parts = [];
+    if (state.mapControls.showFlowVolumes) parts.push(`${formatNumber.format(allocation.flow)} units`);
+    if (state.mapControls.showRouteCosts) parts.push(formatCurrency.format(allocation.transportCost));
+    if (!parts.length) return;
+    const midpoint = [
+      (facility.latitude + customer.latitude) / 2,
+      (facility.longitude + customer.longitude) / 2,
+    ];
+    const label = L.marker(midpoint, {
+      interactive: false,
+      keyboard: false,
+      icon: L.divIcon({
+        className: "route-map-label",
+        html: `<span>${escapeHtml(parts.join(" | "))}</span>`,
+        iconSize: [128, 28],
+        iconAnchor: [64, 14],
+      }),
+    });
+    label.addTo(state.mapLayer);
+  }
+
   function renderLeafletMap(result) {
     if (!window.L) return false;
     selectors.fallback.hidden = true;
@@ -280,6 +331,7 @@
       });
       marker.bindPopup(`<strong>${escapeHtml(facility.name)}</strong><br>Capacity: ${formatNumber.format(facility.capacity)}<br>Utilization: ${formatNumber.format(use / facility.capacity * 100)}%<br>Fixed cost: ${formatCurrency.format(facility.fixedCost)}`);
       marker.on("click", () => detailText(facility.name, `capacity ${formatNumber.format(facility.capacity)}, optimized flow ${formatNumber.format(use)}, utilization ${formatNumber.format(use / facility.capacity * 100)}%, fixed cost ${formatCurrency.format(facility.fixedCost)}.`));
+      if (state.mapControls.showFacilityLabels) bindMapLabel(marker, facility.name, "facility");
       marker.addTo(state.mapLayer);
       bounds.push([facility.latitude, facility.longitude]);
     });
@@ -292,6 +344,7 @@
       });
       marker.bindPopup(`<strong>${escapeHtml(customer.name)}</strong><br>Demand: ${formatNumber.format(customer.demand)}`);
       marker.on("click", () => detailText(customer.name, `demand ${formatNumber.format(customer.demand)} units.`));
+      if (state.mapControls.showDemandLabels) bindMapLabel(marker, customer.name, "customer");
       marker.addTo(state.mapLayer);
       bounds.push([customer.latitude, customer.longitude]);
     });
@@ -300,12 +353,13 @@
       const customer = result.customers[allocation.customerIndex];
       const route = L.polyline([[facility.latitude, facility.longitude], [customer.latitude, customer.longitude]], {
         color: "#1f6feb",
-        weight: Math.max(2, Math.min(8, allocation.flow / 500)),
+        weight: routeWeight(allocation, result),
         opacity: .68,
       });
       route.bindPopup(`<strong>${escapeHtml(facility.name)} to ${escapeHtml(customer.name)}</strong><br>Flow: ${formatNumber.format(allocation.flow)}<br>Distance: ${formatNumber.format(allocation.distanceKm)} km<br>Cost: ${formatCurrency.format(allocation.transportCost)}`);
       route.on("click", () => detailText(`${facility.name} to ${customer.name}`, `flow ${formatNumber.format(allocation.flow)}, distance ${formatNumber.format(allocation.distanceKm)} km, transport cost ${formatCurrency.format(allocation.transportCost)}.`));
       route.addTo(state.mapLayer);
+      addRouteLabel(allocation, facility, customer);
     });
     if (bounds.length) state.map.fitBounds(bounds, { padding: [24, 24] });
     setTimeout(() => state.map.invalidateSize(), 50);
@@ -372,6 +426,15 @@
 
   function renderMap(result) {
     if (!renderLeafletMap(result)) renderFallbackMap(result);
+  }
+
+  function syncMapControls() {
+    state.mapControls.showFacilityLabels = selectors.showFacilityLabels.checked;
+    state.mapControls.showDemandLabels = selectors.showDemandLabels.checked;
+    state.mapControls.showFlowVolumes = selectors.showFlowVolumes.checked;
+    state.mapControls.showRouteCosts = selectors.showRouteCosts.checked;
+    state.mapControls.lineThicknessMode = selectors.lineThicknessMode.value;
+    if (state.result && !selectors.mapSection.hidden) renderMap(state.result);
   }
 
   function renderResults(result) {
@@ -527,6 +590,13 @@
   document.getElementById("importCsvButton").addEventListener("click", importCsv);
   document.getElementById("optimizeButton").addEventListener("click", runOptimization);
   document.getElementById("exportCsvButton").addEventListener("click", exportCsv);
+  [
+    selectors.showFacilityLabels,
+    selectors.showDemandLabels,
+    selectors.showFlowVolumes,
+    selectors.showRouteCosts,
+    selectors.lineThicknessMode,
+  ].forEach((control) => control.addEventListener("change", syncMapControls));
 
   renderEditableTables();
 }());
