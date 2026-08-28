@@ -597,6 +597,31 @@ const problems = [
     title: 'How reliable is an output estimate when the planned inputs are outside historical experience?',
     detail: 'Recommended tool: Multivariate Input-Output Estimator',
     href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+  },
+  {
+    title: 'Which warehouse should serve each customer region?',
+    detail: 'Recommended tool: Supply Chain Network Optimizer',
+    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+  },
+  {
+    title: 'How should I allocate demand to facilities with capacity limits?',
+    detail: 'Recommended tool: Supply Chain Network Optimizer',
+    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+  },
+  {
+    title: 'Which facilities should remain open to minimize network cost?',
+    detail: 'Recommended tool: Supply Chain Network Optimizer',
+    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+  },
+  {
+    title: 'What is the cost saving from an optimized supply chain network?',
+    detail: 'Recommended tool: Supply Chain Network Optimizer',
+    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+  },
+  {
+    title: 'How can I compare current and optimized facility-to-customer allocation?',
+    detail: 'Recommended tool: Supply Chain Network Optimizer',
+    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
   }
 ];
 
@@ -644,6 +669,10 @@ const problemGroups = [
   {
     title: 'Operational Efficiency',
     hrefs: ['Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html']
+  },
+  {
+    title: 'Network Optimization',
+    hrefs: ['Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html']
   }
 ];
 
@@ -660,7 +689,8 @@ const featuredProblemTitles = [
   'What is the probability of achieving a target profit when demand and costs are uncertain?',
   'Which factors are foundational drivers and which are dependent outcomes?',
   'Which comparable branches, warehouses, or operating units are relatively efficient within the observed peer group?',
-  'What outputs should I expect from a new input scenario?'
+  'What outputs should I expect from a new input scenario?',
+  'How should I allocate demand to facilities with capacity limits?'
 ];
 
 const featuredProblems = featuredProblemTitles
@@ -668,14 +698,14 @@ const featuredProblems = featuredProblemTitles
   .filter(Boolean);
 
 const categories = [
-  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, and supplier decisions.', count: '5 tools available', icon: 'boxes' },
+  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, network allocation, and supplier decisions.', count: '6 tools available', icon: 'boxes' },
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
-  { title: 'Operations', benefit: 'Benchmark relative efficiency, estimate output relationships, and review operating performance.', count: '2 tools available', icon: 'settings' },
+  { title: 'Operations', benefit: 'Benchmark relative efficiency, estimate output relationships, optimize network allocation, and review operating performance.', count: '3 tools available', icon: 'settings' },
   { title: 'Statistics', benefit: 'Analyze distributions, uncertainty, regression relationships, samples, and probability-driven outcomes.', count: '2 tools available', icon: 'compare' },
   { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: '1 tool available', icon: 'calculator' },
   { title: 'Decision Science', benefit: 'Structure complex decisions, expert judgements, relationships, priorities, and trade-offs.', count: '3 tools available', icon: 'decision' },
   { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '6 tools available', icon: 'chart' }
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '7 tools available', icon: 'chart' }
 ];
 
 const tools = [
@@ -806,6 +836,16 @@ const tools = [
     cta: 'Open Multivariate Estimator',
     href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html',
     categories: ['Statistics', 'Operations', 'Business Analysis']
+  },
+  {
+    name: 'Supply Chain Network Optimizer',
+    description: 'Optimize facility-to-customer allocation while balancing capacity, distance-based transport cost, and fixed facility cost.',
+    category: 'Operations',
+    input: 'Facilities, customers, coordinates, capacity, demand, fixed cost, and transport cost',
+    output: 'Optimized allocation, KPIs, route map, diagnostics, and current-vs-optimized comparison',
+    cta: 'Open Supply Chain Network Optimizer',
+    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html',
+    categories: ['Inventory and Supply Chain', 'Operations', 'Business Analysis']
   }
 ];
 

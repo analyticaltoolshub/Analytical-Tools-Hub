@@ -347,6 +347,7 @@ Available tools should be represented consistently:
 - Newsvendor Model Optimizer
 - Data Envelopment Analysis
 - Multivariate Input-Output Estimator
+- Supply Chain Network Optimizer
 
 ## Current Tool-Specific Rules
 
@@ -547,6 +548,23 @@ Available tools should be represented consistently:
   in the same change.
 - Future estimator models must not change existing Linear, Ridge, Polynomial, or Auto
   Select results unless the method change is deliberate and independently tested.
+
+### Supply Chain Network Optimizer
+
+- Present the tool as a single-echelon facility-to-customer allocation optimizer, not
+  as a full strategic network design suite.
+- Keep optimization logic in `calculation-core/supply-chain-network.js` and keep map
+  rendering in the tool UI script so future facility-location, multi-echelon, carbon,
+  and resilience models can reuse the calculation layer.
+- Require valid coordinates, non-negative fixed costs, non-negative transport cost,
+  positive total demand, and enough capacity to satisfy demand before presenting a
+  feasible optimized result.
+- Treat current-versus-optimized savings as scenario comparison only. Do not imply the
+  optimized allocation is operationally implementable without checking service time,
+  resilience, contracts, labour, inventory, and route constraints not included in the
+  model.
+- Keep map popups, CSV imports, and exports safe for user-entered names by escaping
+  HTML and quoting CSV fields.
 
 ## SEO Requirements
 

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supply Chain Network Optimizer | Analytical Tools Hub</title>
+  <meta name="description" content="Optimize facility-to-customer allocation, compare current and optimized supply-chain networks, and review capacity, cost, distance, and flow diagnostics.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html">
+  <meta property="og:title" content="Supply Chain Network Optimizer | Analytical Tools Hub">
+  <meta property="og:description" content="Optimize facility-to-customer allocation with browser-based network cost, capacity, and flow analysis.">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Supply Chain Network Optimizer | Analytical Tools Hub">
+  <meta name="twitter:description" content="Optimize facility-to-customer allocation with transparent browser-based network analysis.">
+  <link rel="icon" href="../assets/ath-favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;850&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <link rel="stylesheet" href="Supply_Chain_Network_Optimizer.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Supply Chain Network Optimizer",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Any modern browser",
+    "url": "https://analyticaltoolshub.com/Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html",
+    "description": "Optimize facility-to-customer allocation while considering demand, capacity, fixed facility cost, transport distance, and current network comparison.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Analytical Tools Hub", "item": "https://analyticaltoolshub.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Supply Chain Network Optimizer", "item": "https://analyticaltoolshub.com/Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html" }
+    ]
+  }
+  </script>
+</head>
+<body class="network-page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="tool-topnav">
+    <div class="tool-topnav-inner">
+      <a class="tool-brand" href="../index.html#featured-tools" aria-label="Analytical Tools Hub home">
+        <img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo">
+        <span class="tool-brand-text">
+          <strong class="tool-title">Supply Chain Network Optimizer</strong>
+          <span>Network design workspace</span>
+        </span>
+      </a>
+      <div class="tool-nav-actions">
+        <a class="tool-home-link" href="../index.html">ATH Home</a>
+        <a class="tool-home-link" href="../index.html#featured-tools">Explore Tools</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="main-content">
+    <section class="tool-hero">
+      <span class="tool-badge">Supply Chain and Operations</span>
+      <h1>Supply Chain Network Optimizer</h1>
+      <p>Allocate customer demand to facilities while balancing capacity, distance-based transport cost, and fixed facility cost.</p>
+      <div class="tool-reassurance" aria-label="Tool highlights">
+        <span>Browser-based optimization</span>
+        <span>Capacity-constrained allocation</span>
+        <span>Current vs optimized network</span>
+      </div>
+    </section>
+
+    <section class="panel content-section" aria-labelledby="decision-guide-heading">
+      <h2 id="decision-guide-heading">Why use this tool?</h2>
+      <div class="guidance-grid">
+        <div class="guidance-card">
+          <span>Decision Supported</span>
+          <p>Use this tool when you need to decide which warehouses or facilities should serve each customer region under capacity and cost constraints.</p>
+        </div>
+        <div class="guidance-card">
+          <span>What It Tells You</span>
+          <p>It estimates the lowest-cost feasible allocation, open facilities, flow volumes, utilization, average distance, and savings versus a current assignment.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Example Input</span>
+          <p>Facility coordinates, capacities, fixed costs, customer coordinates, demand, optional current facility, and transport cost per unit/km.</p>
+        </div>
+        <div class="guidance-card">
+          <span>Sample Output Interpretation</span>
+          <p>The optimizer shows where demand can be served at lower cost while still respecting available facility capacity.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="workflow-strip network-workflow" aria-label="Supply Chain Network Optimizer workflow">
+      <article class="workflow-step is-active" data-workflow-step="1" aria-current="step">
+        <span>1</span>
+        <div><h3>Prepare Network</h3><p>Enter facilities, customers, demand, capacity, and costs.</p></div>
+      </article>
+      <article class="workflow-step" data-workflow-step="2">
+        <span>2</span>
+        <div><h3>Optimize Allocation</h3><p>Minimize transport and open-facility cost.</p></div>
+      </article>
+      <article class="workflow-step" data-workflow-step="3">
+        <span>3</span>
+        <div><h3>Map Flows</h3><p>Review routes, distances, utilization, and flow volumes.</p></div>
+      </article>
+      <article class="workflow-step" data-workflow-step="4">
+        <span>4</span>
+        <div><h3>Interpret</h3><p>Compare current and optimized network decisions.</p></div>
+      </article>
+    </section>
+
+    <div class="tool-layout">
+      <div class="tool-main">
+        <section class="panel" id="data-input">
+          <div class="section-actions">
+            <div>
+              <h2>1. Network Data</h2>
+              <p>Prepare facility and customer records before optimizing the allocation.</p>
+            </div>
+            <div class="button-row">
+              <button id="loadSampleButton" type="button">Load Sample Data</button>
+              <button id="resetButton" class="reset" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="import-guidance">
+            <h3>Prepare your network CSV</h3>
+            <p>Upload a CSV file with one row for each facility and each customer or demand point.</p>
+            <div class="import-columns">
+              <div><strong>Facility rows</strong><span>Use Type = Facility, then provide Name, Latitude, Longitude, Capacity, and Fixed Cost.</span></div>
+              <div><strong>Customer rows</strong><span>Use Type = Customer, then provide Name, Latitude, Longitude, Demand, and optional Current Facility.</span></div>
+              <div><strong>Transport cost</strong><span>Enter the cost per unit per kilometre once below. Use consistent units and currency.</span></div>
+            </div>
+            <p class="example-row"><strong>Example rows:</strong> Facility | Midlands DC | 52.4862 | -1.8904 | 5200 | 32000 &nbsp; and &nbsp; Customer | London Region | 51.5072 | -0.1276 | 2600 | Southern DC</p>
+            <p><strong>What ATH does next:</strong> The tool tests feasible facility sets, allocates customer demand to open facilities, and selects the lowest-cost network within the capacity constraints.</p>
+          </div>
+
+          <p class="privacy-note">All network data, optimization, diagnostics, and exports remain in your browser.</p>
+
+          <div class="form-grid">
+            <label>
+              Transportation cost per unit/km
+              <input id="transportCost" type="number" min="0" step="0.001" value="0.035">
+            </label>
+            <label>
+              Import network CSV
+              <input id="csvFile" type="file" accept=".csv,text/csv">
+            </label>
+            <div class="form-action">
+              <button id="importCsvButton" type="button">Import CSV</button>
+            </div>
+          </div>
+          <p id="importStatus" class="status-text" role="status" aria-live="polite"></p>
+
+          <div class="editable-section">
+            <div class="section-actions compact">
+              <div>
+                <h3>Facilities / warehouses</h3>
+                <p>Capacity and fixed cost are used when the optimizer decides whether a facility should be open.</p>
+              </div>
+              <button id="addFacilityButton" type="button">Add Facility</button>
+            </div>
+            <div class="table-scroll">
+              <table class="data-table" id="facilityTable">
+                <thead><tr><th>Name</th><th>Latitude</th><th>Longitude</th><th>Capacity</th><th>Fixed cost</th><th>Remove</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="editable-section">
+            <div class="section-actions compact">
+              <div>
+                <h3>Customers / demand points</h3>
+                <p>Current facility is optional. Add it when you want a current-versus-optimized comparison.</p>
+              </div>
+              <button id="addCustomerButton" type="button">Add Customer</button>
+            </div>
+            <div class="table-scroll">
+              <table class="data-table" id="customerTable">
+                <thead><tr><th>Name</th><th>Latitude</th><th>Longitude</th><th>Demand</th><th>Current facility</th><th>Remove</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="optimization">
+          <div class="section-actions">
+            <div>
+              <h2>2. Run Network Optimization</h2>
+              <p>The optimizer minimizes transport cost plus fixed facility cost while satisfying demand and capacity where feasible.</p>
+            </div>
+            <button id="optimizeButton" type="button">Optimize Network</button>
+          </div>
+          <div id="networkDiagnostics" hidden></div>
+          <p id="errorMessage" class="error-message" role="alert" hidden></p>
+        </section>
+
+        <section class="panel results-panel" id="results" hidden>
+          <div class="section-actions">
+            <div>
+              <h2>3. Results and Interpretation</h2>
+              <p>Review optimized cost, utilization, flow allocation, and scenario comparison.</p>
+            </div>
+            <button id="exportCsvButton" type="button">Export Results CSV</button>
+          </div>
+          <div class="kpi-grid" id="kpiGrid"></div>
+          <div class="comparison-grid" id="comparisonGrid"></div>
+          <div class="interpretation-panel" id="interpretationPanel"></div>
+          <div class="table-scroll">
+            <table class="data-table" id="allocationTable">
+              <thead>
+                <tr><th>Facility</th><th>Customer</th><th>Flow</th><th>Distance km</th><th>Transport cost</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel map-panel" id="network-map-section" hidden>
+          <h2>4. Network Map</h2>
+          <p>Facilities, demand points, and optimized routes are shown as an illustrative map-based network view.</p>
+          <div id="networkMapShell" class="network-map-shell">
+            <div id="networkMap" class="network-map" aria-label="Map of optimized supply chain network"></div>
+            <div id="mapFallback" class="map-fallback" hidden></div>
+          </div>
+          <div class="map-detail" id="mapDetails" aria-live="polite">Select a facility, customer, or route to review its details.</div>
+        </section>
+
+        <section class="panel content-section" id="about-network">
+          <h2>About Supply Chain Network Optimization</h2>
+          <p>Supply chain network optimization helps decide how customer demand should be assigned to facilities when distance, transport cost, fixed operating cost, and facility capacity all matter.</p>
+          <p>This ATH tool focuses on a single-echelon allocation problem: facilities serve customer or demand points directly. It is useful for practical network reviews, but it should be paired with operational judgement when lead time, service policy, resilience, carrier constraints, or carbon targets are important.</p>
+        </section>
+
+        <section class="panel content-section" id="guidance">
+          <h2>Guidance</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card"><span>Use comparable units</span><p>Keep demand, capacity, and transport-cost units consistent. A pallet-based model should not mix cases, tonnes, and orders without conversion.</p></div>
+            <div class="guidance-card"><span>Check capacity realism</span><p>A mathematically feasible allocation can still be operationally weak if utilization is very high or if service-time constraints are missing.</p></div>
+            <div class="guidance-card"><span>Use current assignment carefully</span><p>Current-versus-optimized savings are meaningful only when current facility assignments and fixed facility costs are realistic.</p></div>
+          </div>
+        </section>
+
+        <section class="panel content-section" id="methodology">
+          <h2>Methodology, Assumptions, and Limitations</h2>
+          <div class="guidance-grid">
+            <div class="guidance-card methodology-formula-card"><span>Formula Logic</span><p>For each open-facility set, minimize total cost = sum(flow &times; distance &times; transport cost per unit/km) + sum(open facility fixed costs), subject to customer demand and facility capacity constraints.</p></div>
+            <div class="guidance-card"><span>Optimization Approach</span><p>The browser enumerates feasible open facility sets for modest scenarios and solves each allocation using min-cost flow. This gives an exact result within the current browser limits.</p></div>
+            <div class="guidance-card"><span>Limitations</span><p>The model is single-echelon and does not yet include facility-location generation, service-level constraints, lead times, carbon, route vehicles, resilience, or multi-period demand.</p></div>
+          </div>
+        </section>
+
+        <section class="panel content-section faq-section" id="faq">
+          <h2>FAQ</h2>
+          <details><summary>Does the tool choose which facilities to open?</summary><p>Yes. For modest scenarios it tests feasible open-facility combinations and includes fixed facility cost in the objective.</p></details>
+          <details><summary>Is this a full strategic network design solver?</summary><p>No. It is a practical browser-based allocation optimizer. Larger multi-echelon or mixed-integer models usually need a dedicated solver.</p></details>
+          <details><summary>What if demand exceeds total capacity?</summary><p>The tool stops and shows a high-risk diagnostic because demand cannot be fully satisfied under the entered capacity constraints.</p></details>
+          <details><summary>Is my network data uploaded?</summary><p>No. CSV parsing, optimization, diagnostics, map rendering, and exports run locally in your browser.</p></details>
+        </section>
+      </div>
+
+      <aside class="network-side-nav panel" aria-label="Tool navigation">
+        <h2>Navigation</h2>
+        <nav>
+          <a href="#data-input">Network Data</a>
+          <a href="#optimization">Optimization</a>
+          <a href="#results">Results</a>
+          <a href="#network-map-section">Map</a>
+          <a href="#about-network">About</a>
+          <a href="#guidance">Guidance</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <script src="../calculation-core/supply-chain-network.js"></script>
+  <script src="../diagnostics.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="Supply_Chain_Network_Optimizer.js"></script>
+</body>
+</html>

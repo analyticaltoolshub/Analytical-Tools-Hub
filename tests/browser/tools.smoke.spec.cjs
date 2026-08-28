@@ -15,6 +15,7 @@ const pages = [
   { name: 'Newsvendor Model Optimizer', url: '/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
   { name: 'Data Envelopment Analysis', url: '/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html', template: { selector: '#templateSelect', value: 'distribution-centres' }, sample: '#loadSampleButton' },
   { name: 'Multivariate Input-Output Estimator', url: '/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html', sample: '#loadSampleButton' },
+  { name: 'Supply Chain Network Optimizer', url: '/Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html', sample: '#loadSampleButton', calculate: '#optimizeButton' },
   { name: 'Safety Stock and Reorder Point', url: '/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
 ];
 
@@ -214,6 +215,13 @@ for (const entry of pages) {
       }
       if (entry.name === 'Newsvendor Model Optimizer') {
         await expect(page.locator('#resultDiagnostics')).toContainText('Decision Diagnostics');
+      }
+      if (entry.name === 'Supply Chain Network Optimizer') {
+        await expect(page.locator('#results')).toBeVisible();
+        await expect(page.locator('#networkDiagnostics')).toContainText('Network Diagnostics');
+        await expect(page.locator('#kpiGrid')).toContainText('Total optimized cost');
+        await expect(page.locator('#allocationTable tbody tr').first()).toBeVisible();
+        await expect(page.locator('#networkMapShell')).toBeVisible();
       }
     }
 

@@ -14,6 +14,7 @@ const monteCarlo = require("../calculation-core/monte-carlo.js");
 const newsvendor = require("../calculation-core/newsvendor.js");
 const dea = require("../calculation-core/dea.js");
 const multivariateEstimator = require("../calculation-core/multivariate-estimator.js");
+const supplyChainNetwork = require("../calculation-core/supply-chain-network.js");
 
 function approximatelyEqual(actual, expected, tolerance = 1e-9) {
   assert.ok(
@@ -21,6 +22,66 @@ function approximatelyEqual(actual, expected, tolerance = 1e-9) {
     `Expected ${actual} to be within ${tolerance} of ${expected}`
   );
 }
+
+test("Supply Chain Network Optimizer assigns demand to the lowest-cost feasible facility", () => {
+  const result = supplyChainNetwork.optimizeNetwork({
+    transportCostPerUnitKm: 1,
+    facilities: [
+      { name: "Near Facility", latitude: 0, longitude: 0, capacity: 10, fixedCost: 0 },
+      { name: "Far Facility", latitude: 0, longitude: 1, capacity: 10, fixedCost: 0 },
+    ],
+    customers: [
+      { name: "Customer", latitude: 0, longitude: 0, demand: 5, currentFacility: "Far Facility" },
+    ],
+  });
+
+  assert.equal(result.feasible, true);
+  assert.equal(result.optimized.allocations.length, 1);
+  assert.equal(result.optimized.allocations[0].facility, "Near Facility");
+  approximatelyEqual(result.optimized.totalCost, 0, 1e-6);
+  assert.ok(result.summary.savings > 500, "Current far allocation should be materially more expensive");
+});
+
+test("Supply Chain Network Optimizer includes fixed facility cost in open-network choice", () => {
+  const result = supplyChainNetwork.optimizeNetwork({
+    transportCostPerUnitKm: 1,
+    facilities: [
+      { name: "Expensive Near", latitude: 0, longitude: 0, capacity: 10, fixedCost: 1000 },
+      { name: "Cheap Far", latitude: 0, longitude: 0.01, capacity: 10, fixedCost: 0 },
+    ],
+    customers: [
+      { name: "Demand", latitude: 0, longitude: 0, demand: 1 },
+    ],
+  });
+
+  assert.equal(result.optimized.openFacilities.length, 1);
+  assert.equal(result.optimized.openFacilities[0], "Cheap Far");
+  assert.ok(result.optimized.totalCost < 2);
+});
+
+test("Supply Chain Network Optimizer returns a high-risk diagnostic when capacity is insufficient", () => {
+  const result = supplyChainNetwork.optimizeNetwork({
+    transportCostPerUnitKm: 0.5,
+    facilities: [{ name: "Small DC", latitude: 51, longitude: -1, capacity: 10, fixedCost: 100 }],
+    customers: [{ name: "Demand Region", latitude: 51.1, longitude: -1.1, demand: 25 }],
+  });
+
+  assert.equal(result.feasible, false);
+  assert.match(result.error, /Insufficient capacity/);
+  assert.ok(result.diagnostics.some((item) => item.level === "high-risk" && item.title === "Insufficient total capacity"));
+});
+
+test("Supply Chain Network Optimizer parses mixed facility and customer CSV rows", () => {
+  const parsed = supplyChainNetwork.parseNetworkCsv([
+    "Type,Name,Latitude,Longitude,Capacity,Fixed Cost,Demand,Current Facility",
+    "Facility,Midlands DC,52.4862,-1.8904,5200,32000,,",
+    "Customer,Birmingham Region,52.4862,-1.8904,,,2100,Midlands DC",
+  ].join("\n"));
+
+  assert.equal(parsed.facilities.length, 1);
+  assert.equal(parsed.customers.length, 1);
+  assert.equal(parsed.customers[0].currentFacility, "Midlands DC");
+});
 
 test("Break-Even reproduces a hand-calculated reference case", () => {
   const result = breakEven.calculateBreakEven({

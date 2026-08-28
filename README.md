@@ -19,6 +19,7 @@ Website: https://analyticaltoolshub.com/
 - Interpretive Structural Modeling
 - Data Envelopment Analysis
 - Multivariate Input-Output Estimator
+- Supply Chain Network Optimizer
 
 ## Run Locally
 
