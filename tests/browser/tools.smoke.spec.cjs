@@ -202,6 +202,38 @@ for (const entry of pages) {
       await expect(page.locator('#equationList')).toContainText('nearest historical observations');
       await expect(page.locator('#driverStrengthSummary')).toContainText('similarity weight');
     }
+    if (entry.name === 'Analytic Hierarchy Process') {
+      const expectedCriterionTypes = {
+        'supplier-selection': ['objective:lower', 'objective:higher', 'objective:higher', 'subjective:higher'],
+        'third-party-logistics': ['subjective:higher', 'objective:higher', 'subjective:higher', 'objective:lower', 'subjective:higher'],
+        'warehouse-location': ['subjective:higher', 'objective:lower', 'objective:lower', 'subjective:higher', 'subjective:higher'],
+        'transport-mode': ['objective:lower', 'objective:lower', 'objective:higher', 'objective:lower', 'objective:lower'],
+        'inventory-policy': ['objective:higher', 'objective:lower', 'objective:lower', 'subjective:higher'],
+      };
+
+      for (const [template, expected] of Object.entries(expectedCriterionTypes)) {
+        await page.locator('#sampleTemplateSelect').selectOption(template);
+        await page.locator('#loadSampleDesignButton').click();
+        const actual = await page.locator('[data-structure-item="criteria"]').evaluateAll((items) =>
+          items.map((item) => {
+            const type = item.querySelector('[data-criterion-type]').value;
+            const direction = item.querySelector('[data-criterion-direction]').value;
+            return `${type}:${direction}`;
+          })
+        );
+        expect(actual).toEqual(expected);
+      }
+
+      await page.locator('#sampleTemplateSelect').selectOption('third-party-logistics');
+      await page.locator('#loadSampleDesignButton').click();
+      await page.locator('[data-structure-item="criteria"]').nth(3).locator('[data-criterion-type]').selectOption('objective');
+      await page.locator('[data-structure-item="criteria"]').nth(3).locator('[data-criterion-direction]').selectOption('lower');
+      await page.locator('[data-remove-structure="criteria"][data-index="4"]').click();
+      await expect(page.locator('[data-structure-item="criteria"]')).toHaveCount(4);
+      await expect(page.locator('[data-structure-item="criteria"]').nth(3).locator('[data-type="criteria"]')).toHaveValue('Total Logistics Cost');
+      await expect(page.locator('[data-structure-item="criteria"]').nth(3).locator('[data-criterion-type]')).toHaveValue('objective');
+      await expect(page.locator('[data-structure-item="criteria"]').nth(3).locator('[data-criterion-direction]')).toHaveValue('lower');
+    }
     if (entry.calculate) {
       const calculate = page.locator(entry.calculate);
       await expect(calculate).toBeEnabled();
@@ -222,6 +254,13 @@ for (const entry of pages) {
         await expect(page.locator('#kpiGrid')).toContainText('Total optimized cost');
         await expect(page.locator('#allocationTable tbody tr').first()).toBeVisible();
         await expect(page.locator('#networkMapShell')).toBeVisible();
+      }
+      if (entry.name === 'Analytic Hierarchy Process') {
+        await expect(page.locator('#results')).toBeVisible();
+        await expect(page.locator('.objective-calculation-table').first()).toContainText('Normalisation value');
+        await expect(page.locator('.objective-calculation-table').first()).not.toContainText('Local priority');
+        await expect(page.locator('#decisionMatrix')).toContainText('Priority 0.');
+        await expect(page.locator('#decisionMatrix')).not.toContainText('Priority 0.0%');
       }
     }
 

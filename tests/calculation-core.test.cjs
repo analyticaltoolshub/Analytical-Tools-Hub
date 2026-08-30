@@ -315,6 +315,54 @@ test("AHP calculates weighted alternative scores that sum to one", () => {
   approximatelyEqual(result.alternativeScores[0].score, 0.625);
 });
 
+test("AHP combines subjective pairwise criteria with objective measured criteria", () => {
+  const questionnaire = {
+    criteria: [
+      { name: "Cost", type: "objective", direction: "lower" },
+      { name: "Quality", type: "subjective" },
+    ],
+    alternatives: ["Supplier A", "Supplier B"],
+  };
+  const response = {
+    questionnaire,
+    answers: {
+      criteria: { "c-0-1": 1 },
+      alternatives: {
+        "a-1-0-1": -3,
+      },
+    },
+  };
+  const result = ahp.calculateAhp([response], {
+    objectiveValues: {
+      0: [100, 200],
+    },
+  });
+
+  approximatelyEqual(result.criteriaResult.weights[0], 0.5);
+  approximatelyEqual(result.alternativeResults[0].weights[0], 2 / 3);
+  approximatelyEqual(result.alternativeResults[0].weights[1], 1 / 3);
+  approximatelyEqual(result.alternativeScores[0].score, (0.5 * (1 / 3)) + (0.5 * 0.75));
+  assert.equal(result.alternativeScores[0].alternative, "Supplier B");
+});
+
+test("AHP rejects non-positive values for lower-is-better objective criteria", () => {
+  const questionnaire = {
+    criteria: [{ name: "Cost", type: "objective", direction: "lower" }, "Quality"],
+    alternatives: ["A", "B"],
+  };
+  const response = {
+    questionnaire,
+    answers: {
+      criteria: { "c-0-1": 1 },
+      alternatives: { "a-1-0-1": 1 },
+    },
+  };
+
+  assert.throws(() => ahp.calculateAhp([response], {
+    objectiveValues: { 0: [10, 0] },
+  }), /greater than zero/);
+});
+
 test("AHP rejects incompatible expert questionnaire structures", () => {
   const base = {
     questionnaire: { criteria: ["Cost"], alternatives: ["A", "B"] },

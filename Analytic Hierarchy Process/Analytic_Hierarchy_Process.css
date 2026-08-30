@@ -382,6 +382,34 @@ button:disabled {
   line-height: 1.45;
 }
 
+.criterion-config {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .75rem;
+  padding: .75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background: #fff;
+}
+
+.criterion-config select {
+  width: 100%;
+}
+
+.criterion-config select:disabled {
+  color: #98a2b3;
+  background: var(--surface-alt);
+}
+
+.criterion-config [hidden] {
+  display: none;
+}
+
+.criterion-config-objective {
+  border-color: rgba(31, 111, 235, .35);
+  background: #eff6ff;
+}
+
 .structure-item .remove-structure-button {
   width: 42px;
   min-width: 42px;
@@ -608,6 +636,10 @@ button:disabled {
   line-height: 1.6;
 }
 
+.interpretation span {
+  display: block;
+}
+
 .results-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -696,6 +728,7 @@ button:disabled {
 }
 
 .matrix-header-weight,
+.matrix-header-method,
 .matrix-priority,
 .matrix-contribution {
   display: block;
@@ -706,6 +739,13 @@ button:disabled {
   color: var(--blue-600);
   font-size: .76rem;
   line-height: 1.35;
+}
+
+.matrix-header-method {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: .72rem;
+  line-height: 1.3;
 }
 
 .matrix-priority {
@@ -729,6 +769,76 @@ button:disabled {
   margin: 12px 0 0;
   color: var(--text-secondary);
   font-size: .9rem;
+}
+
+.objective-data-section {
+  display: grid;
+  gap: .75rem;
+  margin-top: 1.15rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-md);
+  background: var(--surface);
+}
+
+.objective-data-section h3 {
+  margin: 0;
+}
+
+.objective-data-section p,
+.objective-data-note {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.objective-data-note {
+  margin-bottom: .75rem;
+  padding: .75rem .85rem;
+  border-left: 3px solid var(--blue-600);
+  background: #fff;
+}
+
+.objective-data-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.objective-data-table caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.objective-data-table th,
+.objective-data-table td {
+  min-width: 180px;
+  padding: 12px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.objective-data-table th:last-child,
+.objective-data-table td:last-child {
+  border-right: 0;
+}
+
+.objective-data-table thead th {
+  background: var(--surface);
+}
+
+.objective-data-table input {
+  width: 100%;
 }
 
 .sensitivity-header {
@@ -1041,6 +1151,15 @@ button:disabled {
   border-left: 3px solid var(--blue-600);
   background: var(--surface);
   color: var(--text-secondary);
+}
+
+.objective-question-note p,
+.objective-note {
+  margin: 0;
+}
+
+.objective-calculation-table {
+  min-width: 720px;
 }
 
 .calculation-detail {
@@ -1383,6 +1502,7 @@ button:disabled {
 
   .input-grid,
   .name-grid,
+  .criterion-config,
   .guidance-grid,
   .question-card {
     grid-template-columns: 1fr;

@@ -23,6 +23,8 @@ const elements = {
   responseFiles: document.getElementById("responseFiles"),
   loadResponsesButton: document.getElementById("loadResponsesButton"),
   loadSampleResponseButton: document.getElementById("loadSampleResponseButton"),
+  objectiveDataSection: document.getElementById("objectiveDataSection"),
+  objectiveDataMatrix: document.getElementById("objectiveDataMatrix"),
   analysisError: document.getElementById("analysisError"),
   responseList: document.getElementById("responseList"),
   calculateAnalysisButton: document.getElementById("calculateAnalysisButton"),
@@ -68,6 +70,7 @@ let loadedResponses = [];
 let latestAnalysis = null;
 let sensitivityPlanningActive = false;
 let sensitivityRangeCache = new Map();
+let objectiveValueDraft = {};
 
 function updateAhpWorkflow(activeIndex) {
   document.querySelectorAll("[data-ahp-workflow-index]").forEach((item) => {
@@ -87,20 +90,25 @@ const sampleTemplates = {
   "supplier-selection": {
     projectTitle: "Supplier Selection Decision",
     criteria: [
-      { name: "Total Cost", description: "Total landed and lifecycle cost, including price, freight, duties, inventory, quality failure, implementation, and ongoing support costs." },
-      { name: "Quality Performance", description: "The supplier's demonstrated ability to meet specifications consistently, prevent defects, maintain process control, and resolve quality issues effectively." },
-      { name: "Delivery Reliability", description: "The supplier's ability to deliver the confirmed quantity on time, maintain predictable lead times, and communicate potential delays early." },
+      { name: "Total Cost", description: "Total landed and lifecycle cost, including price, freight, duties, inventory, quality failure, implementation, and ongoing support costs.", type: "objective", direction: "lower" },
+      { name: "Quality Performance", description: "The supplier's demonstrated ability to meet specifications consistently, prevent defects, maintain process control, and resolve quality issues effectively.", type: "objective", direction: "higher" },
+      { name: "Delivery Reliability", description: "The supplier's ability to deliver the confirmed quantity on time, maintain predictable lead times, and communicate potential delays early.", type: "objective", direction: "higher" },
       { name: "Supply Risk", description: "Exposure to interruption arising from supplier financial health, capacity constraints, geographic concentration, compliance, continuity, or limited alternatives." }
     ],
     alternatives: ["Supplier A", "Supplier B", "Supplier C"],
+    objectiveValues: {
+      0: [112000, 118500, 108000],
+      1: [96, 91, 88],
+      2: [88, 94, 82],
+    },
   },
   "third-party-logistics": {
     projectTitle: "3PL Partner Selection",
     criteria: [
       { name: "Service Coverage", description: "The provider's geographic reach, service portfolio, lane coverage, operating hours, and ability to support the required customer and product profile." },
-      { name: "Delivery Performance", description: "Demonstrated on-time, in-full, damage-free, and exception-management performance under volumes and service conditions comparable to the requirement." },
+      { name: "Delivery Performance", description: "Demonstrated on-time, in-full, damage-free, and exception-management performance under volumes and service conditions comparable to the requirement.", type: "objective", direction: "higher" },
       { name: "Technology Capability", description: "The quality of warehouse, transport, tracking, integration, reporting, cybersecurity, and operational visibility capabilities." },
-      { name: "Total Logistics Cost", description: "Expected end-to-end cost, including rates, accessorial charges, implementation, systems integration, inventory effects, management effort, and exit costs." },
+      { name: "Total Logistics Cost", description: "Expected end-to-end cost, including rates, accessorial charges, implementation, systems integration, inventory effects, management effort, and exit costs.", type: "objective", direction: "lower" },
       { name: "Scalability", description: "The ability to expand capacity, locations, services, labour, and technology support as volumes, channels, and geographic requirements change." }
     ],
     alternatives: ["3PL Provider A", "3PL Provider B", "3PL Provider C"],
@@ -109,8 +117,8 @@ const sampleTemplates = {
     projectTitle: "Warehouse Location Decision",
     criteria: [
       { name: "Transport Access", description: "Access to required road, rail, port, airport, parcel, and freight networks, including route resilience, congestion, and carrier availability." },
-      { name: "Operating Cost", description: "Expected facility, labour, utility, tax, transport, inventory, security, maintenance, and compliance cost for the planning horizon." },
-      { name: "Customer Proximity", description: "The location's ability to meet target delivery times and service priority for current and expected customer demand." },
+      { name: "Operating Cost", description: "Expected facility, labour, utility, tax, transport, inventory, security, maintenance, and compliance cost for the planning horizon.", type: "objective", direction: "lower" },
+      { name: "Customer Proximity", description: "The location's ability to meet target delivery times and service priority for current and expected customer demand.", type: "objective", direction: "lower" },
       { name: "Labour Availability", description: "Availability, skills, wage competitiveness, retention, shift flexibility, and seasonal capacity of the local workforce." },
       { name: "Expansion Potential", description: "Practical ability to add space, throughput, automation, yard capacity, utilities, and supporting services as requirements grow." }
     ],
@@ -119,20 +127,20 @@ const sampleTemplates = {
   "transport-mode": {
     projectTitle: "Transport Mode Selection",
     criteria: [
-      { name: "Transit Time", description: "Door-to-door elapsed time, including collection, terminal handling, consolidation, customs, transfers, and final delivery." },
-      { name: "Freight Cost", description: "Expected transport and accessorial cost for the required shipment profile, frequency, service level, and lane." },
-      { name: "Reliability", description: "Consistency of transit time and the probability of meeting the required delivery window under normal and disrupted conditions." },
-      { name: "Carbon Impact", description: "Estimated greenhouse-gas impact for the shipment activity, using a consistent boundary and method across all modes." },
-      { name: "Damage Risk", description: "Likelihood and operational consequence of loss, damage, contamination, temperature excursion, or excessive handling in transit." }
+      { name: "Transit Time", description: "Door-to-door elapsed time, including collection, terminal handling, consolidation, customs, transfers, and final delivery.", type: "objective", direction: "lower" },
+      { name: "Freight Cost", description: "Expected transport and accessorial cost for the required shipment profile, frequency, service level, and lane.", type: "objective", direction: "lower" },
+      { name: "Reliability", description: "Consistency of transit time and the probability of meeting the required delivery window under normal and disrupted conditions.", type: "objective", direction: "higher" },
+      { name: "Carbon Impact", description: "Estimated greenhouse-gas impact for the shipment activity, using a consistent boundary and method across all modes.", type: "objective", direction: "lower" },
+      { name: "Damage Risk", description: "Likelihood and operational consequence of loss, damage, contamination, temperature excursion, or excessive handling in transit.", type: "objective", direction: "lower" }
     ],
     alternatives: ["Road Freight", "Rail Freight", "Air Freight", "Sea Freight"],
   },
   "inventory-policy": {
     projectTitle: "Inventory Policy Selection",
     criteria: [
-      { name: "Service Level", description: "The policy's ability to meet target product availability, order fulfilment, and customer response-time requirements." },
-      { name: "Working Capital", description: "The expected cash tied up in cycle stock, safety stock, work in progress, and obsolete or slow-moving inventory." },
-      { name: "Stockout Risk", description: "The likelihood and business consequence of inventory being unavailable when customer or production demand occurs." },
+      { name: "Service Level", description: "The policy's ability to meet target product availability, order fulfilment, and customer response-time requirements.", type: "objective", direction: "higher" },
+      { name: "Working Capital", description: "The expected cash tied up in cycle stock, safety stock, work in progress, and obsolete or slow-moving inventory.", type: "objective", direction: "lower" },
+      { name: "Stockout Risk", description: "The likelihood and business consequence of inventory being unavailable when customer or production demand occurs.", type: "objective", direction: "lower" },
       { name: "Planning Complexity", description: "The data, coordination, system discipline, supplier integration, and management effort required to operate the policy reliably." }
     ],
     alternatives: ["Make to Stock", "Make to Order", "Vendor Managed Inventory"],
@@ -141,16 +149,37 @@ const sampleTemplates = {
 
 function normaliseStructureItem(item, fallbackName) {
   if (item && typeof item === "object") {
+    const rawType = Object.prototype.hasOwnProperty.call(item, "type")
+      ? String(item.type || "").trim()
+      : Object.prototype.hasOwnProperty.call(item, "criterionType")
+        ? String(item.criterionType || "").trim()
+      : "subjective";
     return {
       name: safeName(item.name, fallbackName),
       description: String(item.description || "").trim(),
+      type: rawType === "objective" || rawType === "subjective" ? rawType : "subjective",
+      direction: item.direction === "lower" ? "lower" : "higher",
     };
   }
 
   return {
     name: safeName(item, fallbackName),
     description: "",
+    type: "",
+    direction: "higher",
   };
+}
+
+function getCriterionMeta(questionnaire, index) {
+  const source = questionnaire.criteriaMeta?.[index] || {
+    name: questionnaire.criteria[index],
+    description: questionnaire.criteriaDescriptions?.[index] || "",
+  };
+  return ATHAhp.normaliseCriterion(source, index);
+}
+
+function getCriterionMetaList(questionnaire) {
+  return questionnaire.criteria.map((_, index) => getCriterionMeta(questionnaire, index));
 }
 
 function setError(target, message) {
@@ -221,13 +250,23 @@ function createStructureGroupHeader(title, type, count) {
 function readStructureEditorItems(type) {
   return Array.from(
     elements.structureFields.querySelectorAll(`[data-structure-item="${type}"]`),
-    (item, index) => ({
-      name: item.querySelector(`[data-type="${type}"]`)?.value || "",
-      description: type === "criteria"
-        ? item.querySelector('[data-description-type="criteria"]')?.value || ""
-        : "",
-      fallbackName: `${type === "criteria" ? "Criterion" : "Alternative"} ${index + 1}`,
-    })
+    (item, index) => {
+      const criterionType = type === "criteria"
+        ? item.querySelector('[data-criterion-type]')?.value || ""
+        : "subjective";
+      return {
+        name: item.querySelector(`[data-type="${type}"]`)?.value || "",
+        description: type === "criteria"
+          ? item.querySelector('[data-description-type="criteria"]')?.value || ""
+          : "",
+        criterionType,
+        type: criterionType,
+        direction: type === "criteria"
+          ? item.querySelector('[data-criterion-direction]')?.value || "higher"
+          : "higher",
+        fallbackName: `${type === "criteria" ? "Criterion" : "Alternative"} ${index + 1}`,
+      };
+    }
   );
 }
 
@@ -286,7 +325,7 @@ function addStructureItem(type) {
     return;
   }
 
-  items.push({ name: "", description: "" });
+  items.push(type === "criteria" ? { name: "", description: "", type: "" } : { name: "", description: "" });
   elements.criteriaCount.value = criteria.length;
   elements.alternativeCount.value = alternatives.length;
   buildStructureFields(criteria, alternatives);
@@ -349,6 +388,60 @@ function createNameInput(type, index, value, count) {
 
   wrapper.append(itemHeader, nameLabel);
   if (type === "criteria") {
+    const config = document.createElement("div");
+    config.className = "criterion-config";
+
+    const typeLabel = document.createElement("label");
+    typeLabel.textContent = "Criterion type";
+    const typeSelect = document.createElement("select");
+    typeSelect.dataset.criterionType = "true";
+    typeSelect.dataset.index = String(index);
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Select the criterion type";
+    typeSelect.appendChild(placeholderOption);
+    [
+      ["subjective", "Subjective judgement"],
+      ["objective", "Objective measured data"],
+    ].forEach(([optionValue, labelText]) => {
+      const option = document.createElement("option");
+      option.value = optionValue;
+      option.textContent = labelText;
+      typeSelect.appendChild(option);
+    });
+    typeSelect.value = item.type;
+    typeLabel.appendChild(typeSelect);
+
+    const directionLabel = document.createElement("label");
+    directionLabel.textContent = "Objective direction";
+    directionLabel.className = "objective-direction-control";
+    const directionSelect = document.createElement("select");
+    directionSelect.dataset.criterionDirection = "true";
+    directionSelect.dataset.index = String(index);
+    [
+      ["higher", "Higher is better"],
+      ["lower", "Lower is better"],
+    ].forEach(([optionValue, labelText]) => {
+      const option = document.createElement("option");
+      option.value = optionValue;
+      option.textContent = labelText;
+      directionSelect.appendChild(option);
+    });
+    directionSelect.value = item.direction;
+    directionLabel.appendChild(directionSelect);
+
+    const setObjectiveControlsState = () => {
+      const isObjective = typeSelect.value === "objective";
+      directionSelect.disabled = !isObjective;
+      directionLabel.hidden = !isObjective;
+      config.classList.toggle("criterion-config-objective", isObjective);
+    };
+    typeSelect.addEventListener("change", setObjectiveControlsState);
+    setObjectiveControlsState();
+
+    config.append(typeLabel, directionLabel);
+    wrapper.appendChild(config);
+
     const descriptionLabel = document.createElement("label");
     descriptionLabel.textContent = "Description";
     const description = document.createElement("textarea");
@@ -378,9 +471,19 @@ function collectStructure() {
 
   const criterionItems = readStructureEditorItems("criteria");
   const alternativeItems = readStructureEditorItems("alternative");
-  const criteria = criterionItems.map((item, index) => safeName(item.name, `Criterion ${index + 1}`));
+  const missingType = criterionItems.findIndex((item) => item.criterionType !== "subjective" && item.criterionType !== "objective");
+  if (missingType >= 0) {
+    throw new Error(`Select the criterion type for Criterion ${missingType + 1} before previewing the questionnaire.`);
+  }
+
+  const criteria = criterionItems.map((item, index) => ({
+    name: safeName(item.name, `Criterion ${index + 1}`),
+    description: String(item.description || "").trim(),
+    type: item.criterionType === "objective" ? "objective" : "subjective",
+    direction: item.direction === "lower" ? "lower" : "higher",
+  }));
   const alternatives = alternativeItems.map((item, index) => safeName(item.name, `Alternative ${index + 1}`));
-  const criteriaDescriptions = criterionItems.map((item) => String(item.description || "").trim());
+  const criteriaDescriptions = criteria.map((item) => item.description);
 
   if (criteria.length !== criteriaCount || alternatives.length !== alternativeCount) {
     throw new Error("Build the criteria and alternative fields before previewing the questionnaire.");
@@ -412,7 +515,9 @@ function makeQuestionnaire(
   id = uid(),
   criteriaDescriptions = []
 ) {
-  const criteriaPairs = pairsFor(criteria).map((pair, index) => ({
+  const criteriaMeta = criteria.map((criterion, index) => normaliseStructureItem(criterion, `Criterion ${index + 1}`));
+  const criteriaNames = criteriaMeta.map((criterion) => criterion.name);
+  const criteriaPairs = pairsFor(criteriaNames).map((pair, index) => ({
     id: `c-${pair.leftIndex}-${pair.rightIndex}`,
     type: "criteria",
     leftIndex: pair.leftIndex,
@@ -426,7 +531,8 @@ function makeQuestionnaire(
   }));
 
   const alternativePairs = [];
-  criteria.forEach((criterion, criterionIndex) => {
+  criteriaNames.forEach((criterion, criterionIndex) => {
+    if (criteriaMeta[criterionIndex].type === "objective") return;
     pairsFor(alternatives).forEach((pair, index) => {
       alternativePairs.push({
         id: `a-${criterionIndex}-${pair.leftIndex}-${pair.rightIndex}`,
@@ -452,9 +558,10 @@ function makeQuestionnaire(
     createdAt: new Date().toISOString(),
     projectTitle,
     scale: "Saaty 1-9 pairwise comparison scale",
-    criteria,
+    criteria: criteriaNames,
+    criteriaMeta,
     alternatives,
-    criteriaDescriptions: criteria.map((_, index) => criteriaDescriptions[index] || ""),
+    criteriaDescriptions: criteriaNames.map((_, index) => criteriaDescriptions[index] || ""),
     questions: {
       criteria: criteriaPairs,
       alternatives: alternativePairs,
@@ -523,6 +630,16 @@ function validateQuestionnaire(data) {
     throw new Error("AHP requires between two and ten criteria and between two and ten alternatives.");
   }
 
+  const criteriaMeta = data.criteria.map((criterion, index) => {
+    const meta = data.criteriaMeta?.[index] || {
+      name: criterion,
+      description: data.criteriaDescriptions?.[index] || "",
+    };
+    return normaliseStructureItem(meta, `Criterion ${index + 1}`);
+  });
+  data.criteria = criteriaMeta.map((criterion) => criterion.name);
+  data.criteriaMeta = criteriaMeta;
+
   if (
     data.criteria.some((item) => typeof item !== "string" || !item.trim()) ||
     data.alternatives.some((item) => typeof item !== "string" || !item.trim()) ||
@@ -533,13 +650,19 @@ function validateQuestionnaire(data) {
     throw new Error("The questionnaire contains an invalid decision structure.");
   }
 
-  data.criteriaDescriptions = data.criteria.map((_, index) =>
-    String(data.criteriaDescriptions?.[index] || "").slice(0, 300)
-  );
+  data.criteriaDescriptions = criteriaMeta.map((criterion) => String(criterion.description || "").slice(0, 300));
   data.questions.criteria.forEach((question) => {
     question.leftDescription = question.leftDescription || data.criteriaDescriptions[question.leftIndex] || "";
     question.rightDescription = question.rightDescription || data.criteriaDescriptions[question.rightIndex] || "";
   });
+  const validSubjectiveIndexes = new Set(
+    criteriaMeta
+      .map((criterion, index) => criterion.type === "subjective" ? index : null)
+      .filter((index) => index !== null)
+  );
+  data.questions.alternatives = data.questions.alternatives.filter((question) =>
+    validSubjectiveIndexes.has(question.criterionIndex)
+  );
   data.questions.alternatives.forEach((question) => {
     question.criterionDescription = question.criterionDescription || data.criteriaDescriptions[question.criterionIndex] || "";
     delete question.leftDescription;
@@ -631,6 +754,20 @@ function renderSurvey(questionnaire) {
   elements.surveyQuestions.appendChild(criteriaGroup);
 
   questionnaire.criteria.forEach((criterion, criterionIndex) => {
+    const meta = getCriterionMeta(questionnaire, criterionIndex);
+    if (meta.type === "objective") {
+      const note = document.createElement("div");
+      note.className = "question-group objective-question-note";
+      const heading = document.createElement("h3");
+      heading.textContent = `Objective data: ${criterion}`;
+      const text = document.createElement("p");
+      text.textContent =
+        `${criterion} uses measured alternative data (${meta.direction === "lower" ? "lower is better" : "higher is better"}). ` +
+        "Experts do not answer pairwise alternative questions for this criterion; values are entered in the analysis step.";
+      note.append(heading, text);
+      elements.surveyQuestions.appendChild(note);
+      return;
+    }
     const questions = questionnaire.questions.alternatives.filter((question) => question.criterionIndex === criterionIndex);
     elements.surveyQuestions.appendChild(createQuestionGroup(
       `Alternative comparisons: ${criterion}`,
@@ -762,12 +899,17 @@ function calculateWeights(matrix) {
   return ATHAhp.calculateWeights(matrix);
 }
 
-function calculateAhp(responses) {
-  return ATHAhp.calculateAhp(responses);
+function calculateAhp(responses, options = {}) {
+  return ATHAhp.calculateAhp(responses, options);
 }
 
 function formatPercent(value) {
   return `${(value * 100).toFixed(1)}%`;
+}
+
+function formatPriorityValue(value) {
+  if (!Number.isFinite(value)) return "-";
+  return value.toFixed(3);
 }
 
 function renderWeightDistribution(labels, weights) {
@@ -838,13 +980,19 @@ function renderDecisionMatrix(analysis) {
 
   const criteriaRow = document.createElement("tr");
   analysis.questionnaire.criteria.forEach((criterion, index) => {
+    const meta = analysis.questionnaire.criteriaMeta?.[index] || getCriterionMeta(analysis.questionnaire, index);
     const cell = document.createElement("th");
     cell.scope = "col";
     cell.textContent = criterion;
     const weight = document.createElement("span");
     weight.className = "matrix-header-weight";
     weight.textContent = `Weight ${formatPercent(analysis.criteriaResult.weights[index])}`;
-    cell.appendChild(weight);
+    const method = document.createElement("span");
+    method.className = "matrix-header-method";
+    method.textContent = meta.type === "objective"
+      ? `Objective (${meta.direction === "lower" ? "lower is better" : "higher is better"})`
+      : "Subjective pairwise";
+    cell.append(weight, method);
     criteriaRow.appendChild(cell);
   });
   head.append(groupRow, criteriaRow);
@@ -864,7 +1012,7 @@ function renderDecisionMatrix(analysis) {
       const cell = document.createElement("td");
       const priority = document.createElement("span");
       priority.className = "matrix-priority";
-      priority.textContent = `Priority ${formatPercent(localPriority)}`;
+      priority.textContent = `Priority ${formatPriorityValue(localPriority)}`;
       const weighted = document.createElement("span");
       weighted.className = "matrix-contribution";
       weighted.textContent = `Contribution ${formatPercent(contribution)}`;
@@ -874,7 +1022,7 @@ function renderDecisionMatrix(analysis) {
 
     const scoreCell = document.createElement("td");
     scoreCell.className = "matrix-overall";
-    scoreCell.textContent = formatPercent(item.score);
+    scoreCell.textContent = formatPriorityValue(item.score);
     const rankCell = document.createElement("td");
     rankCell.className = "matrix-rank";
     rankCell.textContent = String(rankIndex + 1);
@@ -1354,6 +1502,82 @@ function createPairwiseCalculation(title, labels, result, open = false) {
   return detail;
 }
 
+function createObjectiveCalculation(result, alternatives, open = false) {
+  const detail = document.createElement("details");
+  detail.className = "calculation-detail objective-calculation-detail";
+  detail.open = open;
+
+  const summary = document.createElement("summary");
+  const summaryTitle = document.createElement("span");
+  summaryTitle.className = "calculation-summary-title";
+  summaryTitle.textContent = `Objective data normalisation under ${result.criterion}`;
+
+  const summaryMeta = document.createElement("span");
+  summaryMeta.className = "calculation-summary-meta";
+  const status = document.createElement("span");
+  status.className = "status-good";
+  status.textContent = result.direction === "lower" ? "Lower values preferred" : "Higher values preferred";
+  const disclosure = document.createElement("span");
+  disclosure.className = "calculation-disclosure";
+  disclosure.setAttribute("aria-hidden", "true");
+  const disclosureLabel = document.createElement("span");
+  disclosureLabel.className = "calculation-disclosure-label";
+  const disclosureIcon = document.createElement("span");
+  disclosureIcon.className = "calculation-disclosure-icon";
+  disclosure.append(disclosureLabel, disclosureIcon);
+  summaryMeta.append(status, disclosure);
+  summary.append(summaryTitle, summaryMeta);
+  detail.appendChild(summary);
+
+  const region = document.createElement("div");
+  region.className = "calculation-detail-body";
+  const note = document.createElement("p");
+  note.className = "calculation-note objective-note";
+  note.textContent = result.direction === "lower"
+    ? "Lower-is-better objective values are converted using reciprocal values before normalisation."
+    : "Higher-is-better objective values are normalised directly by their total.";
+
+  const scroll = document.createElement("div");
+  scroll.className = "table-scroll";
+  scroll.tabIndex = 0;
+  scroll.setAttribute("role", "region");
+  scroll.setAttribute("aria-label", `${result.criterion} objective data normalisation table`);
+
+  const table = document.createElement("table");
+  table.className = "pairwise-calculation-table objective-calculation-table";
+  const caption = document.createElement("caption");
+  caption.textContent = `${result.criterion}: raw value and normalised local priority`;
+  table.appendChild(caption);
+  const head = document.createElement("thead");
+  const header = document.createElement("tr");
+  ["Alternative", "Measured value", "Normalisation value"].forEach((label) => {
+    const cell = document.createElement("th");
+    cell.scope = "col";
+    cell.textContent = label;
+    header.appendChild(cell);
+  });
+  head.appendChild(header);
+  table.appendChild(head);
+  const body = document.createElement("tbody");
+  alternatives.forEach((alternative, index) => {
+    const row = document.createElement("tr");
+    const name = document.createElement("th");
+    name.scope = "row";
+    name.textContent = alternative;
+    const measuredCell = document.createElement("td");
+    measuredCell.textContent = formatCalculationValue(result.values[index]);
+    const normalisedCell = document.createElement("td");
+    normalisedCell.textContent = formatPriorityValue(result.weights[index]);
+    row.append(name, measuredCell, normalisedCell);
+    body.appendChild(row);
+  });
+  table.appendChild(body);
+  scroll.appendChild(table);
+  region.append(note, scroll);
+  detail.appendChild(region);
+  return detail;
+}
+
 function renderPairwiseCalculations(analysis) {
   if (!elements.pairwiseCalculations) return;
   const fragment = document.createDocumentFragment();
@@ -1370,6 +1594,13 @@ function renderPairwiseCalculations(analysis) {
     true
   ));
   analysis.alternativeResults.forEach((result) => {
+    if (result.type === "objective") {
+      fragment.appendChild(createObjectiveCalculation(
+        result,
+        analysis.questionnaire.alternatives
+      ));
+      return;
+    }
     fragment.appendChild(createPairwiseCalculation(
       `Alternative pairwise matrix under ${result.criterion}`,
       analysis.questionnaire.alternatives,
@@ -1404,17 +1635,25 @@ function renderAnalysis(analysis) {
     ...analysis.alternativeResults.map((result) => ({
       label: `Alternatives under ${result.criterion}`,
       cr: result.cr,
-    })),
+    })).filter((item) => Number.isFinite(item.cr)),
   ];
 
   const winner = analysis.alternativeScores[0];
   const topCriterionIndex = analysis.criteriaResult.weights.indexOf(Math.max(...analysis.criteriaResult.weights));
   const consistencyWarnings = consistencyItems.filter((item) => item.cr > 0.1).length;
-  elements.analysisSummary.textContent =
-    `${analysis.questionnaire.projectTitle}: ${analysis.expertCount} expert response${analysis.expertCount === 1 ? "" : "s"} analysed. ` +
-    `${winner.alternative} ranks first with an overall priority of ${formatPercent(winner.score)}. ` +
-    `The most influential criterion is ${analysis.questionnaire.criteria[topCriterionIndex]} at ${formatPercent(analysis.criteriaResult.weights[topCriterionIndex])}. ` +
-    `${consistencyWarnings ? `${consistencyWarnings} consistency check${consistencyWarnings === 1 ? "" : "s"} should be reviewed before using the ranking.` : "All displayed consistency ratios are within the common 0.10 review threshold."}`;
+  const summarySentences = [
+    `${analysis.questionnaire.projectTitle}: ${analysis.expertCount} expert response${analysis.expertCount === 1 ? "" : "s"} analysed.`,
+    `${winner.alternative} ranks first with an overall priority of ${formatPercent(winner.score)}.`,
+    `The most influential criterion is ${analysis.questionnaire.criteria[topCriterionIndex]} at ${formatPercent(analysis.criteriaResult.weights[topCriterionIndex])}.`,
+    consistencyWarnings
+      ? `${consistencyWarnings} consistency check${consistencyWarnings === 1 ? "" : "s"} should be reviewed before using the ranking.`
+      : "All displayed consistency ratios are within the common 0.10 review threshold.",
+  ];
+  elements.analysisSummary.replaceChildren(...summarySentences.map((sentence) => {
+    const line = document.createElement("span");
+    line.textContent = sentence;
+    return line;
+  }));
   elements.analysisChartSummary.textContent =
     `Criteria weight distribution: ${analysis.questionnaire.criteria.map((criterion, index) => `${criterion} ${formatPercent(analysis.criteriaResult.weights[index])}`).join(", ")}. ` +
     `AHP ranking summary: ${winner.alternative} is ranked first. ${analysis.questionnaire.criteria[topCriterionIndex]} is the highest-weighted criterion.`;
@@ -1442,6 +1681,127 @@ function renderResponses() {
   });
 
   elements.calculateAnalysisButton.disabled = loadedResponses.length === 0;
+  if (loadedResponses.length) {
+    renderObjectiveDataMatrix(loadedResponses[0].questionnaire, objectiveValueDraft);
+  } else {
+    hideObjectiveDataMatrix();
+  }
+}
+
+function hideObjectiveDataMatrix() {
+  objectiveValueDraft = {};
+  elements.objectiveDataSection?.classList.add("hidden");
+  if (elements.objectiveDataMatrix) {
+    elements.objectiveDataMatrix.textContent = "";
+  }
+}
+
+function renderObjectiveDataMatrix(questionnaire, initialValues = {}) {
+  if (!elements.objectiveDataSection || !elements.objectiveDataMatrix) return;
+  const objectiveCriteria = getCriterionMetaList(questionnaire)
+    .map((criterion, criterionIndex) => ({ ...criterion, criterionIndex }))
+    .filter((criterion) => criterion.type === "objective");
+
+  if (!objectiveCriteria.length) {
+    hideObjectiveDataMatrix();
+    return;
+  }
+
+  elements.objectiveDataSection.classList.remove("hidden");
+  elements.objectiveDataMatrix.textContent = "";
+
+  const note = document.createElement("div");
+  note.className = "objective-data-note";
+  note.textContent =
+    "These values are not expert judgements. Enter measured data using consistent units across alternatives. Lower-is-better criteria use reciprocal normalisation.";
+
+  const scroll = document.createElement("div");
+  scroll.className = "table-scroll";
+  scroll.tabIndex = 0;
+  scroll.setAttribute("role", "region");
+  scroll.setAttribute("aria-label", "Objective criteria data entry matrix");
+
+  const table = document.createElement("table");
+  table.className = "objective-data-table";
+  const caption = document.createElement("caption");
+  caption.textContent = "Measured values for objective AHP criteria";
+  table.appendChild(caption);
+  const head = document.createElement("thead");
+  const header = document.createElement("tr");
+  const alternativeHeader = document.createElement("th");
+  alternativeHeader.scope = "col";
+  alternativeHeader.textContent = "Alternative";
+  header.appendChild(alternativeHeader);
+  objectiveCriteria.forEach((criterion) => {
+    const cell = document.createElement("th");
+    cell.scope = "col";
+    cell.textContent = criterion.name;
+    const meta = document.createElement("span");
+    meta.className = "matrix-header-weight";
+    meta.textContent = criterion.direction === "lower" ? "Lower is better" : "Higher is better";
+    cell.appendChild(meta);
+    header.appendChild(cell);
+  });
+  head.appendChild(header);
+  table.appendChild(head);
+
+  const body = document.createElement("tbody");
+  questionnaire.alternatives.forEach((alternative, alternativeIndex) => {
+    const row = document.createElement("tr");
+    const label = document.createElement("th");
+    label.scope = "row";
+    label.textContent = alternative;
+    row.appendChild(label);
+    objectiveCriteria.forEach((criterion) => {
+      const cell = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "number";
+      input.step = "any";
+      input.min = criterion.direction === "lower" ? "0.000001" : "0";
+      input.inputMode = "decimal";
+      input.dataset.objectiveCriterionIndex = String(criterion.criterionIndex);
+      input.dataset.objectiveAlternativeIndex = String(alternativeIndex);
+      input.value = initialValues?.[criterion.criterionIndex]?.[alternativeIndex] ??
+        initialValues?.[String(criterion.criterionIndex)]?.[alternativeIndex] ?? "";
+      input.setAttribute("aria-label", `${criterion.name} value for ${alternative}`);
+      cell.appendChild(input);
+      row.appendChild(cell);
+    });
+    body.appendChild(row);
+  });
+  table.appendChild(body);
+  scroll.appendChild(table);
+  elements.objectiveDataMatrix.append(note, scroll);
+}
+
+function readObjectiveValues() {
+  const values = {};
+  if (!loadedResponses.length || !elements.objectiveDataSection || elements.objectiveDataSection.classList.contains("hidden")) {
+    return values;
+  }
+
+  getCriterionMetaList(loadedResponses[0].questionnaire).forEach((criterion, criterionIndex) => {
+    if (criterion.type !== "objective") return;
+    values[criterionIndex] = [];
+    loadedResponses[0].questionnaire.alternatives.forEach((alternative, alternativeIndex) => {
+      const input = elements.objectiveDataMatrix.querySelector(
+        `[data-objective-criterion-index="${criterionIndex}"][data-objective-alternative-index="${alternativeIndex}"]`
+      );
+      const number = Number(input?.value);
+      if (!Number.isFinite(number)) {
+        throw new Error(`Enter a numeric ${criterion.name} value for ${alternative}.`);
+      }
+      if (criterion.direction === "lower" && number <= 0) {
+        throw new Error(`${criterion.name} is lower-is-better, so values must be greater than zero.`);
+      }
+      if (criterion.direction === "higher" && number < 0) {
+        throw new Error(`${criterion.name} is higher-is-better, so values cannot be negative.`);
+      }
+      values[criterionIndex].push(number);
+    });
+  });
+  objectiveValueDraft = values;
+  return values;
 }
 
 function downloadJson(filename, data) {
@@ -1486,7 +1846,7 @@ function sampleQuestionnaire() {
   const alternatives = template.alternatives.map((item, index) => normaliseStructureItem(item, `Alternative ${index + 1}`));
   return makeQuestionnaire(
     template.projectTitle,
-    criteria.map((item) => item.name),
+    criteria,
     alternatives.map((item) => item.name),
     "ahp-sample-supplier-selection",
     criteria.map((item) => item.description)
@@ -1512,15 +1872,6 @@ function sampleResponse() {
         "c-2-3": 6,
       },
       alternatives: {
-        "a-0-0-1": 3,
-        "a-0-0-2": -2,
-        "a-0-1-2": -4,
-        "a-1-0-1": -3,
-        "a-1-0-2": 2,
-        "a-1-1-2": 4,
-        "a-2-0-1": -2,
-        "a-2-0-2": -4,
-        "a-2-1-2": -2,
         "a-3-0-1": 2,
         "a-3-0-2": -3,
         "a-3-1-2": -5,
@@ -1587,6 +1938,7 @@ elements.loadResponsesButton.addEventListener("click", async () => {
       throw new Error("Choose at least one completed response JSON file.");
     }
     loadedResponses = await Promise.all(files.map(async (file) => validateResponse(await readJsonFile(file))));
+    objectiveValueDraft = {};
     latestAnalysis = null;
     sensitivityPlanningActive = false;
     elements.results.classList.add("hidden");
@@ -1602,6 +1954,7 @@ elements.loadResponsesButton.addEventListener("click", async () => {
 elements.loadSampleResponseButton.addEventListener("click", () => {
   clearErrors();
   loadedResponses = [sampleResponse()];
+  objectiveValueDraft = sampleTemplates["supplier-selection"].objectiveValues || {};
   latestAnalysis = null;
   sensitivityPlanningActive = false;
   elements.results.classList.add("hidden");
@@ -1617,7 +1970,7 @@ elements.calculateAnalysisButton.addEventListener("click", () => {
     if (!loadedResponses.length) {
       throw new Error("Load at least one completed response before calculating.");
     }
-    latestAnalysis = calculateAhp(loadedResponses);
+    latestAnalysis = calculateAhp(loadedResponses, { objectiveValues: readObjectiveValues() });
     renderAnalysis(latestAnalysis);
   } catch (error) {
     setError(elements.analysisError, error.message);
@@ -1633,8 +1986,21 @@ elements.exportAnalysisButton.addEventListener("click", () => {
     ["Rank", "Alternative", "Overall Priority"],
     ...latestAnalysis.alternativeScores.map((item, index) => [index + 1, item.alternative, item.score.toFixed(6)]),
     [],
-    ["Criterion", "Weight"],
-    ...latestAnalysis.questionnaire.criteria.map((criterion, index) => [criterion, latestAnalysis.criteriaResult.weights[index].toFixed(6)]),
+    ["Criterion", "Type", "Direction", "Weight"],
+    ...latestAnalysis.questionnaire.criteria.map((criterion, index) => {
+      const meta = latestAnalysis.questionnaire.criteriaMeta?.[index] || getCriterionMeta(latestAnalysis.questionnaire, index);
+      return [criterion, meta.type, meta.type === "objective" ? meta.direction : "", latestAnalysis.criteriaResult.weights[index].toFixed(6)];
+    }),
+    [],
+    ["Criterion", "Alternative", "Measured Value", "Local Priority"],
+    ...latestAnalysis.alternativeResults
+      .filter((result) => result.type === "objective")
+      .flatMap((result) => latestAnalysis.questionnaire.alternatives.map((alternative, index) => [
+        result.criterion,
+        alternative,
+        result.values[index],
+        result.weights[index].toFixed(6),
+      ])),
   ];
   downloadCsv("ahp-ranking.csv", rows);
 });

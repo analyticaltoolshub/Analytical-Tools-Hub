@@ -41,6 +41,101 @@
     return matrix;
   }
 
+  function criterionName(criterion, index) {
+    if (criterion && typeof criterion === "object") {
+      return String(criterion.name || `Criterion ${index + 1}`).trim() || `Criterion ${index + 1}`;
+    }
+    return String(criterion || `Criterion ${index + 1}`).trim() || `Criterion ${index + 1}`;
+  }
+
+  function normaliseCriterion(criterion, index) {
+    if (criterion && typeof criterion === "object") {
+      const type = criterion.type === "objective" ? "objective" : "subjective";
+      const direction = criterion.direction === "lower" ? "lower" : "higher";
+      return {
+        name: criterionName(criterion, index),
+        description: String(criterion.description || "").trim(),
+        type,
+        direction,
+      };
+    }
+    return {
+      name: criterionName(criterion, index),
+      description: "",
+      type: "subjective",
+      direction: "higher",
+    };
+  }
+
+  function normaliseCriteria(criteria) {
+    return criteria.map((criterion, index) => normaliseCriterion(criterion, index));
+  }
+
+  function criteriaFromQuestionnaire(questionnaire) {
+    const criteria = questionnaire.criteria || [];
+    if (Array.isArray(questionnaire.criteriaMeta) && questionnaire.criteriaMeta.length === criteria.length) {
+      return questionnaire.criteriaMeta.map((criterion, index) =>
+        normaliseCriterion({ ...criterion, name: criterionName(criterion.name || criteria[index], index) }, index)
+      );
+    }
+    return normaliseCriteria(criteria);
+  }
+
+  function objectiveValueList(objectiveValues, criterionIndex, alternativeCount) {
+    const values = objectiveValues || {};
+    const row = Array.isArray(values)
+      ? values[criterionIndex]
+      : values[String(criterionIndex)] ?? values[criterionIndex];
+    if (!Array.isArray(row)) {
+      throw new Error("Objective criteria require measured alternative values before AHP can be calculated.");
+    }
+    if (row.length < alternativeCount) {
+      throw new Error("Objective criteria values must be provided for every alternative.");
+    }
+    return row.slice(0, alternativeCount).map((value) => {
+      const number = Number(value);
+      if (!Number.isFinite(number)) {
+        throw new Error("Objective criteria values must be numeric.");
+      }
+      return number;
+    });
+  }
+
+  function calculateObjectivePriorities(criterion, rawValues) {
+    const values = rawValues.map(Number);
+    let transformedValues;
+    if (criterion.direction === "lower") {
+      if (values.some((value) => value <= 0)) {
+        throw new Error(`${criterion.name} uses lower-is-better objective scoring, so every value must be greater than zero.`);
+      }
+      transformedValues = values.map((value) => 1 / value);
+    } else {
+      if (values.some((value) => value < 0)) {
+        throw new Error(`${criterion.name} uses higher-is-better objective scoring, so values cannot be negative.`);
+      }
+      transformedValues = values.slice();
+    }
+
+    const total = transformedValues.reduce((sum, value) => sum + value, 0);
+    if (total <= 0) {
+      throw new Error(`${criterion.name} objective values do not contain enough positive information to calculate priorities.`);
+    }
+
+    return {
+      criterion: criterion.name,
+      criterionMeta: criterion,
+      type: "objective",
+      direction: criterion.direction,
+      values,
+      transformedValues,
+      weights: transformedValues.map((value) => value / total),
+      matrix: null,
+      cr: null,
+      ci: null,
+      lambdaMax: null,
+    };
+  }
+
   function aggregateMatrices(matrices) {
     const size = matrices[0].length;
     return Array.from({ length: size }, (_, row) =>
@@ -70,16 +165,20 @@
     return { weights, rowGeometricMeans, weightedSums, consistencyVector, lambdaMax, ci, cr };
   }
 
-  function calculateAhp(responses) {
+  function calculateAhp(responses, options = {}) {
     const questionnaire = responses[0].questionnaire;
-    const criteriaCount = questionnaire.criteria.length;
+    const criteria = criteriaFromQuestionnaire(questionnaire);
+    const criteriaNames = criteria.map((criterion) => criterion.name);
+    const criteriaCount = criteria.length;
     const alternativeCount = questionnaire.alternatives.length;
 
     responses.forEach((response) => {
+      const responseCriteria = criteriaFromQuestionnaire(response.questionnaire);
       if (
-        response.questionnaire.criteria.length !== criteriaCount ||
+        responseCriteria.length !== criteriaCount ||
         response.questionnaire.alternatives.length !== alternativeCount ||
-        response.questionnaire.criteria.join("|") !== questionnaire.criteria.join("|") ||
+        responseCriteria.map((criterion) => `${criterion.name}:${criterion.type}:${criterion.direction}`).join("|") !==
+          criteria.map((criterion) => `${criterion.name}:${criterion.type}:${criterion.direction}`).join("|") ||
         response.questionnaire.alternatives.join("|") !== questionnaire.alternatives.join("|")
       ) {
         throw new Error("All response files must use the same questionnaire structure.");
@@ -91,13 +190,26 @@
     );
     const criteriaMatrix = aggregateMatrices(criteriaMatrices);
     const criteriaResult = { matrix: criteriaMatrix, ...calculateWeights(criteriaMatrix) };
-    const alternativeResults = questionnaire.criteria.map((criterion, criterionIndex) => {
+    const alternativeResults = criteria.map((criterion, criterionIndex) => {
+      if (criterion.type === "objective") {
+        return calculateObjectivePriorities(
+          criterion,
+          objectiveValueList(options.objectiveValues, criterionIndex, alternativeCount)
+        );
+      }
+
       const prefix = `a-${criterionIndex}`;
       const matrices = responses.map((response) =>
         matrixFromAnswers(alternativeCount, response.answers.alternatives, prefix)
       );
       const matrix = aggregateMatrices(matrices);
-      return { criterion, matrix, ...calculateWeights(matrix) };
+      return {
+        criterion: criterion.name,
+        criterionMeta: criterion,
+        type: "subjective",
+        matrix,
+        ...calculateWeights(matrix),
+      };
     });
     const alternativeScores = questionnaire.alternatives.map((alternative, alternativeIndex) => {
       const score = alternativeResults.reduce((sum, result, criterionIndex) =>
@@ -106,15 +218,25 @@
       return { alternative, alternativeIndex, score };
     }).sort((a, b) => b.score - a.score);
 
-    return { questionnaire, expertCount: responses.length, criteriaResult, alternativeResults, alternativeScores };
+    return {
+      questionnaire: { ...questionnaire, criteria: criteriaNames, criteriaMeta: criteria },
+      expertCount: responses.length,
+      criteriaResult,
+      alternativeResults,
+      alternativeScores,
+    };
   }
 
   return {
     RI,
+    normaliseCriterion,
+    normaliseCriteria,
+    criteriaFromQuestionnaire,
     judgementToRatio,
     matrixFromAnswers,
     aggregateMatrices,
     calculateWeights,
+    calculateObjectivePriorities,
     calculateAhp,
   };
 }));

@@ -941,8 +941,8 @@ h3 {
 }
 
 .decision-method-heading p {
-  max-width: 1120px;
-  text-align: justify;
+  max-width: 1040px;
+  text-align: left;
   text-wrap: pretty;
 }
 

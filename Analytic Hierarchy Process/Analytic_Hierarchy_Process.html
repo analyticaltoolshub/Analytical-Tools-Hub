@@ -245,6 +245,12 @@
 
           <div id="responseList" class="response-list"></div>
 
+          <div id="objectiveDataSection" class="objective-data-section hidden">
+            <h3>Objective Criteria Data</h3>
+            <p>Enter measured values for objective criteria before calculating the final ranking. These values are normalised into local priorities and combined with the criterion weights.</p>
+            <div id="objectiveDataMatrix"></div>
+          </div>
+
           <div class="action-row">
             <button id="calculateAnalysisButton" type="button" disabled>Calculate AHP Ranking</button>
             <button id="exportAnalysisButton" type="button" disabled>Export Ranking CSV</button>
@@ -274,7 +280,7 @@
             </div>
             <div class="result-card result-card-wide">
               <h3>Pairwise Comparison Calculations</h3>
-              <p class="result-card-intro">Trace the calculation from the aggregated pairwise judgements through geometric-mean priorities and consistency checks. Select any matrix below to view its calculation.</p>
+              <p class="result-card-intro">Trace the calculation from the aggregated pairwise judgements and any objective data normalisation through local priorities and consistency checks. Select any calculation below to view the detail.</p>
               <div id="pairwiseCalculations" class="pairwise-calculations"></div>
             </div>
             <div class="result-card result-card-wide">
@@ -342,9 +348,10 @@
           <h2>Guidance</h2>
           <ol class="method-list">
             <li>Define the decision goal, criteria, and alternatives in the questionnaire design section.</li>
+            <li>Choose whether each criterion is subjective judgement or objective measured data. Objective criteria need a direction such as higher-is-better or lower-is-better.</li>
             <li>Export the blank questionnaire JSON and send it to the expert or decision-maker.</li>
             <li>The expert imports the questionnaire, answers each pairwise question, and exports the completed response JSON.</li>
-            <li>Load one or more completed response files into the analysis section and calculate the ranking.</li>
+            <li>Load one or more completed response files into the analysis section, enter measured values for any objective criteria, and calculate the ranking.</li>
             <li>Review consistency ratios before using the ranking to support a decision.</li>
             <li>Optionally turn on Scenario Planning after calculation to test whether changes in criterion importance alter the preferred alternative.</li>
           </ol>
@@ -362,6 +369,8 @@
                 <p><strong>Row geometric mean</strong><br><var>GM</var><sub>i</sub> = (&prod;<sub>j=1</sub><sup>n</sup> <var>A</var><sub>ij</sub>)<sup>1/n</sup></p>
                 <p><strong>Normalised priority weight</strong><br><var>w</var><sub>i</sub> = <var>GM</var><sub>i</sub> / &sum;<sub>k=1</sub><sup>n</sup> <var>GM</var><sub>k</sub></p>
                 <p><strong>Final alternative priority</strong><br><var>S</var><sub>a</sub> = &sum;<sub>i=1</sub><sup>n</sup> <var>w</var><sub>i</sub> &times; <var>p</var><sub>ai</sub>, where <var>p</var><sub>ai</sub> is alternative <var>a</var>'s local priority under criterion <var>i</var></p>
+                <p><strong>Objective criterion, higher is better</strong><br><var>p</var><sub>ai</sub> = <var>x</var><sub>ai</sub> / &sum;<sub>a</sub> <var>x</var><sub>ai</sub></p>
+                <p><strong>Objective criterion, lower is better</strong><br><var>p</var><sub>ai</sub> = (1 / <var>x</var><sub>ai</sub>) / &sum;<sub>a</sub> (1 / <var>x</var><sub>ai</sub>)</p>
                 <p><strong>Sensitivity scenario</strong><br><var>w</var>&prime;<sub>k</sub> = <var>s</var>, &nbsp; <var>w</var>&prime;<sub>j</sub> = <var>w</var><sub>j</sub> &times; (1 - <var>s</var>) / (1 - <var>w</var><sub>k</sub>)</p>
               </div>
             </div>
@@ -381,11 +390,11 @@
             </div>
             <div class="guidance-card">
               <span>Assumptions</span>
-              <p>Experts can make meaningful pairwise judgements, criteria are relevant to the decision, and alternatives are comparable under each criterion.</p>
+              <p>Experts can make meaningful pairwise judgements, objective values are measured consistently, criteria are relevant to the decision, and alternatives are comparable under each criterion.</p>
             </div>
             <div class="guidance-card">
               <span>Limitations</span>
-              <p>AHP supports structured judgement but does not remove bias. Poorly defined criteria or inconsistent responses can produce misleading rankings.</p>
+              <p>AHP supports structured judgement but does not remove bias. Objective criteria are normalised decision inputs, not proof that the selected measures fully represent performance.</p>
             </div>
           </div>
         </section>
@@ -399,6 +408,10 @@
           <details>
             <summary>Can several experts answer the same questionnaire?</summary>
             <p>Yes. Send the same questionnaire JSON to each expert, then load multiple completed response files in the analysis section. The tool aggregates judgements using a geometric mean.</p>
+          </details>
+          <details>
+            <summary>Can AHP use objective data as well as expert judgement?</summary>
+            <p>Yes. Mark a criterion as objective when alternatives can be compared using measured values, such as cost, on-time delivery percentage, emissions, or lead time. The tool normalises those values into local priorities while still using AHP criterion weights.</p>
           </details>
           <details>
             <summary>What does consistency ratio mean?</summary>
