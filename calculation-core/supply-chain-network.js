@@ -69,10 +69,28 @@
     return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
   }
 
-  function buildDistanceMatrix(facilities, customers, transportCostPerUnitKm) {
+  function normaliseRouteDistances(routeDistances = []) {
+    if (!Array.isArray(routeDistances) || !routeDistances.length) return { lookup: new Map(), count: 0 };
+    const lookup = new Map();
+    routeDistances.forEach((route, index) => {
+      const facility = cleanName(route.facility || route.facilityName, "");
+      const customer = cleanName(route.customer || route.customerName, "");
+      if (!facility || !customer) throw new Error(`Route distance row ${index + 1} needs Facility and Customer names.`);
+      const distanceKm = toNumber(route.distanceKm ?? route.distance ?? route["distance km"], `${facility} to ${customer} distance km`);
+      if (distanceKm < 0) throw new Error(`${facility} to ${customer} distance cannot be negative.`);
+      lookup.set(`${facility.toLowerCase()}||${customer.toLowerCase()}`, distanceKm);
+    });
+    return { lookup, count: lookup.size };
+  }
+
+  function buildDistanceMatrix(facilities, customers, transportCostPerUnitKm, routeDistances = []) {
+    const normalisedRoutes = normaliseRouteDistances(routeDistances);
     return facilities.map((facility) => customers.map((customer) => {
-      const distanceKm = haversineKm(facility, customer);
-      return { distanceKm, unitCost: distanceKm * transportCostPerUnitKm };
+      const key = `${facility.name.toLowerCase()}||${customer.name.toLowerCase()}`;
+      const uploadedDistance = normalisedRoutes.lookup.get(key);
+      const source = Number.isFinite(uploadedDistance) ? "uploaded" : "haversine";
+      const distanceKm = source === "uploaded" ? uploadedDistance : haversineKm(facility, customer);
+      return { distanceKm, unitCost: distanceKm * transportCostPerUnitKm, source };
     }));
   }
 
@@ -156,6 +174,7 @@
           customerIndex,
           flow: quantity,
           distanceKm: distance.distanceKm,
+          distanceSource: distance.source,
           transportCost: quantity * distance.unitCost,
         });
       });
@@ -216,7 +235,8 @@
         customerIndex,
         flow: customer.demand,
         distanceKm: distance.distanceKm,
-        transportCost: customer.demand * distance.distanceKm * transportCostPerUnitKm,
+        distanceSource: distance.source,
+        transportCost: customer.demand * distance.unitCost,
       });
     });
     const transportCost = allocations.reduce((sum, allocation) => sum + allocation.transportCost, 0);
@@ -308,6 +328,31 @@
         consider: "For larger strategic design problems, use pre-screened candidate facilities or a dedicated MILP solver.",
       });
     }
+    if (result?.distanceSource === "uploaded") {
+      diagnostics.push({
+        level: "info",
+        title: "Uploaded route distances used",
+        detected: `${result.distanceSummary.uploadedLaneCount} facility-customer lane distance${result.distanceSummary.uploadedLaneCount === 1 ? "" : "s"} supplied by the user.`,
+        why: "Using a lane-distance matrix is more realistic than straight-line distance when it reflects road, route, or transport-network distance.",
+        consider: "Check that distance units match the transport cost per unit/km.",
+      });
+    } else if (result?.distanceSource === "mixed") {
+      diagnostics.push({
+        level: "caution",
+        title: "Mixed distance sources",
+        detected: `${result.distanceSummary.uploadedLaneCount} uploaded lane distance${result.distanceSummary.uploadedLaneCount === 1 ? "" : "s"} and ${result.distanceSummary.haversineLaneCount} straight-line fallback distance${result.distanceSummary.haversineLaneCount === 1 ? "" : "s"}.`,
+        why: "Comparing route distances with straight-line fallback distances can bias allocation decisions.",
+        consider: "Upload distances for every facility-customer lane, or remove the route matrix and use one consistent approximation.",
+      });
+    } else if (result?.distanceSource === "haversine") {
+      diagnostics.push({
+        level: "info",
+        title: "Straight-line distance approximation",
+        detected: "No route-distance matrix was supplied.",
+        why: "The optimizer uses great-circle distance from coordinates as an early-stage approximation, not road distance or travel time.",
+        consider: "For operational decisions, upload a facility-customer distance matrix from routing, TMS, GIS, or carrier data.",
+      });
+    }
     diagnostics.push({
       level: "info",
       title: "Model boundary",
@@ -335,7 +380,12 @@
         error: "Insufficient capacity to satisfy demand.",
       };
     }
-    const distanceMatrix = buildDistanceMatrix(facilities, customers, transportCostPerUnitKm);
+    const distanceMatrix = buildDistanceMatrix(facilities, customers, transportCostPerUnitKm, input.routeDistances || []);
+    const flatDistances = distanceMatrix.flat();
+    const uploadedLaneCount = flatDistances.filter((distance) => distance.source === "uploaded").length;
+    const haversineLaneCount = flatDistances.length - uploadedLaneCount;
+    const distanceSource = uploadedLaneCount === 0 ? "haversine" : haversineLaneCount === 0 ? "uploaded" : "mixed";
+    const distanceSummary = { uploadedLaneCount, haversineLaneCount, totalLanes: flatDistances.length };
     let best = null;
     enumerateOpenSets(facilities.length, Number(input.maxCombinations || 4096)).forEach((openSet) => {
       const candidate = evaluateOpenSet(facilities, customers, distanceMatrix, openSet);
@@ -350,6 +400,8 @@
       customers,
       transportCostPerUnitKm,
       distanceMatrix,
+      distanceSource,
+      distanceSummary,
       optimized: best,
       current,
       summary,
@@ -414,5 +466,27 @@
     return { facilities, customers };
   }
 
-  return { optimizeNetwork, diagnoseNetwork, haversineKm, parseNetworkCsv };
+  function parseRouteDistanceCsv(text) {
+    const rows = parseCsv(text);
+    if (rows.length < 2) throw new Error("Route distance CSV needs a header row and at least one data row.");
+    const headers = rows[0].map((header) => header.trim().toLowerCase());
+    const indexOf = (names) => names.map((name) => headers.indexOf(name)).find((index) => index >= 0);
+    const facilityIndex = indexOf(["facility", "facility name", "warehouse", "origin"]);
+    const customerIndex = indexOf(["customer", "customer name", "demand point", "destination"]);
+    const distanceIndex = indexOf(["distance km", "distance", "route distance km", "road distance km"]);
+    if ([facilityIndex, customerIndex, distanceIndex].some((index) => index === undefined)) {
+      throw new Error("Route distance CSV must include Facility, Customer, and Distance km columns.");
+    }
+    return rows.slice(1).map((row, rowIndex) => {
+      if (!row.some((cell) => String(cell || "").trim())) return null;
+      const facility = cleanName(row[facilityIndex], "");
+      const customer = cleanName(row[customerIndex], "");
+      const distanceKm = toNumber(row[distanceIndex], `Route distance row ${rowIndex + 2}`);
+      if (!facility || !customer) throw new Error(`Route distance row ${rowIndex + 2} needs Facility and Customer names.`);
+      if (distanceKm < 0) throw new Error(`Route distance row ${rowIndex + 2} cannot be negative.`);
+      return { facility, customer, distanceKm };
+    }).filter(Boolean);
+  }
+
+  return { optimizeNetwork, diagnoseNetwork, haversineKm, parseNetworkCsv, parseRouteDistanceCsv };
 }));

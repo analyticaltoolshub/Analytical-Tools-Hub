@@ -202,6 +202,45 @@
   align-items: end;
 }
 
+.route-distance-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr);
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.route-distance-panel h3 {
+  margin: 0 0 .35rem;
+  color: var(--navy-950);
+}
+
+.route-distance-panel p {
+  margin: .55rem 0 0;
+  color: var(--text-secondary);
+}
+
+.route-distance-form {
+  display: grid;
+  align-content: start;
+  gap: .75rem;
+  min-width: 0;
+}
+
+.route-distance-form label {
+  display: grid;
+  gap: .4rem;
+  color: var(--navy-950);
+  font-weight: 800;
+}
+
+.route-distance-form button {
+  width: 100%;
+}
+
 .form-grid label {
   display: grid;
   gap: .4rem;
@@ -533,6 +572,7 @@ textarea {
 
   .network-workflow,
   .import-columns,
+  .route-distance-panel,
   .kpi-grid,
   .comparison-grid {
     grid-template-columns: 1fr 1fr;
@@ -559,6 +599,7 @@ textarea {
 
   .network-workflow,
   .import-columns,
+  .route-distance-panel,
   .kpi-grid,
   .comparison-grid {
     grid-template-columns: 1fr;

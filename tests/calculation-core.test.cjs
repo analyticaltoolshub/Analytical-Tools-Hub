@@ -83,6 +83,58 @@ test("Supply Chain Network Optimizer parses mixed facility and customer CSV rows
   assert.equal(parsed.customers[0].currentFacility, "Midlands DC");
 });
 
+test("Supply Chain Network Optimizer uses uploaded route distances when supplied", () => {
+  const result = supplyChainNetwork.optimizeNetwork({
+    transportCostPerUnitKm: 1,
+    facilities: [
+      { name: "Facility A", latitude: 0, longitude: 0, capacity: 10, fixedCost: 0 },
+      { name: "Facility B", latitude: 0, longitude: 0.01, capacity: 10, fixedCost: 0 },
+    ],
+    customers: [
+      { name: "Customer 1", latitude: 0, longitude: 0, demand: 5 },
+    ],
+    routeDistances: [
+      { facility: "Facility A", customer: "Customer 1", distanceKm: 100 },
+      { facility: "Facility B", customer: "Customer 1", distanceKm: 10 },
+    ],
+  });
+
+  assert.equal(result.distanceSource, "uploaded");
+  assert.equal(result.optimized.allocations[0].facility, "Facility B");
+  assert.equal(result.optimized.allocations[0].distanceSource, "uploaded");
+  approximatelyEqual(result.optimized.totalCost, 50);
+});
+
+test("Supply Chain Network Optimizer reports mixed distance sources for partial route matrix", () => {
+  const result = supplyChainNetwork.optimizeNetwork({
+    transportCostPerUnitKm: 1,
+    facilities: [
+      { name: "Facility A", latitude: 0, longitude: 0, capacity: 10, fixedCost: 0 },
+      { name: "Facility B", latitude: 0, longitude: 0.01, capacity: 10, fixedCost: 0 },
+    ],
+    customers: [
+      { name: "Customer 1", latitude: 0, longitude: 0, demand: 5 },
+    ],
+    routeDistances: [
+      { facility: "Facility A", customer: "Customer 1", distanceKm: 100 },
+    ],
+  });
+
+  assert.equal(result.distanceSource, "mixed");
+  assert.ok(result.diagnostics.some((item) => item.title === "Mixed distance sources"));
+});
+
+test("Supply Chain Network Optimizer parses route distance CSV rows", () => {
+  const parsed = supplyChainNetwork.parseRouteDistanceCsv([
+    "Facility,Customer,Distance km",
+    "Midlands DC,London Region,178",
+    "Northern DC,Leeds Region,72",
+  ].join("\n"));
+
+  assert.equal(parsed.length, 2);
+  assert.deepEqual(parsed[0], { facility: "Midlands DC", customer: "London Region", distanceKm: 178 });
+});
+
 test("Break-Even reproduces a hand-calculated reference case", () => {
   const result = breakEven.calculateBreakEven({
     fixedCosts: 25000,

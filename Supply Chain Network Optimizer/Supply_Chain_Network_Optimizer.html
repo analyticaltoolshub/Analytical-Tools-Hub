@@ -158,6 +158,23 @@
           </div>
           <p id="importStatus" class="status-text" role="status" aria-live="polite"></p>
 
+          <div class="route-distance-panel">
+            <div>
+              <h3>Optional route / distance matrix</h3>
+              <p>For operational use, upload real facility-to-customer lane distances from routing, TMS, GIS, or carrier data. If no matrix is uploaded, ATH uses straight-line Haversine distance from latitude and longitude as a transparent approximation.</p>
+              <p class="example-row"><strong>Distance example:</strong> Facility | Customer | Distance km &nbsp; then &nbsp; Midlands DC | London Region | 178</p>
+              <p><strong>Limitation:</strong> Straight-line distance is useful for early screening, but it does not reflect road distance, travel time, tolls, delivery windows, congestion, vehicle constraints, or carrier rate structures. Map route lines are visual connections unless you provide route distances.</p>
+            </div>
+            <div class="route-distance-form">
+              <label>
+                Route distance CSV
+                <input id="routeDistanceFile" type="file" accept=".csv,text/csv">
+              </label>
+              <button id="importRouteDistanceButton" type="button">Import Distance Matrix</button>
+              <p id="routeDistanceStatus" class="status-text" role="status" aria-live="polite">No distance matrix uploaded. Straight-line distance will be used.</p>
+            </div>
+          </div>
+
           <div class="editable-section">
             <div class="section-actions compact">
               <div>
@@ -217,7 +234,7 @@
           <div class="table-scroll">
             <table class="data-table" id="allocationTable">
               <thead>
-                <tr><th>Facility</th><th>Customer</th><th>Flow</th><th>Distance km</th><th>Transport cost</th></tr>
+                <tr><th>Facility</th><th>Customer</th><th>Flow</th><th>Distance km</th><th>Distance source</th><th>Transport cost</th></tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -226,7 +243,7 @@
 
         <section class="panel map-panel" id="network-map-section" hidden>
           <h2>4. Network Map</h2>
-          <p>Facilities, demand points, and optimized routes are shown as an illustrative map-based network view. Use the map controls to adjust labels, route values, and line thickness.</p>
+          <p>Facilities, demand points, and optimized flows are shown as an illustrative map-based network view. Route lines show facility-to-customer connections; they are not road-route geometry.</p>
           <p class="map-privacy-note">Map background tiles are requested from OpenStreetMap. Facility names, customer names, demand, capacity, cost, flow volumes, and optimization results are not sent by ATH.</p>
           <div id="networkMapShell" class="network-map-shell">
             <div class="map-controls-card" role="group" aria-labelledby="mapControlsTitle">
@@ -278,7 +295,7 @@
         <section class="panel content-section" id="methodology">
           <h2>Methodology, Assumptions, and Limitations</h2>
           <div class="guidance-grid">
-            <div class="guidance-card methodology-formula-card"><span>Formula Logic</span><p>For each open-facility set, minimize total cost = sum(flow &times; distance &times; transport cost per unit/km) + sum(open facility fixed costs), subject to customer demand and facility capacity constraints.</p></div>
+            <div class="guidance-card methodology-formula-card"><span>Formula Logic</span><p>For each open-facility set, minimize total cost = sum(flow &times; distance &times; transport cost per unit/km) + sum(open facility fixed costs), subject to customer demand and facility capacity constraints. Distance comes from the uploaded route matrix where a matching facility-customer lane exists; otherwise ATH uses Haversine straight-line distance from coordinates.</p></div>
             <div class="guidance-card"><span>Optimization Approach</span><p>The browser enumerates feasible open facility sets for modest scenarios and solves each allocation using min-cost flow. This gives an exact result within the current browser limits.</p></div>
             <div class="guidance-card"><span>Limitations</span><p>The model is single-echelon and does not yet include facility-location generation, service-level constraints, lead times, carbon, route vehicles, resilience, or multi-period demand.</p></div>
           </div>
@@ -287,6 +304,7 @@
         <section class="panel content-section faq-section" id="faq">
           <h2>FAQ</h2>
           <details><summary>Does the tool choose which facilities to open?</summary><p>Yes. For modest scenarios it tests feasible open-facility combinations and includes fixed facility cost in the objective.</p></details>
+          <details><summary>How are distances calculated?</summary><p>If you upload a route or distance matrix, matching facility-customer lanes use those distances. Any lane without an uploaded distance uses Haversine straight-line distance from latitude and longitude. Straight-line distance is transparent and useful for early screening, but it is not road distance, travel time, or carrier-rated distance.</p></details>
           <details><summary>Is this a full strategic network design solver?</summary><p>No. It is a practical browser-based allocation optimizer. Larger multi-echelon or mixed-integer models usually need a dedicated solver.</p></details>
           <details><summary>What if demand exceeds total capacity?</summary><p>The tool stops and shows a high-risk diagnostic because demand cannot be fully satisfied under the entered capacity constraints.</p></details>
           <details><summary>Is my network data uploaded?</summary><p>No. CSV parsing, optimization, diagnostics, route drawing, and exports run locally in your browser. The map background uses OpenStreetMap tiles, so tile requests are made for the visible map area, but ATH does not send your facility, customer, demand, capacity, cost, or optimization data.</p></details>

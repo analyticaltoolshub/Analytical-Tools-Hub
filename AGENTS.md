@@ -563,6 +563,10 @@ Available tools should be represented consistently:
   optimized allocation is operationally implementable without checking service time,
   resilience, contracts, labour, inventory, and route constraints not included in the
   model.
+- Prefer user-supplied facility-customer route/distance matrices for operational
+  reviews. If a lane distance is not supplied, clearly label the Haversine
+  straight-line coordinate distance as an approximation and explain that it is not
+  road distance, travel time, carrier-rated distance, or route geometry.
 - Keep map popups, CSV imports, and exports safe for user-entered names by escaping
   HTML and quoting CSV fields.
 

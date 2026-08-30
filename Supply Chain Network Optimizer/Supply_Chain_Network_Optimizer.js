@@ -25,6 +25,7 @@
   const state = {
     facilities: [],
     customers: [],
+    routeDistances: [],
     result: null,
     map: null,
     mapLayer: null,
@@ -43,6 +44,8 @@
     customerBody: document.querySelector("#customerTable tbody"),
     importStatus: document.getElementById("importStatus"),
     csvFile: document.getElementById("csvFile"),
+    routeDistanceFile: document.getElementById("routeDistanceFile"),
+    routeDistanceStatus: document.getElementById("routeDistanceStatus"),
     errorMessage: document.getElementById("errorMessage"),
     results: document.getElementById("results"),
     mapSection: document.getElementById("network-map-section"),
@@ -240,6 +243,7 @@
           allocation.customer,
           formatNumber.format(allocation.flow),
           formatNumber.format(allocation.distanceKm),
+          allocation.distanceSource === "uploaded" ? "Uploaded route matrix" : "Straight-line fallback",
           formatCurrency.format(allocation.transportCost),
         ].forEach((value) => {
           const cell = document.createElement("td");
@@ -356,8 +360,9 @@
         weight: routeWeight(allocation, result),
         opacity: .68,
       });
-      route.bindPopup(`<strong>${escapeHtml(facility.name)} to ${escapeHtml(customer.name)}</strong><br>Flow: ${formatNumber.format(allocation.flow)}<br>Distance: ${formatNumber.format(allocation.distanceKm)} km<br>Cost: ${formatCurrency.format(allocation.transportCost)}`);
-      route.on("click", () => detailText(`${facility.name} to ${customer.name}`, `flow ${formatNumber.format(allocation.flow)}, distance ${formatNumber.format(allocation.distanceKm)} km, transport cost ${formatCurrency.format(allocation.transportCost)}.`));
+      const distanceSourceLabel = allocation.distanceSource === "uploaded" ? "uploaded route matrix" : "straight-line fallback";
+      route.bindPopup(`<strong>${escapeHtml(facility.name)} to ${escapeHtml(customer.name)}</strong><br>Flow: ${formatNumber.format(allocation.flow)}<br>Distance: ${formatNumber.format(allocation.distanceKm)} km (${distanceSourceLabel})<br>Cost: ${formatCurrency.format(allocation.transportCost)}`);
+      route.on("click", () => detailText(`${facility.name} to ${customer.name}`, `flow ${formatNumber.format(allocation.flow)}, distance ${formatNumber.format(allocation.distanceKm)} km (${distanceSourceLabel}), transport cost ${formatCurrency.format(allocation.transportCost)}.`));
       route.addTo(state.mapLayer);
       addRouteLabel(allocation, facility, customer);
     });
@@ -458,6 +463,7 @@
         facilities: state.facilities,
         customers: state.customers,
         transportCostPerUnitKm: selectors.transportCost.value,
+        routeDistances: state.routeDistances,
       });
       diagnosticsRenderer?.render("#networkDiagnostics", result.diagnostics, { heading: "Network Diagnostics" });
       if (!result.feasible) {
@@ -475,6 +481,7 @@
         facilities: state.facilities,
         customers: state.customers,
         transportCostPerUnitKm: selectors.transportCost.value,
+        routeDistances: state.routeDistances,
       }), { heading: "Network Diagnostics" });
       showError(error.message);
     }
@@ -494,6 +501,9 @@
       ["Section", "Metric", "Value"].map(quoteCsv).join(","),
       ["Metadata", "Generated", new Date().toISOString()].map(quoteCsv).join(","),
       ["Metadata", "Method", "Exact open-facility enumeration with min-cost flow allocation"].map(quoteCsv).join(","),
+      ["Metadata", "Distance source", result.distanceSource].map(quoteCsv).join(","),
+      ["Metadata", "Uploaded distance lanes", result.distanceSummary.uploadedLaneCount].map(quoteCsv).join(","),
+      ["Metadata", "Straight-line fallback lanes", result.distanceSummary.haversineLaneCount].map(quoteCsv).join(","),
       ["Summary", "Total optimized cost", result.summary.totalOptimizedCost].map(quoteCsv).join(","),
       ["Summary", "Transport cost", result.summary.transportCost].map(quoteCsv).join(","),
       ["Summary", "Facility cost", result.summary.facilityCost].map(quoteCsv).join(","),
@@ -502,12 +512,13 @@
       ["Summary", "Current cost", result.summary.currentCost ?? ""].map(quoteCsv).join(","),
       ["Summary", "Savings", result.summary.savings ?? ""].map(quoteCsv).join(","),
       "",
-      ["Facility", "Customer", "Flow", "Distance km", "Transport cost"].map(quoteCsv).join(","),
+      ["Facility", "Customer", "Flow", "Distance km", "Distance source", "Transport cost"].map(quoteCsv).join(","),
       ...result.optimized.allocations.map((allocation) => [
         allocation.facility,
         allocation.customer,
         allocation.flow,
         allocation.distanceKm,
+        allocation.distanceSource,
         allocation.transportCost,
       ].map(quoteCsv).join(",")),
       "",
@@ -526,8 +537,11 @@
   function loadSample() {
     state.facilities = structuredClone(sampleFacilities);
     state.customers = structuredClone(sampleCustomers);
+    state.routeDistances = [];
     selectors.transportCost.value = "0.035";
     selectors.importStatus.textContent = "Sample network loaded. Review and edit the facility, customer, and cost assumptions before using the result.";
+    selectors.routeDistanceStatus.textContent = "No distance matrix uploaded. Straight-line distance will be used.";
+    selectors.routeDistanceFile.value = "";
     clearError();
     renderEditableTables();
     setWorkflow(1);
@@ -536,11 +550,14 @@
   function resetTool() {
     state.facilities = [];
     state.customers = [];
+    state.routeDistances = [];
     state.result = null;
     selectors.results.hidden = true;
     selectors.mapSection.hidden = true;
     selectors.importStatus.textContent = "";
     selectors.csvFile.value = "";
+    selectors.routeDistanceFile.value = "";
+    selectors.routeDistanceStatus.textContent = "No distance matrix uploaded. Straight-line distance will be used.";
     selectors.transportCost.value = "0.035";
     clearError();
     diagnosticsRenderer?.render("#networkDiagnostics", []);
@@ -575,6 +592,31 @@
     reader.readAsText(file);
   }
 
+  function importRouteDistances() {
+    const file = selectors.routeDistanceFile.files?.[0];
+    if (!file) {
+      selectors.routeDistanceStatus.textContent = "Choose a route distance CSV before importing.";
+      return;
+    }
+    if (!file.name.toLowerCase().endsWith(".csv") || file.size > 1024 * 1024) {
+      showError("Use a route distance CSV file up to 1 MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        state.routeDistances = core.parseRouteDistanceCsv(String(reader.result || ""));
+        selectors.routeDistanceStatus.textContent = `${state.routeDistances.length} route distance lane${state.routeDistances.length === 1 ? "" : "s"} imported. Run Optimize Network to apply matching uploaded distances.`;
+        clearError();
+      } catch (error) {
+        state.routeDistances = [];
+        selectors.routeDistanceStatus.textContent = "No valid distance matrix loaded.";
+        showError(error.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
   document.getElementById("loadSampleButton").addEventListener("click", loadSample);
   document.getElementById("resetButton").addEventListener("click", resetTool);
   document.getElementById("addFacilityButton").addEventListener("click", () => {
@@ -588,6 +630,7 @@
     renderEditableTables();
   });
   document.getElementById("importCsvButton").addEventListener("click", importCsv);
+  document.getElementById("importRouteDistanceButton").addEventListener("click", importRouteDistances);
   document.getElementById("optimizeButton").addEventListener("click", runOptimization);
   document.getElementById("exportCsvButton").addEventListener("click", exportCsv);
   [
