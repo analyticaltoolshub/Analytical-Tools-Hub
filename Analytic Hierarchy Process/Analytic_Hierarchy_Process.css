@@ -146,6 +146,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.criteria-grid {
+  grid-template-columns: 1fr;
+}
+
 .input-grid label,
 .name-grid label,
 .file-row label,
@@ -359,9 +363,9 @@ button:disabled {
 
 .structure-item {
   display: grid;
-  gap: .75rem;
+  gap: .65rem;
   min-width: 0;
-  padding: .25rem 0 1rem;
+  padding: .25rem 0 .9rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -377,16 +381,27 @@ button:disabled {
 }
 
 .structure-item textarea {
-  min-height: 82px;
+  min-height: 68px;
   resize: vertical;
   line-height: 1.45;
+}
+
+.criterion-field-row {
+  display: grid;
+  grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.subcriterion-field-row textarea {
+  min-height: 58px;
 }
 
 .criterion-config {
   display: grid;
   grid-template-columns: 1fr;
-  gap: .75rem;
-  padding: .75rem;
+  gap: .6rem;
+  padding: .65rem;
   border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
   background: #fff;
@@ -405,14 +420,126 @@ button:disabled {
   display: none;
 }
 
+.criterion-config[hidden] {
+  display: none;
+}
+
 .criterion-config-objective {
   border-color: rgba(31, 111, 235, .35);
   background: #eff6ff;
 }
 
+.subcriteria-toggle {
+  position: relative;
+  display: inline-flex;
+  gap: .65rem;
+  align-items: center;
+  justify-content: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 42px;
+  padding: .45rem .65rem .45rem .8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background: #fff;
+  box-shadow: none;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.subcriteria-toggle input {
+  position: absolute;
+  right: .65rem;
+  width: 46px;
+  height: 26px;
+  min-height: 26px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.subcriteria-toggle-copy {
+  min-width: 0;
+}
+
+.subcriteria-toggle-track {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: #d0d5dd;
+  pointer-events: none;
+  transition: background .2s ease;
+}
+
+.subcriteria-toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, .22);
+  transition: transform .2s ease;
+}
+
+.subcriteria-toggle:has(input:checked) {
+  border-color: rgba(31, 111, 235, .35);
+  background: #eff6ff;
+  box-shadow: 0 8px 20px rgba(31, 111, 235, .08);
+}
+
+.subcriteria-toggle:has(input:checked) .subcriteria-toggle-track {
+  background: var(--blue-600);
+}
+
+.subcriteria-toggle:has(input:checked) .subcriteria-toggle-track::after {
+  transform: translateX(20px);
+}
+
+.subcriteria-toggle:has(input:focus-visible) {
+  outline: 3px solid rgba(31, 111, 235, .2);
+  outline-offset: 3px;
+}
+
+.subcriteria-editor {
+  display: grid;
+  gap: .85rem;
+  padding: .9rem;
+  border: 1px solid rgba(31, 111, 235, .25);
+  border-radius: var(--border-radius-md);
+  background: #f8fbff;
+}
+
+.subcriteria-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subcriterion-item {
+  display: grid;
+  gap: .65rem;
+  padding: .9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background: #fff;
+}
+
 .structure-item .remove-structure-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 42px;
   min-width: 42px;
+  height: 42px;
   min-height: 42px;
   padding: 0;
   border: 1px solid #fecdca;
@@ -662,7 +789,141 @@ button:disabled {
   color: var(--text-secondary);
 }
 
+.ahp-hierarchy-structure {
+  display: grid;
+  gap: 14px;
+}
+
+.ahp-hierarchy-goal,
+.ahp-hierarchy-node,
+.ahp-hierarchy-alternatives {
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background: var(--surface);
+}
+
+.ahp-hierarchy-goal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+  color: var(--navy-950);
+  font-weight: 900;
+}
+
+.ahp-hierarchy-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.ahp-hierarchy-node {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  min-width: 0;
+  background: #fff;
+}
+
+.ahp-hierarchy-node-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.ahp-hierarchy-node-header strong {
+  min-width: 0;
+}
+
+.ahp-hierarchy-leaf {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.ahp-hierarchy-node-header strong,
+.ahp-hierarchy-leaf strong {
+  color: var(--navy-950);
+}
+
+.ahp-hierarchy-badge,
+.ahp-hierarchy-metric {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.ahp-hierarchy-badge {
+  color: var(--blue-600);
+  background: var(--blue-100);
+}
+
+.ahp-hierarchy-metric {
+  color: var(--text-secondary);
+  background: var(--surface-alt);
+}
+
+.ahp-hierarchy-subcriteria {
+  display: grid;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 3px solid var(--blue-100);
+}
+
+.ahp-hierarchy-leaf {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background: #f8fbff;
+}
+
+.ahp-hierarchy-direct-leaf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 0;
+}
+
+.ahp-hierarchy-alternatives {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  background: #fff;
+}
+
+.ahp-hierarchy-alternative-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ahp-hierarchy-alternative-list span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-primary);
+  background: var(--surface);
+  font-weight: 800;
+}
+
 .table-scroll {
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
@@ -774,6 +1035,7 @@ button:disabled {
 .objective-data-section {
   display: grid;
   gap: .75rem;
+  min-width: 0;
   margin-top: 1.15rem;
   padding: 1rem;
   border: 1px solid var(--border);
@@ -797,6 +1059,10 @@ button:disabled {
   padding: .75rem .85rem;
   border-left: 3px solid var(--blue-600);
   background: #fff;
+}
+
+#objectiveDataMatrix {
+  min-width: 0;
 }
 
 .objective-data-table {
@@ -1502,6 +1768,8 @@ button:disabled {
 
   .input-grid,
   .name-grid,
+  .criterion-field-row,
+  .ahp-hierarchy-list,
   .criterion-config,
   .guidance-grid,
   .question-card {
@@ -1510,6 +1778,83 @@ button:disabled {
 
   .formula-list {
     grid-template-columns: 1fr;
+  }
+
+  .ahp-hierarchy-goal,
+  .ahp-hierarchy-node,
+  .ahp-hierarchy-alternatives {
+    padding: 12px;
+  }
+
+  .ahp-hierarchy-node-header,
+  .ahp-hierarchy-leaf {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    align-items: center;
+  }
+
+  .ahp-hierarchy-node-header strong,
+  .ahp-hierarchy-leaf strong {
+    flex: 1 1 100%;
+    order: 2;
+  }
+
+  .ahp-hierarchy-badge {
+    order: 1;
+    max-width: 100%;
+  }
+
+  .ahp-hierarchy-metric {
+    order: 3;
+  }
+
+  .ahp-hierarchy-subcriteria {
+    gap: 8px;
+    padding-left: 8px;
+  }
+
+  .objective-data-section {
+    gap: .65rem;
+    margin-top: 1rem;
+    padding: .75rem;
+  }
+
+  .objective-data-note {
+    margin-bottom: .55rem;
+    padding: .65rem .75rem;
+    font-size: .9rem;
+  }
+
+  .objective-data-table {
+    min-width: 500px;
+  }
+
+  .objective-data-table th,
+  .objective-data-table td {
+    min-width: 132px;
+    padding: 9px;
+    font-size: .86rem;
+  }
+
+  .objective-data-table th:first-child,
+  .objective-data-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 126px;
+    background: #fff;
+    box-shadow: 1px 0 0 var(--border);
+  }
+
+  .objective-data-table thead th:first-child {
+    z-index: 2;
+    background: var(--surface);
+  }
+
+  .objective-data-table input {
+    min-height: 40px;
+    padding: 8px 9px;
   }
 
   .field-group-header {

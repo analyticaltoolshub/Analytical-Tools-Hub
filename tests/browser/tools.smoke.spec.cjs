@@ -38,7 +38,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const entry of pages) {
-  test(`${entry.name} loads and its primary sample flow remains operable`, async ({ page }) => {
+  test(`${entry.name} loads and its primary sample flow remains operable`, async ({ page }, testInfo) => {
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
 
@@ -233,6 +233,18 @@ for (const entry of pages) {
       await expect(page.locator('[data-structure-item="criteria"]').nth(3).locator('[data-type="criteria"]')).toHaveValue('Total Logistics Cost');
       await expect(page.locator('[data-structure-item="criteria"]').nth(3).locator('[data-criterion-type]')).toHaveValue('objective');
       await expect(page.locator('[data-structure-item="criteria"]').nth(3).locator('[data-criterion-direction]')).toHaveValue('lower');
+
+      await page.locator('#sampleTemplateSelect').selectOption('third-party-logistics');
+      await page.locator('#loadSampleDesignButton').click();
+      await page.locator('[data-toggle-subcriteria="0"]').check();
+      await expect(page.locator('[data-structure-item="criteria"]').first().locator('[data-subcriterion-item]')).toHaveCount(2);
+      await page.locator('[data-structure-item="criteria"]').first().locator('[data-subcriterion-name]').nth(0).fill('Geographic Coverage');
+      await page.locator('[data-structure-item="criteria"]').first().locator('[data-subcriterion-type]').nth(0).selectOption('subjective');
+      await page.locator('[data-structure-item="criteria"]').first().locator('[data-subcriterion-name]').nth(1).fill('Service Portfolio Fit');
+      await page.locator('[data-structure-item="criteria"]').first().locator('[data-subcriterion-type]').nth(1).selectOption('subjective');
+      await page.locator('#previewQuestionnaireButton').click();
+      await expect(page.locator('#questionnairePreview')).toContainText('sub-criteria comparison questions');
+      await page.locator('#loadSampleResponseButton').click();
     }
     if (entry.calculate) {
       const calculate = page.locator(entry.calculate);
@@ -257,10 +269,25 @@ for (const entry of pages) {
       }
       if (entry.name === 'Analytic Hierarchy Process') {
         await expect(page.locator('#results')).toBeVisible();
+        await expect(page.locator('#hierarchyStructure')).toContainText('Level 1 - Goal');
+        await expect(page.locator('#hierarchyStructure')).toContainText('Level 2 - Criterion');
+        await expect(page.locator('#hierarchyStructure')).toContainText('Alternatives');
+        await expect(page.locator('#hierarchyStructure')).not.toContainText('Leaf criterion');
         await expect(page.locator('.objective-calculation-table').first()).toContainText('Normalisation value');
         await expect(page.locator('.objective-calculation-table').first()).not.toContainText('Local priority');
         await expect(page.locator('#decisionMatrix')).toContainText('Priority 0.');
         await expect(page.locator('#decisionMatrix')).not.toContainText('Priority 0.0%');
+        const objectiveMatrixLayout = await page.locator('#objectiveDataMatrix .table-scroll').evaluate((scroll) => {
+          const rect = scroll.getBoundingClientRect();
+          return {
+            contained: rect.left >= -1 && rect.right <= document.documentElement.clientWidth + 1,
+            scrollable: scroll.scrollWidth > scroll.clientWidth,
+          };
+        });
+        expect(objectiveMatrixLayout.contained).toBe(true);
+        if (testInfo.project.name === 'mobile-chromium') {
+          expect(objectiveMatrixLayout.scrollable).toBe(true);
+        }
       }
     }
 

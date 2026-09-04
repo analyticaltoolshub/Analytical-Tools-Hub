@@ -30,7 +30,7 @@
   function matrixFromAnswers(size, answers, prefix) {
     const matrix = Array.from({ length: size }, () => Array(size).fill(1));
     Object.entries(answers).forEach(([key, value]) => {
-      if (!key.startsWith(prefix)) return;
+      if (!(key === prefix || key.startsWith(`${prefix}-`))) return;
       const parts = key.split("-").map((part) => Number(part));
       const i = prefix === "c" ? parts[1] : parts[2];
       const j = prefix === "c" ? parts[2] : parts[3];
@@ -50,6 +50,9 @@
 
   function normaliseCriterion(criterion, index) {
     if (criterion && typeof criterion === "object") {
+      const children = Array.isArray(criterion.children)
+        ? criterion.children.map((child, childIndex) => normaliseCriterion(child, childIndex))
+        : [];
       const type = criterion.type === "objective" ? "objective" : "subjective";
       const direction = criterion.direction === "lower" ? "lower" : "higher";
       return {
@@ -57,6 +60,7 @@
         description: String(criterion.description || "").trim(),
         type,
         direction,
+        children,
       };
     }
     return {
@@ -64,6 +68,7 @@
       description: "",
       type: "subjective",
       direction: "higher",
+      children: [],
     };
   }
 
@@ -79,6 +84,47 @@
       );
     }
     return normaliseCriteria(criteria);
+  }
+
+  function criterionSignature(criteria) {
+    return criteria.map((criterion) => {
+      const childSignature = criterion.children && criterion.children.length
+        ? `[${criterionSignature(criterion.children)}]`
+        : "";
+      return `${criterion.name}:${criterion.type}:${criterion.direction}${childSignature}`;
+    }).join("|");
+  }
+
+  function leafCriteriaFromCriteria(criteria, criteriaWeights = []) {
+    const leaves = [];
+    criteria.forEach((criterion, criterionIndex) => {
+      const parentWeight = criteriaWeights[criterionIndex] ?? 1;
+      if (criterion.children && criterion.children.length) {
+        criterion.children.forEach((child, childIndex) => {
+          leaves.push({
+            ...child,
+            parentName: criterion.name,
+            parentIndex: criterionIndex,
+            childIndex,
+            label: `${criterion.name}: ${child.name}`,
+            globalWeight: parentWeight,
+          });
+        });
+        return;
+      }
+      leaves.push({
+        ...criterion,
+        parentName: "",
+        parentIndex: criterionIndex,
+        childIndex: null,
+        label: criterion.name,
+        globalWeight: parentWeight,
+      });
+    });
+    leaves.forEach((leaf, index) => {
+      leaf.globalIndex = index;
+    });
+    return leaves;
   }
 
   function objectiveValueList(objectiveValues, criterionIndex, alternativeCount) {
@@ -122,7 +168,7 @@
     }
 
     return {
-      criterion: criterion.name,
+      criterion: criterion.label || criterion.name,
       criterionMeta: criterion,
       type: "objective",
       direction: criterion.direction,
@@ -165,6 +211,24 @@
     return { weights, rowGeometricMeans, weightedSums, consistencyVector, lambdaMax, ci, cr };
   }
 
+  function requirePairwiseAnswers(answers, ids) {
+    ids.forEach((id) => {
+      if (!Number.isFinite(Number(answers?.[id]))) {
+        throw new Error("AHP calculation is missing one or more required pairwise answers.");
+      }
+    });
+  }
+
+  function pairIds(prefix, size) {
+    const ids = [];
+    for (let i = 0; i < size; i++) {
+      for (let j = i + 1; j < size; j++) {
+        ids.push(`${prefix}-${i}-${j}`);
+      }
+    }
+    return ids;
+  }
+
   function calculateAhp(responses, options = {}) {
     const questionnaire = responses[0].questionnaire;
     const criteria = criteriaFromQuestionnaire(questionnaire);
@@ -177,12 +241,12 @@
       if (
         responseCriteria.length !== criteriaCount ||
         response.questionnaire.alternatives.length !== alternativeCount ||
-        responseCriteria.map((criterion) => `${criterion.name}:${criterion.type}:${criterion.direction}`).join("|") !==
-          criteria.map((criterion) => `${criterion.name}:${criterion.type}:${criterion.direction}`).join("|") ||
+        criterionSignature(responseCriteria) !== criterionSignature(criteria) ||
         response.questionnaire.alternatives.join("|") !== questionnaire.alternatives.join("|")
       ) {
         throw new Error("All response files must use the same questionnaire structure.");
       }
+      requirePairwiseAnswers(response.answers.criteria, pairIds("c", criteriaCount));
     });
 
     const criteriaMatrices = responses.map((response) =>
@@ -190,21 +254,78 @@
     );
     const criteriaMatrix = aggregateMatrices(criteriaMatrices);
     const criteriaResult = { matrix: criteriaMatrix, ...calculateWeights(criteriaMatrix) };
-    const alternativeResults = criteria.map((criterion, criterionIndex) => {
+
+    const subcriteriaResults = criteria.map((criterion, criterionIndex) => {
+      if (!criterion.children || !criterion.children.length) return null;
+      const prefix = `s-${criterionIndex}`;
+      responses.forEach((response) => {
+        requirePairwiseAnswers(response.answers.subcriteria || {}, pairIds(prefix, criterion.children.length));
+      });
+      const matrices = responses.map((response) =>
+        matrixFromAnswers(criterion.children.length, response.answers.subcriteria || {}, prefix)
+      );
+      const matrix = aggregateMatrices(matrices);
+      return {
+        criterion: criterion.name,
+        criterionIndex,
+        children: criterion.children.map((child) => child.name),
+        matrix,
+        ...calculateWeights(matrix),
+      };
+    });
+
+    const leafCriteria = [];
+    criteria.forEach((criterion, criterionIndex) => {
+      const parentWeight = criteriaResult.weights[criterionIndex];
+      if (criterion.children && criterion.children.length) {
+        const subResult = subcriteriaResults[criterionIndex];
+        criterion.children.forEach((child, childIndex) => {
+          const localWeight = subResult.weights[childIndex];
+          leafCriteria.push({
+            ...child,
+            parentName: criterion.name,
+            parentIndex: criterionIndex,
+            childIndex,
+            label: `${criterion.name}: ${child.name}`,
+            localWeight,
+            globalWeight: parentWeight * localWeight,
+          });
+        });
+        return;
+      }
+      leafCriteria.push({
+        ...criterion,
+        parentName: "",
+        parentIndex: criterionIndex,
+        childIndex: null,
+        label: criterion.name,
+        localWeight: parentWeight,
+        globalWeight: parentWeight,
+      });
+    });
+    leafCriteria.forEach((criterion, index) => {
+      criterion.globalIndex = index;
+    });
+    const leafWeights = leafCriteria.map((criterion) => criterion.globalWeight);
+
+    const alternativeResults = leafCriteria.map((criterion, leafIndex) => {
       if (criterion.type === "objective") {
         return calculateObjectivePriorities(
           criterion,
-          objectiveValueList(options.objectiveValues, criterionIndex, alternativeCount)
+          objectiveValueList(options.objectiveValues, leafIndex, alternativeCount)
         );
       }
 
-      const prefix = `a-${criterionIndex}`;
+      const prefix = `a-${leafIndex}`;
+      responses.forEach((response) => {
+        requirePairwiseAnswers(response.answers.alternatives, pairIds(prefix, alternativeCount));
+      });
       const matrices = responses.map((response) =>
         matrixFromAnswers(alternativeCount, response.answers.alternatives, prefix)
       );
       const matrix = aggregateMatrices(matrices);
       return {
-        criterion: criterion.name,
+        criterion: criterion.label || criterion.name,
         criterionMeta: criterion,
         type: "subjective",
         matrix,
@@ -212,8 +333,8 @@
       };
     });
     const alternativeScores = questionnaire.alternatives.map((alternative, alternativeIndex) => {
-      const score = alternativeResults.reduce((sum, result, criterionIndex) =>
-        sum + criteriaResult.weights[criterionIndex] * result.weights[alternativeIndex], 0
+      const score = alternativeResults.reduce((sum, result, leafIndex) =>
+        sum + leafWeights[leafIndex] * result.weights[alternativeIndex], 0
       );
       return { alternative, alternativeIndex, score };
     }).sort((a, b) => b.score - a.score);
@@ -222,6 +343,9 @@
       questionnaire: { ...questionnaire, criteria: criteriaNames, criteriaMeta: criteria },
       expertCount: responses.length,
       criteriaResult,
+      subcriteriaResults,
+      leafCriteria,
+      leafWeights,
       alternativeResults,
       alternativeScores,
     };
@@ -232,6 +356,7 @@
     normaliseCriterion,
     normaliseCriteria,
     criteriaFromQuestionnaire,
+    leafCriteriaFromCriteria,
     judgementToRatio,
     matrixFromAnswers,
     aggregateMatrices,

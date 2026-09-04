@@ -91,15 +91,15 @@
       <div class="guidance-grid">
         <div class="guidance-card">
           <span>Decision Supported</span>
-          <p>Use this tool when a decision has several criteria and several alternatives that need structured expert judgement.</p>
+          <p>Use this tool when a decision has several criteria, optional sub-criteria, and several alternatives that need structured judgement and measured evidence.</p>
         </div>
         <div class="guidance-card">
           <span>What It Tells You</span>
-          <p>It estimates criterion weights, alternative scores under each criterion, overall ranking, and consistency ratios for the expert judgements.</p>
+          <p>It estimates criterion weights, sub-criteria weights where used, alternative scores under each evaluable criterion, overall ranking, and consistency ratios.</p>
         </div>
         <div class="guidance-card">
           <span>Example Input</span>
-          <p>Define criteria such as cost, quality, risk, and implementation time, then compare alternatives pairwise under each criterion.</p>
+          <p>Define criteria such as cost, quality, risk, and implementation time; add sub-criteria when a criterion needs a clearer breakdown.</p>
         </div>
         <div class="guidance-card">
           <span>Sample Output Interpretation</span>
@@ -113,7 +113,7 @@
         <li class="active" data-ahp-workflow-index="0" aria-current="step">
           <span>1</span>
           <strong>Design</strong>
-          <small>Define the goal, criteria, and alternatives</small>
+          <small>Define the goal, criteria, sub-criteria, and alternatives</small>
         </li>
         <li data-ahp-workflow-index="1">
           <span>2</span>
@@ -247,7 +247,7 @@
 
           <div id="objectiveDataSection" class="objective-data-section hidden">
             <h3>Objective Criteria Data</h3>
-            <p>Enter measured values for objective criteria before calculating the final ranking. These values are normalised into local priorities and combined with the criterion weights.</p>
+            <p>Enter measured values for objective leaf criteria before calculating the final ranking. These values are normalised into local priorities and combined with their global weights.</p>
             <div id="objectiveDataMatrix"></div>
           </div>
 
@@ -279,20 +279,25 @@
               <div id="alternativeRanking" class="ranking-list"></div>
             </div>
             <div class="result-card result-card-wide">
+              <h3>AHP Hierarchy Structure</h3>
+              <p class="result-card-intro">Review the decision hierarchy used in this calculation: goal, criteria, optional sub-criteria, and alternatives.</p>
+              <div id="hierarchyStructure" class="ahp-hierarchy-structure"></div>
+            </div>
+            <div class="result-card result-card-wide">
               <h3>Pairwise Comparison Calculations</h3>
               <p class="result-card-intro">Trace the calculation from the aggregated pairwise judgements and any objective data normalisation through local priorities and consistency checks. Select any calculation below to view the detail.</p>
               <div id="pairwiseCalculations" class="pairwise-calculations"></div>
             </div>
             <div class="result-card result-card-wide">
               <h3>Decision Matrix and Weighted Calculation</h3>
-              <p class="result-card-intro">The final matrix combines each alternative's local priority under every criterion with the criterion weights.</p>
+              <p class="result-card-intro">The final matrix combines each alternative's local priority under every leaf criterion or sub-criterion with its global weight.</p>
               <div id="decisionMatrix" class="decision-matrix-wrap"></div>
             </div>
             <div class="result-card result-card-wide sensitivity-card">
               <div class="sensitivity-header">
                 <div>
                   <h3>Scenario Planning: Test Weight Sensitivity</h3>
-                  <p class="result-card-intro">Test whether the preferred alternative changes when one criterion receives more or less importance.</p>
+                  <p class="result-card-intro">Test whether the preferred alternative changes when one criterion or sub-criterion receives more or less importance.</p>
                 </div>
                 <button class="scenario-toggle" id="sensitivityToggle" type="button" aria-pressed="false" aria-controls="sensitivityPanel">
                   <span class="scenario-toggle-text">Scenario Planning</span>
@@ -301,7 +306,7 @@
               </div>
 
               <div id="sensitivityPanel" class="sensitivity-panel hidden">
-                <p class="scenario-note">This scenario temporarily overrides one criterion weight and proportionally rebalances the others. It does not change the original pairwise judgements, decision matrix, or consistency ratios.</p>
+                <p class="scenario-note">This scenario temporarily overrides one global leaf weight and proportionally rebalances the others. It does not change the original pairwise judgements, decision matrix, or consistency ratios.</p>
 
                 <div class="sensitivity-controls">
                   <label>
@@ -341,17 +346,17 @@
 
         <section class="panel content-section" id="about-ahp">
           <h2>About Analytic Hierarchy Process</h2>
-          <p>Analytic Hierarchy Process is a structured method for multi-criteria decision-making. It asks experts to compare criteria and alternatives in pairs, converts those judgements into priority weights, and combines the weights into an overall ranking.</p>
+          <p>Analytic Hierarchy Process is a structured method for multi-criteria decision-making. It asks experts to compare criteria, optional sub-criteria, and alternatives in pairs, converts those judgements into priority weights, and combines the weights into an overall ranking.</p>
         </section>
 
         <section class="panel content-section" id="how-to-use">
           <h2>Guidance</h2>
           <ol class="method-list">
-            <li>Define the decision goal, criteria, and alternatives in the questionnaire design section.</li>
-            <li>Choose whether each criterion is subjective judgement or objective measured data. Objective criteria need a direction such as higher-is-better or lower-is-better.</li>
+            <li>Define the decision goal, criteria, optional sub-criteria, and alternatives in the questionnaire design section.</li>
+            <li>Choose whether each final evaluable criterion or sub-criterion is subjective judgement or objective measured data. Objective items need a direction such as higher-is-better or lower-is-better.</li>
             <li>Export the blank questionnaire JSON and send it to the expert or decision-maker.</li>
             <li>The expert imports the questionnaire, answers each pairwise question, and exports the completed response JSON.</li>
-            <li>Load one or more completed response files into the analysis section, enter measured values for any objective criteria, and calculate the ranking.</li>
+            <li>Load one or more completed response files into the analysis section, enter measured values for any objective leaf criteria, and calculate the ranking.</li>
             <li>Review consistency ratios before using the ranking to support a decision.</li>
             <li>Optionally turn on Scenario Planning after calculation to test whether changes in criterion importance alter the preferred alternative.</li>
           </ol>
@@ -368,7 +373,8 @@
                 <p><strong>Multiple-expert aggregation</strong><br><var>A</var><sub>ij</sub> = (&prod;<sub>e=1</sub><sup>E</sup> <var>a</var><sub>ij</sub><sup>(e)</sup>)<sup>1/E</sup></p>
                 <p><strong>Row geometric mean</strong><br><var>GM</var><sub>i</sub> = (&prod;<sub>j=1</sub><sup>n</sup> <var>A</var><sub>ij</sub>)<sup>1/n</sup></p>
                 <p><strong>Normalised priority weight</strong><br><var>w</var><sub>i</sub> = <var>GM</var><sub>i</sub> / &sum;<sub>k=1</sub><sup>n</sup> <var>GM</var><sub>k</sub></p>
-                <p><strong>Final alternative priority</strong><br><var>S</var><sub>a</sub> = &sum;<sub>i=1</sub><sup>n</sup> <var>w</var><sub>i</sub> &times; <var>p</var><sub>ai</sub>, where <var>p</var><sub>ai</sub> is alternative <var>a</var>'s local priority under criterion <var>i</var></p>
+                <p><strong>Sub-criteria global weight</strong><br><var>g</var><sub>ij</sub> = <var>w</var><sub>i</sub> &times; <var>u</var><sub>ij</sub>, where <var>w</var><sub>i</sub> is the parent criterion weight and <var>u</var><sub>ij</sub> is the local sub-criterion weight</p>
+                <p><strong>Final alternative priority</strong><br><var>S</var><sub>a</sub> = &sum;<sub>l=1</sub><sup>L</sup> <var>g</var><sub>l</sub> &times; <var>p</var><sub>al</sub>, where <var>g</var><sub>l</sub> is a global leaf weight and <var>p</var><sub>al</sub> is alternative <var>a</var>'s local priority under leaf criterion <var>l</var></p>
                 <p><strong>Objective criterion, higher is better</strong><br><var>p</var><sub>ai</sub> = <var>x</var><sub>ai</sub> / &sum;<sub>a</sub> <var>x</var><sub>ai</sub></p>
                 <p><strong>Objective criterion, lower is better</strong><br><var>p</var><sub>ai</sub> = (1 / <var>x</var><sub>ai</sub>) / &sum;<sub>a</sub> (1 / <var>x</var><sub>ai</sub>)</p>
                 <p><strong>Sensitivity scenario</strong><br><var>w</var>&prime;<sub>k</sub> = <var>s</var>, &nbsp; <var>w</var>&prime;<sub>j</sub> = <var>w</var><sub>j</sub> &times; (1 - <var>s</var>) / (1 - <var>w</var><sub>k</sub>)</p>
@@ -390,7 +396,7 @@
             </div>
             <div class="guidance-card">
               <span>Assumptions</span>
-              <p>Experts can make meaningful pairwise judgements, objective values are measured consistently, criteria are relevant to the decision, and alternatives are comparable under each criterion.</p>
+              <p>Experts can make meaningful pairwise judgements, objective values are measured consistently, criteria and sub-criteria are relevant to the decision, and alternatives are comparable under each leaf criterion.</p>
             </div>
             <div class="guidance-card">
               <span>Limitations</span>
@@ -411,7 +417,11 @@
           </details>
           <details>
             <summary>Can AHP use objective data as well as expert judgement?</summary>
-            <p>Yes. Mark a criterion as objective when alternatives can be compared using measured values, such as cost, on-time delivery percentage, emissions, or lead time. The tool normalises those values into local priorities while still using AHP criterion weights.</p>
+            <p>Yes. Mark a final criterion or sub-criterion as objective when alternatives can be compared using measured values, such as cost, on-time delivery percentage, emissions, or lead time. The tool normalises those values into local priorities while still using AHP criterion and sub-criterion weights.</p>
+          </details>
+          <details>
+            <summary>Can AHP use sub-criteria?</summary>
+            <p>Yes. Use one sub-criteria level when a main criterion needs a clearer breakdown. The tool compares sub-criteria under their parent criterion and multiplies local sub-criteria weights by the parent weight to create global leaf weights.</p>
           </details>
           <details>
             <summary>What does consistency ratio mean?</summary>

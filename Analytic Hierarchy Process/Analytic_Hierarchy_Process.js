@@ -35,6 +35,7 @@ const elements = {
   criteriaWeightChart: document.getElementById("criteriaWeightChart"),
   criteriaWeightLegend: document.getElementById("criteriaWeightLegend"),
   alternativeRanking: document.getElementById("alternativeRanking"),
+  hierarchyStructure: document.getElementById("hierarchyStructure"),
   decisionMatrix: document.getElementById("decisionMatrix"),
   pairwiseCalculations: document.getElementById("pairwiseCalculations"),
   sensitivityToggle: document.getElementById("sensitivityToggle"),
@@ -159,6 +160,9 @@ function normaliseStructureItem(item, fallbackName) {
       description: String(item.description || "").trim(),
       type: rawType === "objective" || rawType === "subjective" ? rawType : "subjective",
       direction: item.direction === "lower" ? "lower" : "higher",
+      children: Array.isArray(item.children)
+        ? item.children.map((child, childIndex) => normaliseStructureItem(child, `Sub-criterion ${childIndex + 1}`))
+        : [],
     };
   }
 
@@ -167,6 +171,7 @@ function normaliseStructureItem(item, fallbackName) {
     description: "",
     type: "",
     direction: "higher",
+    children: [],
   };
 }
 
@@ -180,6 +185,10 @@ function getCriterionMeta(questionnaire, index) {
 
 function getCriterionMetaList(questionnaire) {
   return questionnaire.criteria.map((_, index) => getCriterionMeta(questionnaire, index));
+}
+
+function getLeafCriteria(questionnaire) {
+  return ATHAhp.leafCriteriaFromCriteria(getCriterionMetaList(questionnaire));
 }
 
 function setError(target, message) {
@@ -249,11 +258,25 @@ function createStructureGroupHeader(title, type, count) {
 
 function readStructureEditorItems(type) {
   return Array.from(
-    elements.structureFields.querySelectorAll(`[data-structure-item="${type}"]`),
+    elements.structureFields.querySelectorAll(`:scope > .field-group [data-structure-item="${type}"]`),
     (item, index) => {
       const criterionType = type === "criteria"
         ? item.querySelector('[data-criterion-type]')?.value || ""
         : "subjective";
+      const children = type === "criteria"
+        ? Array.from(item.querySelectorAll("[data-subcriterion-item]"), (child, childIndex) => {
+          const childType = child.querySelector("[data-subcriterion-type]")?.value || "";
+          return {
+            name: child.querySelector("[data-subcriterion-name]")?.value || "",
+            description: child.querySelector("[data-subcriterion-description]")?.value || "",
+            criterionType: childType,
+            type: childType,
+            direction: child.querySelector("[data-subcriterion-direction]")?.value || "higher",
+            children: [],
+            fallbackName: `Sub-criterion ${childIndex + 1}`,
+          };
+        })
+        : [];
       return {
         name: item.querySelector(`[data-type="${type}"]`)?.value || "",
         description: type === "criteria"
@@ -264,6 +287,7 @@ function readStructureEditorItems(type) {
         direction: type === "criteria"
           ? item.querySelector('[data-criterion-direction]')?.value || "higher"
           : "higher",
+        children,
         fallbackName: `${type === "criteria" ? "Criterion" : "Alternative"} ${index + 1}`,
       };
     }
@@ -287,7 +311,7 @@ function buildStructureFields(criteria = [], alternatives = []) {
   criteriaGroup.className = "field-group";
   const criteriaHeader = createStructureGroupHeader("Criteria", "criteria", criteriaCount);
   const criteriaGrid = document.createElement("div");
-  criteriaGrid.className = "name-grid";
+  criteriaGrid.className = "name-grid criteria-grid";
 
   for (let i = 0; i < criteriaCount; i++) {
     criteriaGrid.appendChild(createNameInput("criteria", i, criteria[i], criteriaCount));
@@ -325,7 +349,7 @@ function addStructureItem(type) {
     return;
   }
 
-  items.push(type === "criteria" ? { name: "", description: "", type: "" } : { name: "", description: "" });
+  items.push(type === "criteria" ? { name: "", description: "", type: "", children: [] } : { name: "", description: "" });
   elements.criteriaCount.value = criteria.length;
   elements.alternativeCount.value = alternatives.length;
   buildStructureFields(criteria, alternatives);
@@ -352,6 +376,42 @@ function removeStructureItem(type, index) {
   buildStructureFields(criteria, alternatives);
 }
 
+function addSubcriterion(parentIndex) {
+  const criteria = readStructureEditorItems("criteria");
+  const alternatives = readStructureEditorItems("alternative");
+  const criterion = criteria[parentIndex];
+  if (!criterion) return;
+  if (criterion.children.length >= 8) {
+    setError(elements.designError, "AHP supports up to 8 sub-criteria under one criterion in this tool.");
+    return;
+  }
+  criterion.children.push({ name: "", description: "", type: "", children: [] });
+  buildStructureFields(criteria, alternatives);
+}
+
+function removeSubcriterion(parentIndex, childIndex) {
+  const criteria = readStructureEditorItems("criteria");
+  const alternatives = readStructureEditorItems("alternative");
+  const criterion = criteria[parentIndex];
+  if (!criterion) return;
+  criterion.children.splice(childIndex, 1);
+  buildStructureFields(criteria, alternatives);
+}
+
+function toggleSubcriteria(parentIndex, enabled) {
+  const criteria = readStructureEditorItems("criteria");
+  const alternatives = readStructureEditorItems("alternative");
+  const criterion = criteria[parentIndex];
+  if (!criterion) return;
+  criterion.children = enabled
+    ? criterion.children.length ? criterion.children : [
+      { name: "", description: "", type: "", children: [] },
+      { name: "", description: "", type: "", children: [] },
+    ]
+    : [];
+  buildStructureFields(criteria, alternatives);
+}
+
 function createNameInput(type, index, value, count) {
   const item = normaliseStructureItem(
     value,
@@ -370,7 +430,7 @@ function createNameInput(type, index, value, count) {
   removeButton.className = "remove-structure-button";
   removeButton.dataset.removeStructure = type;
   removeButton.dataset.index = String(index);
-  removeButton.textContent = "×";
+  removeButton.textContent = "\u00d7";
   removeButton.title = `Remove ${type === "criteria" ? "criterion" : "alternative"}`;
   removeButton.setAttribute("aria-label", `Remove ${type === "criteria" ? "criterion" : "alternative"} ${index + 1}`);
   removeButton.disabled = count <= 2;
@@ -386,8 +446,40 @@ function createNameInput(type, index, value, count) {
   input.dataset.index = String(index);
   nameLabel.appendChild(input);
 
-  wrapper.append(itemHeader, nameLabel);
   if (type === "criteria") {
+    wrapper.appendChild(itemHeader);
+    const descriptionLabel = document.createElement("label");
+    descriptionLabel.textContent = "Description";
+    const description = document.createElement("textarea");
+    description.rows = 3;
+    description.maxLength = 300;
+    description.value = item.description;
+    description.dataset.descriptionType = type;
+    description.dataset.index = String(index);
+    description.placeholder = "Explain what this criterion includes and how experts should interpret it.";
+    descriptionLabel.appendChild(description);
+
+    const fieldRow = document.createElement("div");
+    fieldRow.className = "criterion-field-row";
+    fieldRow.append(nameLabel, descriptionLabel);
+    wrapper.appendChild(fieldRow);
+
+    const subcriteriaToggleLabel = document.createElement("label");
+    subcriteriaToggleLabel.className = "subcriteria-toggle";
+    const subcriteriaToggle = document.createElement("input");
+    subcriteriaToggle.type = "checkbox";
+    subcriteriaToggle.setAttribute("role", "switch");
+    subcriteriaToggle.checked = item.children.length > 0;
+    subcriteriaToggle.dataset.toggleSubcriteria = String(index);
+    const subcriteriaText = document.createElement("span");
+    subcriteriaText.className = "subcriteria-toggle-copy";
+    subcriteriaText.textContent = "This criterion has sub-criteria";
+    const subcriteriaTrack = document.createElement("span");
+    subcriteriaTrack.className = "subcriteria-toggle-track";
+    subcriteriaTrack.setAttribute("aria-hidden", "true");
+    subcriteriaToggleLabel.append(subcriteriaText, subcriteriaToggle, subcriteriaTrack);
+    wrapper.appendChild(subcriteriaToggleLabel);
+
     const config = document.createElement("div");
     config.className = "criterion-config";
 
@@ -440,21 +532,144 @@ function createNameInput(type, index, value, count) {
     setObjectiveControlsState();
 
     config.append(typeLabel, directionLabel);
+    config.hidden = item.children.length > 0;
     wrapper.appendChild(config);
+
+    if (item.children.length) {
+      wrapper.appendChild(createSubcriteriaEditor(index, item.children));
+    }
+  } else {
+    wrapper.append(itemHeader, nameLabel);
+  }
+  return wrapper;
+}
+
+function createCriterionTypeControl(item, selectors) {
+  const config = document.createElement("div");
+  config.className = "criterion-config";
+
+  const typeLabel = document.createElement("label");
+  typeLabel.textContent = "Criterion type";
+  const typeSelect = document.createElement("select");
+  typeSelect.dataset[selectors.type] = "true";
+  const placeholderOption = document.createElement("option");
+  placeholderOption.value = "";
+  placeholderOption.textContent = "Select the criterion type";
+  typeSelect.appendChild(placeholderOption);
+  [
+    ["subjective", "Subjective judgement"],
+    ["objective", "Objective measured data"],
+  ].forEach(([optionValue, labelText]) => {
+    const option = document.createElement("option");
+    option.value = optionValue;
+    option.textContent = labelText;
+    typeSelect.appendChild(option);
+  });
+  typeSelect.value = item.type || item.criterionType || "";
+  typeLabel.appendChild(typeSelect);
+
+  const directionLabel = document.createElement("label");
+  directionLabel.textContent = "Objective direction";
+  directionLabel.className = "objective-direction-control";
+  const directionSelect = document.createElement("select");
+  directionSelect.dataset[selectors.direction] = "true";
+  [
+    ["higher", "Higher is better"],
+    ["lower", "Lower is better"],
+  ].forEach(([optionValue, labelText]) => {
+    const option = document.createElement("option");
+    option.value = optionValue;
+    option.textContent = labelText;
+    directionSelect.appendChild(option);
+  });
+  directionSelect.value = item.direction === "lower" ? "lower" : "higher";
+  directionLabel.appendChild(directionSelect);
+
+  const setObjectiveControlsState = () => {
+    const isObjective = typeSelect.value === "objective";
+    directionSelect.disabled = !isObjective;
+    directionLabel.hidden = !isObjective;
+    config.classList.toggle("criterion-config-objective", isObjective);
+  };
+  typeSelect.addEventListener("change", setObjectiveControlsState);
+  setObjectiveControlsState();
+
+  config.append(typeLabel, directionLabel);
+  return config;
+}
+
+function createSubcriteriaEditor(parentIndex, children) {
+  const panel = document.createElement("div");
+  panel.className = "subcriteria-editor";
+
+  const header = document.createElement("div");
+  header.className = "subcriteria-header";
+  const title = document.createElement("strong");
+  title.textContent = "Sub-criteria";
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "add-structure-button";
+  button.dataset.addSubcriterion = String(parentIndex);
+  button.textContent = "+ Add Sub-criterion";
+  button.disabled = children.length >= 8;
+  header.append(title, button);
+  panel.appendChild(header);
+
+  children.forEach((child, childIndex) => {
+    const item = normaliseStructureItem(child, `Sub-criterion ${childIndex + 1}`);
+    const card = document.createElement("div");
+    card.className = "subcriterion-item";
+    card.dataset.subcriterionItem = "true";
+
+    const itemHeader = document.createElement("div");
+    itemHeader.className = "structure-item-header";
+    const itemTitle = document.createElement("strong");
+    itemTitle.textContent = `Sub-criterion ${childIndex + 1}`;
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.className = "remove-structure-button";
+    removeButton.dataset.removeSubcriterion = String(parentIndex);
+    removeButton.dataset.childIndex = String(childIndex);
+    removeButton.textContent = "\u00d7";
+    removeButton.title = "Remove sub-criterion";
+    removeButton.setAttribute("aria-label", `Remove sub-criterion ${childIndex + 1}`);
+    itemHeader.append(itemTitle, removeButton);
+
+    const nameLabel = document.createElement("label");
+    nameLabel.textContent = "Name";
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.maxLength = 100;
+    nameInput.value = item.name;
+    nameInput.dataset.subcriterionName = "true";
+    nameLabel.appendChild(nameInput);
 
     const descriptionLabel = document.createElement("label");
     descriptionLabel.textContent = "Description";
     const description = document.createElement("textarea");
-    description.rows = 3;
+    description.rows = 2;
     description.maxLength = 300;
     description.value = item.description;
-    description.dataset.descriptionType = type;
-    description.dataset.index = String(index);
-    description.placeholder = "Explain what this criterion includes and how experts should interpret it.";
+    description.dataset.subcriterionDescription = "true";
+    description.placeholder = "Explain how this sub-criterion should be evaluated.";
     descriptionLabel.appendChild(description);
-    wrapper.appendChild(descriptionLabel);
-  }
-  return wrapper;
+
+    const fieldRow = document.createElement("div");
+    fieldRow.className = "criterion-field-row subcriterion-field-row";
+    fieldRow.append(nameLabel, descriptionLabel);
+
+    card.append(
+      itemHeader,
+      fieldRow,
+      createCriterionTypeControl(item, {
+        type: "subcriterionType",
+        direction: "subcriterionDirection",
+      })
+    );
+    panel.appendChild(card);
+  });
+
+  return panel;
 }
 
 function collectStructure() {
@@ -471,9 +686,17 @@ function collectStructure() {
 
   const criterionItems = readStructureEditorItems("criteria");
   const alternativeItems = readStructureEditorItems("alternative");
-  const missingType = criterionItems.findIndex((item) => item.criterionType !== "subjective" && item.criterionType !== "objective");
+  const leafItems = criterionItems.flatMap((item, criterionIndex) =>
+    item.children.length
+      ? item.children.map((child, childIndex) => ({
+        ...child,
+        displayName: `Criterion ${criterionIndex + 1}, Sub-criterion ${childIndex + 1}`,
+      }))
+      : [{ ...item, displayName: `Criterion ${criterionIndex + 1}` }]
+  );
+  const missingType = leafItems.findIndex((item) => item.criterionType !== "subjective" && item.criterionType !== "objective");
   if (missingType >= 0) {
-    throw new Error(`Select the criterion type for Criterion ${missingType + 1} before previewing the questionnaire.`);
+    throw new Error(`Select the criterion type for ${leafItems[missingType].displayName} before previewing the questionnaire.`);
   }
 
   const criteria = criterionItems.map((item, index) => ({
@@ -481,6 +704,13 @@ function collectStructure() {
     description: String(item.description || "").trim(),
     type: item.criterionType === "objective" ? "objective" : "subjective",
     direction: item.direction === "lower" ? "lower" : "higher",
+    children: item.children.map((child, childIndex) => ({
+      name: safeName(child.name, `Sub-criterion ${childIndex + 1}`),
+      description: String(child.description || "").trim(),
+      type: child.criterionType === "objective" ? "objective" : "subjective",
+      direction: child.direction === "lower" ? "lower" : "higher",
+      children: [],
+    })),
   }));
   const alternatives = alternativeItems.map((item, index) => safeName(item.name, `Alternative ${index + 1}`));
   const criteriaDescriptions = criteria.map((item) => item.description);
@@ -517,6 +747,7 @@ function makeQuestionnaire(
 ) {
   const criteriaMeta = criteria.map((criterion, index) => normaliseStructureItem(criterion, `Criterion ${index + 1}`));
   const criteriaNames = criteriaMeta.map((criterion) => criterion.name);
+  const leafCriteria = ATHAhp.leafCriteriaFromCriteria(criteriaMeta);
   const criteriaPairs = pairsFor(criteriaNames).map((pair, index) => ({
     id: `c-${pair.leftIndex}-${pair.rightIndex}`,
     type: "criteria",
@@ -530,16 +761,39 @@ function makeQuestionnaire(
     order: index + 1,
   }));
 
+  const subcriteriaPairs = [];
+  criteriaMeta.forEach((criterion, criterionIndex) => {
+    if (!criterion.children.length) return;
+    pairsFor(criterion.children.map((child) => child.name)).forEach((pair, index) => {
+      subcriteriaPairs.push({
+        id: `s-${criterionIndex}-${pair.leftIndex}-${pair.rightIndex}`,
+        type: "subcriteria",
+        criterionIndex,
+        criterion: criterion.name,
+        criterionDescription: criteriaDescriptions[criterionIndex] || "",
+        leftIndex: pair.leftIndex,
+        rightIndex: pair.rightIndex,
+        left: pair.left,
+        right: pair.right,
+        leftDescription: criterion.children[pair.leftIndex]?.description || "",
+        rightDescription: criterion.children[pair.rightIndex]?.description || "",
+        prompt: `Under ${criterion.name}, compare ${pair.left} with ${pair.right}.`,
+        order: index + 1,
+      });
+    });
+  });
+
   const alternativePairs = [];
-  criteriaNames.forEach((criterion, criterionIndex) => {
-    if (criteriaMeta[criterionIndex].type === "objective") return;
+  leafCriteria.forEach((criterion, leafIndex) => {
+    if (criterion.type === "objective") return;
     pairsFor(alternatives).forEach((pair, index) => {
       alternativePairs.push({
-        id: `a-${criterionIndex}-${pair.leftIndex}-${pair.rightIndex}`,
+        id: `a-${leafIndex}-${pair.leftIndex}-${pair.rightIndex}`,
         type: "alternative",
-        criterionIndex,
-        criterion,
-        criterionDescription: criteriaDescriptions[criterionIndex] || "",
+        criterionIndex: leafIndex,
+        parentCriterion: criterion.parentName || "",
+        criterion: criterion.label || criterion.name,
+        criterionDescription: criterion.description || "",
         leftIndex: pair.leftIndex,
         rightIndex: pair.rightIndex,
         left: pair.left,
@@ -564,6 +818,7 @@ function makeQuestionnaire(
     criteriaDescriptions: criteriaNames.map((_, index) => criteriaDescriptions[index] || ""),
     questions: {
       criteria: criteriaPairs,
+      subcriteria: subcriteriaPairs,
       alternatives: alternativePairs,
     },
   };
@@ -574,6 +829,7 @@ function previewQuestionnaire() {
     clearErrors();
     currentQuestionnaire = createQuestionnaire();
     const criteriaCount = currentQuestionnaire.questions.criteria.length;
+    const subcriteriaCount = currentQuestionnaire.questions.subcriteria.length;
     const alternativeCount = currentQuestionnaire.questions.alternatives.length;
     elements.questionnairePreview.textContent = "";
 
@@ -581,8 +837,8 @@ function previewQuestionnaire() {
     title.textContent = currentQuestionnaire.projectTitle;
     const text = document.createElement("p");
     text.textContent =
-      `${criteriaCount} criteria-comparison questions and ${alternativeCount} alternative-comparison questions will be included. ` +
-      `${currentQuestionnaire.criteria.length} criteria and ${currentQuestionnaire.alternatives.length} alternatives are defined.`;
+      `${criteriaCount} criteria-comparison questions, ${subcriteriaCount} sub-criteria comparison questions, and ${alternativeCount} alternative-comparison questions will be included. ` +
+      `${currentQuestionnaire.criteria.length} criteria, ${ATHAhp.leafCriteriaFromCriteria(currentQuestionnaire.criteriaMeta).length} evaluable leaf criteria, and ${currentQuestionnaire.alternatives.length} alternatives are defined.`;
 
     elements.questionnairePreview.append(title, text);
     elements.questionnairePreview.classList.remove("hidden");
@@ -649,14 +905,25 @@ function validateQuestionnaire(data) {
   ) {
     throw new Error("The questionnaire contains an invalid decision structure.");
   }
+  if (!Array.isArray(data.questions.subcriteria)) {
+    data.questions.subcriteria = [];
+  }
 
   data.criteriaDescriptions = criteriaMeta.map((criterion) => String(criterion.description || "").slice(0, 300));
   data.questions.criteria.forEach((question) => {
     question.leftDescription = question.leftDescription || data.criteriaDescriptions[question.leftIndex] || "";
     question.rightDescription = question.rightDescription || data.criteriaDescriptions[question.rightIndex] || "";
   });
+  data.questions.subcriteria.forEach((question) => {
+    const parent = criteriaMeta[question.criterionIndex];
+    question.criterion = question.criterion || parent?.name || "";
+    question.criterionDescription = question.criterionDescription || parent?.description || "";
+    question.leftDescription = question.leftDescription || parent?.children?.[question.leftIndex]?.description || "";
+    question.rightDescription = question.rightDescription || parent?.children?.[question.rightIndex]?.description || "";
+  });
+  const leafCriteria = ATHAhp.leafCriteriaFromCriteria(criteriaMeta);
   const validSubjectiveIndexes = new Set(
-    criteriaMeta
+    leafCriteria
       .map((criterion, index) => criterion.type === "subjective" ? index : null)
       .filter((index) => index !== null)
   );
@@ -753,26 +1020,36 @@ function renderSurvey(questionnaire) {
   const criteriaGroup = createQuestionGroup("Criteria comparisons", questionnaire.questions.criteria);
   elements.surveyQuestions.appendChild(criteriaGroup);
 
-  questionnaire.criteria.forEach((criterion, criterionIndex) => {
-    const meta = getCriterionMeta(questionnaire, criterionIndex);
+  const subcriteriaGroups = questionnaire.questions.subcriteria || [];
+  getCriterionMetaList(questionnaire).forEach((criterion, criterionIndex) => {
+    if (!criterion.children.length) return;
+    const questions = subcriteriaGroups.filter((question) => question.criterionIndex === criterionIndex);
+    elements.surveyQuestions.appendChild(createQuestionGroup(
+      `Sub-criteria comparisons: ${criterion.name}`,
+      questions,
+      criterion.description || ""
+    ));
+  });
+
+  getLeafCriteria(questionnaire).forEach((meta) => {
     if (meta.type === "objective") {
       const note = document.createElement("div");
       note.className = "question-group objective-question-note";
       const heading = document.createElement("h3");
-      heading.textContent = `Objective data: ${criterion}`;
+      heading.textContent = `Objective data: ${meta.label || meta.name}`;
       const text = document.createElement("p");
       text.textContent =
-        `${criterion} uses measured alternative data (${meta.direction === "lower" ? "lower is better" : "higher is better"}). ` +
+        `${meta.label || meta.name} uses measured alternative data (${meta.direction === "lower" ? "lower is better" : "higher is better"}). ` +
         "Experts do not answer pairwise alternative questions for this criterion; values are entered in the analysis step.";
       note.append(heading, text);
       elements.surveyQuestions.appendChild(note);
       return;
     }
-    const questions = questionnaire.questions.alternatives.filter((question) => question.criterionIndex === criterionIndex);
+    const questions = questionnaire.questions.alternatives.filter((question) => question.criterionIndex === meta.globalIndex);
     elements.surveyQuestions.appendChild(createQuestionGroup(
-      `Alternative comparisons: ${criterion}`,
+      `Alternative comparisons: ${meta.label || meta.name}`,
       questions,
-      questionnaire.criteriaDescriptions?.[criterionIndex] || ""
+      meta.description || ""
     ));
   });
 
@@ -799,7 +1076,11 @@ function createQuestionGroup(title, questions, description = "") {
 
     const questionText = document.createElement("div");
     const label = document.createElement("span");
-    label.textContent = question.type === "criteria" ? "Criteria judgement" : "Alternative judgement";
+    label.textContent = question.type === "criteria"
+      ? "Criteria judgement"
+      : question.type === "subcriteria"
+        ? "Sub-criteria judgement"
+        : "Alternative judgement";
     const prompt = document.createElement("p");
     prompt.textContent = question.prompt;
     questionText.append(label, prompt);
@@ -842,6 +1123,7 @@ function collectSurveyResponse() {
 
   const answers = {
     criteria: {},
+    subcriteria: {},
     alternatives: {},
   };
 
@@ -849,6 +1131,8 @@ function collectSurveyResponse() {
     const value = Number(slider.dataset.ahpValue);
     if (slider.dataset.questionId.startsWith("c-")) {
       answers.criteria[slider.dataset.questionId] = value;
+    } else if (slider.dataset.questionId.startsWith("s-")) {
+      answers.subcriteria[slider.dataset.questionId] = value;
     } else {
       answers.alternatives[slider.dataset.questionId] = value;
     }
@@ -872,11 +1156,13 @@ function validateResponse(data) {
 
   const questionnaire = validateQuestionnaire(data.questionnaire);
   const criteriaIds = questionnaire.questions.criteria.map((question) => question.id);
+  const subcriteriaIds = questionnaire.questions.subcriteria.map((question) => question.id);
   const alternativeIds = questionnaire.questions.alternatives.map((question) => question.id);
   const missingCriteria = criteriaIds.filter((id) => !Number.isFinite(Number(data.answers.criteria?.[id])));
+  const missingSubcriteria = subcriteriaIds.filter((id) => !Number.isFinite(Number(data.answers.subcriteria?.[id])));
   const missingAlternatives = alternativeIds.filter((id) => !Number.isFinite(Number(data.answers.alternatives?.[id])));
 
-  if (missingCriteria.length || missingAlternatives.length) {
+  if (missingCriteria.length || missingSubcriteria.length || missingAlternatives.length) {
     throw new Error("The completed response is missing one or more pairwise answers.");
   }
 
@@ -965,7 +1251,7 @@ function renderDecisionMatrix(analysis) {
   alternativeHeader.textContent = "Alternative";
   const criteriaGroup = document.createElement("th");
   criteriaGroup.scope = "colgroup";
-  criteriaGroup.colSpan = analysis.questionnaire.criteria.length;
+  criteriaGroup.colSpan = analysis.leafCriteria.length;
   criteriaGroup.className = "matrix-criteria-group";
   criteriaGroup.textContent = "Criteria";
   const overallHeader = document.createElement("th");
@@ -979,14 +1265,13 @@ function renderDecisionMatrix(analysis) {
   groupRow.append(alternativeHeader, criteriaGroup, overallHeader, rankHeader);
 
   const criteriaRow = document.createElement("tr");
-  analysis.questionnaire.criteria.forEach((criterion, index) => {
-    const meta = analysis.questionnaire.criteriaMeta?.[index] || getCriterionMeta(analysis.questionnaire, index);
+  analysis.leafCriteria.forEach((meta, index) => {
     const cell = document.createElement("th");
     cell.scope = "col";
-    cell.textContent = criterion;
+    cell.textContent = meta.label || meta.name;
     const weight = document.createElement("span");
     weight.className = "matrix-header-weight";
-    weight.textContent = `Weight ${formatPercent(analysis.criteriaResult.weights[index])}`;
+    weight.textContent = `Global weight ${formatPercent(analysis.leafWeights[index])}`;
     const method = document.createElement("span");
     method.className = "matrix-header-method";
     method.textContent = meta.type === "objective"
@@ -1008,7 +1293,7 @@ function renderDecisionMatrix(analysis) {
 
     analysis.alternativeResults.forEach((criterionResult, criterionIndex) => {
       const localPriority = criterionResult.weights[item.alternativeIndex];
-      const contribution = analysis.criteriaResult.weights[criterionIndex] * localPriority;
+      const contribution = analysis.leafWeights[criterionIndex] * localPriority;
       const cell = document.createElement("td");
       const priority = document.createElement("span");
       priority.className = "matrix-priority";
@@ -1033,7 +1318,7 @@ function renderDecisionMatrix(analysis) {
 
   const formula = document.createElement("p");
   formula.className = "decision-matrix-formula";
-  formula.textContent = "Overall priority = sum of (criterion weight x alternative priority under that criterion).";
+  formula.textContent = "Overall priority = sum of (global leaf weight x alternative priority under that criterion or sub-criterion).";
   wrapper.appendChild(table);
   elements.decisionMatrix.replaceChildren(wrapper, formula);
 }
@@ -1074,7 +1359,7 @@ function rankScenarioAlternatives(analysis, scoreValues) {
 
 function getSensitivityWinner(analysis, criterionIndex, criterionWeight) {
   const weights = rebalanceCriterionWeights(
-    analysis.criteriaResult.weights,
+    analysis.leafWeights,
     criterionIndex,
     criterionWeight
   );
@@ -1089,7 +1374,7 @@ function findBaselineWinnerRange(analysis, criterionIndex) {
     return sensitivityRangeCache.get(criterionIndex);
   }
   const baselineWinnerIndex = analysis.alternativeScores[0].alternativeIndex;
-  const baselineWeight = analysis.criteriaResult.weights[criterionIndex];
+  const baselineWeight = analysis.leafWeights[criterionIndex];
   const step = 0.001;
   let lower = baselineWeight;
   let upper = baselineWeight;
@@ -1131,7 +1416,7 @@ function renderSensitivityChart(analysis, criterionIndex, scenarioWeight, scenar
 
   for (let percentage = 0; percentage <= 100; percentage += 2) {
     const weights = rebalanceCriterionWeights(
-      analysis.criteriaResult.weights,
+      analysis.leafWeights,
       criterionIndex,
       percentage / 100
     );
@@ -1146,7 +1431,8 @@ function renderSensitivityChart(analysis, criterionIndex, scenarioWeight, scenar
   const xScale = (percentage) => margin.left + (percentage / 100) * plotWidth;
   const yScale = (score) => margin.top + plotHeight - (score / yMaximum) * plotHeight;
   const title = createSvgElement("title");
-  title.textContent = `Alternative priorities as ${analysis.questionnaire.criteria[criterionIndex]} changes from zero to one hundred percent`;
+  const criterionLabel = analysis.leafCriteria[criterionIndex]?.label || analysis.leafCriteria[criterionIndex]?.name || "selected criterion";
+  title.textContent = `Alternative priorities as ${criterionLabel} changes from zero to one hundred percent`;
   const description = createSvgElement("desc");
   description.textContent = "Each labelled line represents an alternative. The vertical marker shows the selected scenario weight.";
   svg.append(title, description);
@@ -1196,7 +1482,7 @@ function renderSensitivityChart(analysis, criterionIndex, scenarioWeight, scenar
     class: "sensitivity-axis-title",
     "text-anchor": "middle",
   });
-  xAxisTitle.textContent = `${analysis.questionnaire.criteria[criterionIndex]} weight`;
+  xAxisTitle.textContent = `${criterionLabel} weight`;
   const yAxisTitle = createSvgElement("text", {
     x: 16,
     y: margin.top + plotHeight / 2,
@@ -1292,17 +1578,17 @@ function renderSensitivityWeights(analysis, scenarioWeights) {
   head.appendChild(header);
   table.appendChild(head);
   const body = document.createElement("tbody");
-  analysis.questionnaire.criteria.forEach((criterion, index) => {
+  analysis.leafCriteria.forEach((criterion, index) => {
     const row = document.createElement("tr");
     const name = document.createElement("th");
     name.scope = "row";
-    name.textContent = criterion;
+    name.textContent = criterion.label || criterion.name;
     const baseline = document.createElement("td");
-    baseline.textContent = formatPercent(analysis.criteriaResult.weights[index]);
+    baseline.textContent = formatPercent(analysis.leafWeights[index]);
     const scenario = document.createElement("td");
     scenario.textContent = formatPercent(scenarioWeights[index]);
     const change = document.createElement("td");
-    const difference = scenarioWeights[index] - analysis.criteriaResult.weights[index];
+    const difference = scenarioWeights[index] - analysis.leafWeights[index];
     change.textContent = `${difference >= 0 ? "+" : ""}${(difference * 100).toFixed(1)} pp`;
     row.append(name, baseline, scenario, change);
     body.appendChild(row);
@@ -1316,7 +1602,7 @@ function renderSensitivityScenario() {
   const criterionIndex = Number(elements.sensitivityCriterion.value);
   const scenarioWeight = Number(elements.sensitivityWeight.value) / 100;
   const scenarioWeights = rebalanceCriterionWeights(
-    latestAnalysis.criteriaResult.weights,
+    latestAnalysis.leafWeights,
     criterionIndex,
     scenarioWeight
   );
@@ -1325,7 +1611,7 @@ function renderSensitivityScenario() {
   const baselineWinner = latestAnalysis.alternativeScores[0];
   const scenarioWinner = ranking[0];
   const stabilityRange = findBaselineWinnerRange(latestAnalysis, criterionIndex);
-  const criterion = latestAnalysis.questionnaire.criteria[criterionIndex];
+  const criterion = latestAnalysis.leafCriteria[criterionIndex]?.label || latestAnalysis.leafCriteria[criterionIndex]?.name || "selected criterion";
 
   elements.sensitivityWeightValue.textContent = formatPercent(scenarioWeight);
   renderSensitivityWeights(latestAnalysis, scenarioWeights);
@@ -1367,21 +1653,21 @@ function initialiseSensitivityScenario(analysis) {
   elements.sensitivityToggle.setAttribute("aria-pressed", "false");
   elements.sensitivityPanel.classList.add("hidden");
   elements.sensitivityCriterion.textContent = "";
-  analysis.questionnaire.criteria.forEach((criterion, index) => {
+  analysis.leafCriteria.forEach((criterion, index) => {
     const option = document.createElement("option");
     option.value = String(index);
-    option.textContent = criterion;
+    option.textContent = criterion.label || criterion.name;
     elements.sensitivityCriterion.appendChild(option);
   });
   elements.sensitivityCriterion.value = "0";
-  elements.sensitivityWeight.value = (analysis.criteriaResult.weights[0] * 100).toFixed(1);
-  elements.sensitivityWeightValue.textContent = formatPercent(analysis.criteriaResult.weights[0]);
+  elements.sensitivityWeight.value = (analysis.leafWeights[0] * 100).toFixed(1);
+  elements.sensitivityWeightValue.textContent = formatPercent(analysis.leafWeights[0]);
 }
 
 function resetSensitivityToBaseline() {
   if (!latestAnalysis) return;
   const criterionIndex = Number(elements.sensitivityCriterion.value);
-  elements.sensitivityWeight.value = (latestAnalysis.criteriaResult.weights[criterionIndex] * 100).toFixed(1);
+  elements.sensitivityWeight.value = (latestAnalysis.leafWeights[criterionIndex] * 100).toFixed(1);
   renderSensitivityScenario();
 }
 
@@ -1593,6 +1879,14 @@ function renderPairwiseCalculations(analysis) {
     analysis.criteriaResult,
     true
   ));
+  analysis.subcriteriaResults.forEach((result) => {
+    if (!result) return;
+    fragment.appendChild(createPairwiseCalculation(
+      `Sub-criteria pairwise matrix under ${result.criterion}`,
+      result.children,
+      result
+    ));
+  });
   analysis.alternativeResults.forEach((result) => {
     if (result.type === "objective") {
       fragment.appendChild(createObjectiveCalculation(
@@ -1610,11 +1904,111 @@ function renderPairwiseCalculations(analysis) {
   elements.pairwiseCalculations.replaceChildren(fragment);
 }
 
+function createHierarchyBadge(text) {
+  const badge = document.createElement("span");
+  badge.className = "ahp-hierarchy-badge";
+  badge.textContent = text;
+  return badge;
+}
+
+function createHierarchyMetric(label, value) {
+  const metric = document.createElement("span");
+  metric.className = "ahp-hierarchy-metric";
+  metric.textContent = `${label}: ${value}`;
+  return metric;
+}
+
+function renderHierarchyStructure(analysis) {
+  if (!elements.hierarchyStructure) return;
+  const criteriaMeta = analysis.questionnaire.criteriaMeta || getCriterionMetaList(analysis.questionnaire);
+  const fragment = document.createDocumentFragment();
+
+  const goal = document.createElement("div");
+  goal.className = "ahp-hierarchy-goal";
+  goal.append(
+    createHierarchyBadge("Level 1 - Goal"),
+    document.createTextNode(analysis.questionnaire.projectTitle)
+  );
+  fragment.appendChild(goal);
+
+  const criteriaList = document.createElement("div");
+  criteriaList.className = "ahp-hierarchy-list";
+  criteriaMeta.forEach((criterion, criterionIndex) => {
+    const criterionNode = document.createElement("section");
+    criterionNode.className = "ahp-hierarchy-node";
+
+    const header = document.createElement("div");
+    header.className = "ahp-hierarchy-node-header";
+    const title = document.createElement("strong");
+    title.textContent = criterion.name;
+    header.append(
+      createHierarchyBadge("Level 2 - Criterion"),
+      title,
+      createHierarchyMetric("Weight", formatPercent(analysis.criteriaResult.weights[criterionIndex]))
+    );
+    criterionNode.appendChild(header);
+
+    if (criterion.children && criterion.children.length) {
+      const subResult = analysis.subcriteriaResults[criterionIndex];
+      const childList = document.createElement("div");
+      childList.className = "ahp-hierarchy-subcriteria";
+      criterion.children.forEach((child, childIndex) => {
+        const leaf = analysis.leafCriteria.find((item) =>
+          item.parentIndex === criterionIndex && item.childIndex === childIndex
+        );
+        const childNode = document.createElement("div");
+        childNode.className = "ahp-hierarchy-leaf";
+        const childTitle = document.createElement("strong");
+        childTitle.textContent = child.name;
+        childNode.append(
+          createHierarchyBadge("Level 3 - Sub-criterion"),
+          childTitle,
+          createHierarchyMetric("Local", formatPercent(subResult?.weights?.[childIndex] ?? 0)),
+          createHierarchyMetric("Global", formatPercent(leaf?.globalWeight ?? 0))
+        );
+        childList.appendChild(childNode);
+      });
+      criterionNode.appendChild(childList);
+    } else {
+      const leaf = analysis.leafCriteria.find((item) => item.parentIndex === criterionIndex && item.childIndex === null);
+      const leafInfo = document.createElement("div");
+      leafInfo.className = "ahp-hierarchy-direct-leaf";
+      leafInfo.append(
+        createHierarchyMetric("Global", formatPercent(leaf?.globalWeight ?? analysis.criteriaResult.weights[criterionIndex]))
+      );
+      criterionNode.appendChild(leafInfo);
+    }
+
+    criteriaList.appendChild(criterionNode);
+  });
+  fragment.appendChild(criteriaList);
+
+  const alternatives = document.createElement("div");
+  alternatives.className = "ahp-hierarchy-alternatives";
+  const alternativesHeader = document.createElement("div");
+  alternativesHeader.className = "ahp-hierarchy-node-header";
+  const alternativesTitle = document.createElement("strong");
+  alternativesTitle.textContent = "Alternatives";
+  alternativesHeader.append(createHierarchyBadge("Final level"), alternativesTitle);
+  const alternativesList = document.createElement("div");
+  alternativesList.className = "ahp-hierarchy-alternative-list";
+  analysis.questionnaire.alternatives.forEach((alternative) => {
+    const item = document.createElement("span");
+    item.textContent = alternative;
+    alternativesList.appendChild(item);
+  });
+  alternatives.append(alternativesHeader, alternativesList);
+  fragment.appendChild(alternatives);
+
+  elements.hierarchyStructure.replaceChildren(fragment);
+}
+
 function renderAnalysis(analysis) {
   elements.results.classList.remove("hidden");
   updateAhpWorkflow(2);
   renderWeightDistribution(analysis.questionnaire.criteria, analysis.criteriaResult.weights);
   renderPairwiseCalculations(analysis);
+  renderHierarchyStructure(analysis);
   renderDecisionMatrix(analysis);
   initialiseSensitivityScenario(analysis);
   elements.alternativeRanking.textContent = "";
@@ -1632,6 +2026,10 @@ function renderAnalysis(analysis) {
 
   const consistencyItems = [
     { label: "Criteria comparisons", cr: analysis.criteriaResult.cr },
+    ...analysis.subcriteriaResults.filter(Boolean).map((result) => ({
+      label: `Sub-criteria under ${result.criterion}`,
+      cr: result.cr,
+    })),
     ...analysis.alternativeResults.map((result) => ({
       label: `Alternatives under ${result.criterion}`,
       cr: result.cr,
@@ -1698,7 +2096,7 @@ function hideObjectiveDataMatrix() {
 
 function renderObjectiveDataMatrix(questionnaire, initialValues = {}) {
   if (!elements.objectiveDataSection || !elements.objectiveDataMatrix) return;
-  const objectiveCriteria = getCriterionMetaList(questionnaire)
+  const objectiveCriteria = getLeafCriteria(questionnaire)
     .map((criterion, criterionIndex) => ({ ...criterion, criterionIndex }))
     .filter((criterion) => criterion.type === "objective");
 
@@ -1735,7 +2133,7 @@ function renderObjectiveDataMatrix(questionnaire, initialValues = {}) {
   objectiveCriteria.forEach((criterion) => {
     const cell = document.createElement("th");
     cell.scope = "col";
-    cell.textContent = criterion.name;
+    cell.textContent = criterion.label || criterion.name;
     const meta = document.createElement("span");
     meta.className = "matrix-header-weight";
     meta.textContent = criterion.direction === "lower" ? "Lower is better" : "Higher is better";
@@ -1763,7 +2161,7 @@ function renderObjectiveDataMatrix(questionnaire, initialValues = {}) {
       input.dataset.objectiveAlternativeIndex = String(alternativeIndex);
       input.value = initialValues?.[criterion.criterionIndex]?.[alternativeIndex] ??
         initialValues?.[String(criterion.criterionIndex)]?.[alternativeIndex] ?? "";
-      input.setAttribute("aria-label", `${criterion.name} value for ${alternative}`);
+      input.setAttribute("aria-label", `${criterion.label || criterion.name} value for ${alternative}`);
       cell.appendChild(input);
       row.appendChild(cell);
     });
@@ -1780,7 +2178,7 @@ function readObjectiveValues() {
     return values;
   }
 
-  getCriterionMetaList(loadedResponses[0].questionnaire).forEach((criterion, criterionIndex) => {
+  getLeafCriteria(loadedResponses[0].questionnaire).forEach((criterion, criterionIndex) => {
     if (criterion.type !== "objective") return;
     values[criterionIndex] = [];
     loadedResponses[0].questionnaire.alternatives.forEach((alternative, alternativeIndex) => {
@@ -1789,13 +2187,13 @@ function readObjectiveValues() {
       );
       const number = Number(input?.value);
       if (!Number.isFinite(number)) {
-        throw new Error(`Enter a numeric ${criterion.name} value for ${alternative}.`);
+        throw new Error(`Enter a numeric ${criterion.label || criterion.name} value for ${alternative}.`);
       }
       if (criterion.direction === "lower" && number <= 0) {
-        throw new Error(`${criterion.name} is lower-is-better, so values must be greater than zero.`);
+        throw new Error(`${criterion.label || criterion.name} is lower-is-better, so values must be greater than zero.`);
       }
       if (criterion.direction === "higher" && number < 0) {
-        throw new Error(`${criterion.name} is higher-is-better, so values cannot be negative.`);
+        throw new Error(`${criterion.label || criterion.name} is higher-is-better, so values cannot be negative.`);
       }
       values[criterionIndex].push(number);
     });
@@ -1891,6 +2289,26 @@ elements.structureFields.addEventListener("click", (event) => {
   const removeButton = event.target.closest("[data-remove-structure]");
   if (removeButton) {
     removeStructureItem(removeButton.dataset.removeStructure, Number(removeButton.dataset.index));
+    return;
+  }
+
+  const addSubcriterionButton = event.target.closest("[data-add-subcriterion]");
+  if (addSubcriterionButton) {
+    addSubcriterion(Number(addSubcriterionButton.dataset.addSubcriterion));
+    return;
+  }
+
+  const removeSubcriterionButton = event.target.closest("[data-remove-subcriterion]");
+  if (removeSubcriterionButton) {
+    removeSubcriterion(
+      Number(removeSubcriterionButton.dataset.removeSubcriterion),
+      Number(removeSubcriterionButton.dataset.childIndex)
+    );
+  }
+});
+elements.structureFields.addEventListener("change", (event) => {
+  if (event.target.matches("[data-toggle-subcriteria]")) {
+    toggleSubcriteria(Number(event.target.dataset.toggleSubcriteria), event.target.checked);
   }
 });
 elements.loadSampleDesignButton.addEventListener("click", loadSampleDesign);
@@ -1986,11 +2404,25 @@ elements.exportAnalysisButton.addEventListener("click", () => {
     ["Rank", "Alternative", "Overall Priority"],
     ...latestAnalysis.alternativeScores.map((item, index) => [index + 1, item.alternative, item.score.toFixed(6)]),
     [],
-    ["Criterion", "Type", "Direction", "Weight"],
+    ["Parent Criterion", "Type", "Direction", "Weight"],
     ...latestAnalysis.questionnaire.criteria.map((criterion, index) => {
       const meta = latestAnalysis.questionnaire.criteriaMeta?.[index] || getCriterionMeta(latestAnalysis.questionnaire, index);
-      return [criterion, meta.type, meta.type === "objective" ? meta.direction : "", latestAnalysis.criteriaResult.weights[index].toFixed(6)];
+      return [
+        criterion,
+        meta.children?.length ? "parent" : meta.type,
+        meta.children?.length ? "" : meta.type === "objective" ? meta.direction : "",
+        latestAnalysis.criteriaResult.weights[index].toFixed(6),
+      ];
     }),
+    [],
+    ["Leaf Criterion", "Parent Criterion", "Type", "Direction", "Global Weight"],
+    ...latestAnalysis.leafCriteria.map((criterion, index) => [
+      criterion.label || criterion.name,
+      criterion.parentName || "",
+      criterion.type,
+      criterion.type === "objective" ? criterion.direction : "",
+      latestAnalysis.leafWeights[index].toFixed(6),
+    ]),
     [],
     ["Criterion", "Alternative", "Measured Value", "Local Priority"],
     ...latestAnalysis.alternativeResults

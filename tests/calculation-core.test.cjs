@@ -363,6 +363,44 @@ test("AHP rejects non-positive values for lower-is-better objective criteria", (
   }), /greater than zero/);
 });
 
+test("AHP calculates global weights for one sub-criteria level", () => {
+  const questionnaire = {
+    criteria: [
+      {
+        name: "Cost",
+        children: [
+          { name: "Transport Cost", type: "objective", direction: "lower" },
+          { name: "Implementation Cost", type: "objective", direction: "lower" },
+        ],
+      },
+      { name: "Service", type: "subjective" },
+    ],
+    alternatives: ["A", "B"],
+  };
+  const response = {
+    questionnaire,
+    answers: {
+      criteria: { "c-0-1": 3 },
+      subcriteria: { "s-0-0-1": 3 },
+      alternatives: { "a-2-0-1": -3 },
+    },
+  };
+  const result = ahp.calculateAhp([response], {
+    objectiveValues: {
+      0: [100, 200],
+      1: [40, 60],
+    },
+  });
+
+  approximatelyEqual(result.criteriaResult.weights[0], 0.75);
+  approximatelyEqual(result.subcriteriaResults[0].weights[0], 0.75);
+  approximatelyEqual(result.leafWeights[0], 0.5625);
+  approximatelyEqual(result.leafWeights[1], 0.1875);
+  approximatelyEqual(result.leafWeights[2], 0.25);
+  approximatelyEqual(result.alternativeScores.reduce((sum, row) => sum + row.score, 0), 1);
+  assert.equal(result.alternativeScores[0].alternative, "A");
+});
+
 test("AHP rejects incompatible expert questionnaire structures", () => {
   const base = {
     questionnaire: { criteria: ["Cost"], alternatives: ["A", "B"] },
