@@ -791,7 +791,8 @@ button:disabled {
 
 .ahp-hierarchy-structure {
   display: grid;
-  gap: 14px;
+  gap: 24px;
+  container-type: inline-size;
 }
 
 .ahp-hierarchy-goal,
@@ -810,29 +811,42 @@ button:disabled {
   padding: 14px;
   color: var(--navy-950);
   font-weight: 900;
+  justify-self: center;
+  justify-content: center;
+  max-width: 100%;
+  position: relative;
 }
 
 .ahp-hierarchy-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(var(--criterion-count), minmax(0, 1fr));
+  gap: 16px;
   align-items: start;
+  padding-top: 20px;
+  position: relative;
 }
 
 .ahp-hierarchy-node {
   display: grid;
   gap: 8px;
-  padding: 12px;
+  padding: 0;
   min-width: 0;
-  background: #fff;
+  background: transparent;
+  border: 0;
+  position: relative;
 }
 
 .ahp-hierarchy-node-header {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   align-items: center;
   min-width: 0;
+  justify-items: start;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
 }
 
 .ahp-hierarchy-node-header strong {
@@ -841,10 +855,12 @@ button:disabled {
 
 .ahp-hierarchy-leaf {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   align-items: center;
   min-width: 0;
+  justify-items: start;
+  position: relative;
 }
 
 .ahp-hierarchy-node-header strong,
@@ -878,7 +894,8 @@ button:disabled {
   display: grid;
   gap: 8px;
   padding-left: 12px;
-  border-left: 3px solid var(--blue-100);
+  border-left: 2px solid var(--blue-100);
+  margin-left: 12px;
 }
 
 .ahp-hierarchy-leaf {
@@ -886,6 +903,116 @@ button:disabled {
   border: 1px solid var(--border);
   border-radius: var(--border-radius-sm);
   background: #f8fbff;
+}
+
+.ahp-hierarchy-goal::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  height: 25px;
+  border-left: 2px solid var(--blue-100);
+}
+
+.ahp-hierarchy-list::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc((100% - (var(--criterion-count) - 1) * 16px) / var(--criterion-count) / 2);
+  right: calc((100% - (var(--criterion-count) - 1) * 16px) / var(--criterion-count) / 2);
+  border-top: 2px solid var(--blue-100);
+}
+
+.ahp-hierarchy-node::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  height: 20px;
+  border-left: 2px solid var(--blue-100);
+}
+
+.ahp-hierarchy-leaf::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: -14px;
+  width: 13px;
+  border-top: 2px solid var(--blue-100);
+}
+
+.ahp-hierarchy-structure strong,
+.ahp-hierarchy-goal,
+.ahp-hierarchy-badge,
+.ahp-hierarchy-metric {
+  overflow-wrap: anywhere;
+}
+
+.ahp-hierarchy-explanation {
+  margin: 0;
+  font-size: .875rem;
+  color: var(--text-secondary);
+}
+
+.ahp-hierarchy-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  align-items: center;
+}
+
+.ahp-hierarchy-metadata .ahp-hierarchy-badge,
+.ahp-hierarchy-metadata .ahp-hierarchy-metric {
+  font-weight: 600;
+}
+
+.ahp-hierarchy-list.ahp-hierarchy-many {
+  grid-template-columns: 1fr;
+  padding: 0 0 0 18px;
+  border-left: 2px solid var(--blue-100);
+}
+
+.ahp-hierarchy-many::before {
+  left: -2px;
+  right: 50%;
+  top: -24px;
+  height: 24px;
+  border-left: 2px solid var(--blue-100);
+}
+
+.ahp-hierarchy-many > .ahp-hierarchy-node::before {
+  left: -20px;
+  top: 24px;
+  bottom: auto;
+  width: 20px;
+  height: 0;
+  border-top: 2px solid var(--blue-100);
+}
+
+@container (max-width: 699px) {
+  .ahp-hierarchy-list {
+    grid-template-columns: 1fr;
+    padding: 0 0 0 18px;
+    border-left: 2px solid var(--blue-100);
+  }
+
+  .ahp-hierarchy-list::before {
+    left: -2px;
+    right: 50%;
+    top: -24px;
+    height: 24px;
+    border-left: 2px solid var(--blue-100);
+  }
+
+  .ahp-hierarchy-list > .ahp-hierarchy-node::before {
+    left: -20px;
+    top: 24px;
+    bottom: auto;
+    width: 20px;
+    height: 0;
+    border-top: 2px solid var(--blue-100);
+  }
 }
 
 .ahp-hierarchy-direct-leaf {
@@ -907,6 +1034,12 @@ button:disabled {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.ahp-hierarchy-alternatives > .ahp-hierarchy-node-header {
+  border: 0;
+  padding: 0;
+  background: transparent;
 }
 
 .ahp-hierarchy-alternative-list span {
@@ -1781,37 +1914,35 @@ button:disabled {
   }
 
   .ahp-hierarchy-goal,
-  .ahp-hierarchy-node,
   .ahp-hierarchy-alternatives {
     padding: 12px;
   }
 
   .ahp-hierarchy-node-header,
   .ahp-hierarchy-leaf {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 7px;
     align-items: center;
   }
 
   .ahp-hierarchy-node-header strong,
   .ahp-hierarchy-leaf strong {
-    flex: 1 1 100%;
-    order: 2;
+    order: 0;
   }
 
   .ahp-hierarchy-badge {
-    order: 1;
+    order: 0;
     max-width: 100%;
   }
 
   .ahp-hierarchy-metric {
-    order: 3;
+    order: 0;
   }
 
   .ahp-hierarchy-subcriteria {
     gap: 8px;
-    padding-left: 8px;
+    padding-left: 12px;
   }
 
   .objective-data-section {

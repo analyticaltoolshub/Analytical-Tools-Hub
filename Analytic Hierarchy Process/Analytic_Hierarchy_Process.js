@@ -67,6 +67,7 @@ const preferenceLabels = {
 };
 
 let currentQuestionnaire = null;
+let surveyQuestionnaire = null;
 let loadedResponses = [];
 let latestAnalysis = null;
 let sensitivityPlanningActive = false;
@@ -798,7 +799,7 @@ function makeQuestionnaire(
         rightIndex: pair.rightIndex,
         left: pair.left,
         right: pair.right,
-        prompt: `With respect to ${criterion}, compare ${pair.left} with ${pair.right}.`,
+        prompt: `With respect to ${criterion.label || criterion.name}, compare ${pair.left} with ${pair.right}.`,
         order: index + 1,
       });
     });
@@ -873,6 +874,8 @@ function resetQuestionnaireDesign() {
 }
 
 function validateQuestionnaire(data) {
+  ATHAhp.validateStructure(data);
+  if (data.version !== undefined && data.version !== 1) throw new Error("Unsupported AHP questionnaire version.");
   if (!data || data.type !== "ahp-questionnaire" || !Array.isArray(data.criteria) || !Array.isArray(data.alternatives)) {
     throw new Error("The selected file is not a valid AHP questionnaire JSON.");
   }
@@ -895,6 +898,20 @@ function validateQuestionnaire(data) {
   });
   data.criteria = criteriaMeta.map((criterion) => criterion.name);
   data.criteriaMeta = criteriaMeta;
+  const expected = makeQuestionnaire(data.projectTitle, criteriaMeta, data.alternatives, data.id);
+  for (const group of ["criteria", "subcriteria", "alternatives"]) {
+    const questions = data.questions?.[group] ?? (group === "subcriteria" ? [] : null);
+    const required = expected.questions[group];
+    if (!Array.isArray(questions) || questions.length !== required.length || new Set(questions.map((question) => question?.id)).size !== required.length) {
+      throw new Error(`The questionnaire has missing or duplicate ${group} comparisons.`);
+    }
+    for (const question of questions) {
+      const match = required.find((item) => item.id === question?.id);
+      if (!match || question.leftIndex !== match.leftIndex || question.rightIndex !== match.rightIndex || question.criterionIndex !== match.criterionIndex || question.left !== match.left || question.right !== match.right) {
+        throw new Error(`The questionnaire contains an invalid ${group} comparison.`);
+      }
+    }
+  }
 
   if (
     data.criteria.some((item) => typeof item !== "string" || !item.trim()) ||
@@ -937,6 +954,7 @@ function validateQuestionnaire(data) {
   });
   delete data.alternativeDescriptions;
 
+  data.questions = expected.questions;
   return data;
 }
 
@@ -1013,6 +1031,7 @@ function createJudgementSlider(question) {
 
 function renderSurvey(questionnaire) {
   currentQuestionnaire = questionnaire;
+  surveyQuestionnaire = questionnaire;
   elements.surveyWorkspace.classList.remove("hidden");
   elements.surveyTitle.textContent = questionnaire.projectTitle;
   elements.surveyQuestions.textContent = "";
@@ -1115,7 +1134,7 @@ function updateSurveyCompleteness() {
 }
 
 function collectSurveyResponse() {
-  if (!currentQuestionnaire) {
+  if (!surveyQuestionnaire) {
     throw new Error("Load a questionnaire before exporting a survey response.");
   }
 
@@ -1144,17 +1163,19 @@ function collectSurveyResponse() {
     version: 1,
     completedAt: new Date().toISOString(),
     expertName: safeName(elements.expertName.value, "Unnamed expert"),
-    questionnaire: currentQuestionnaire,
+    questionnaire: surveyQuestionnaire,
     answers,
   };
 }
 
 function validateResponse(data) {
+  if (data?.version !== undefined && data.version !== 1) throw new Error("Unsupported AHP response version.");
   if (!data || data.type !== "ahp-survey-response" || !data.questionnaire || !data.answers) {
     throw new Error("The selected file is not a valid completed AHP survey response.");
   }
 
   const questionnaire = validateQuestionnaire(data.questionnaire);
+  ATHAhp.validateAnswers(questionnaire, data.answers);
   const criteriaIds = questionnaire.questions.criteria.map((question) => question.id);
   const subcriteriaIds = questionnaire.questions.subcriteria.map((question) => question.id);
   const alternativeIds = questionnaire.questions.alternatives.map((question) => question.id);
@@ -1933,6 +1954,8 @@ function renderHierarchyStructure(analysis) {
 
   const criteriaList = document.createElement("div");
   criteriaList.className = "ahp-hierarchy-list";
+  criteriaList.style.setProperty("--criterion-count", criteriaMeta.length);
+  criteriaList.classList.toggle("ahp-hierarchy-many", criteriaMeta.length > 5);
   criteriaMeta.forEach((criterion, criterionIndex) => {
     const criterionNode = document.createElement("section");
     criterionNode.className = "ahp-hierarchy-node";
@@ -1963,23 +1986,24 @@ function renderHierarchyStructure(analysis) {
         childNode.append(
           createHierarchyBadge("Level 3 - Sub-criterion"),
           childTitle,
-          createHierarchyMetric("Local", formatPercent(subResult?.weights?.[childIndex] ?? 0)),
-          createHierarchyMetric("Global", formatPercent(leaf?.globalWeight ?? 0))
+          createHierarchyMetric("Local weight", formatPercent(subResult?.weights?.[childIndex] ?? 0)),
+          createHierarchyMetric("Overall weight", formatPercent(leaf?.globalWeight ?? 0)),
+          createHierarchyBadge(child.type === "objective" ? "Objective" : "Subjective")
         );
         childList.appendChild(childNode);
       });
       criterionNode.appendChild(childList);
     } else {
-      const leaf = analysis.leafCriteria.find((item) => item.parentIndex === criterionIndex && item.childIndex === null);
-      const leafInfo = document.createElement("div");
-      leafInfo.className = "ahp-hierarchy-direct-leaf";
-      leafInfo.append(
-        createHierarchyMetric("Global", formatPercent(leaf?.globalWeight ?? analysis.criteriaResult.weights[criterionIndex]))
-      );
-      criterionNode.appendChild(leafInfo);
+      header.appendChild(createHierarchyBadge(criterion.type === "objective" ? "Objective" : "Subjective"));
     }
 
     criteriaList.appendChild(criterionNode);
+  });
+  criteriaList.querySelectorAll(".ahp-hierarchy-node-header, .ahp-hierarchy-leaf").forEach((node) => {
+    const metadata = document.createElement("div");
+    metadata.className = "ahp-hierarchy-metadata";
+    Array.from(node.children).slice(2).forEach((item) => metadata.appendChild(item));
+    node.appendChild(metadata);
   });
   fragment.appendChild(criteriaList);
 
@@ -1988,7 +2012,7 @@ function renderHierarchyStructure(analysis) {
   const alternativesHeader = document.createElement("div");
   alternativesHeader.className = "ahp-hierarchy-node-header";
   const alternativesTitle = document.createElement("strong");
-  alternativesTitle.textContent = "Alternatives";
+  alternativesTitle.textContent = "Alternatives evaluated";
   alternativesHeader.append(createHierarchyBadge("Final level"), alternativesTitle);
   const alternativesList = document.createElement("div");
   alternativesList.className = "ahp-hierarchy-alternative-list";
@@ -1998,6 +2022,10 @@ function renderHierarchyStructure(analysis) {
     alternativesList.appendChild(item);
   });
   alternatives.append(alternativesHeader, alternativesList);
+  const explanation = document.createElement("p");
+  explanation.className = "ahp-hierarchy-explanation";
+  explanation.textContent = "Each alternative is evaluated against every criterion without sub-criteria and every sub-criterion. Local weight is the share within its parent; overall weight is the parent weight multiplied by the local weight.";
+  alternatives.appendChild(explanation);
   fragment.appendChild(alternatives);
 
   elements.hierarchyStructure.replaceChildren(fragment);
@@ -2185,8 +2213,13 @@ function readObjectiveValues() {
       const input = elements.objectiveDataMatrix.querySelector(
         `[data-objective-criterion-index="${criterionIndex}"][data-objective-alternative-index="${alternativeIndex}"]`
       );
-      const number = Number(input?.value);
-      if (!Number.isFinite(number)) {
+      let number;
+      try {
+        number = ATHAhp.objectiveNumber(input?.value);
+        input?.removeAttribute("aria-invalid");
+      } catch {
+        input?.setAttribute("aria-invalid", "true");
+        input?.focus();
         throw new Error(`Enter a numeric ${criterion.label || criterion.name} value for ${alternative}.`);
       }
       if (criterion.direction === "lower" && number <= 0) {
@@ -2318,8 +2351,7 @@ elements.previewQuestionnaireButton.addEventListener("click", previewQuestionnai
 elements.exportQuestionnaireButton.addEventListener("click", () => {
   try {
     clearErrors();
-    currentQuestionnaire = currentQuestionnaire || createQuestionnaire();
-    downloadJson("ahp-questionnaire.json", currentQuestionnaire);
+    downloadJson("ahp-questionnaire.json", createQuestionnaire());
   } catch (error) {
     setError(elements.designError, error.message);
   }
@@ -2382,7 +2414,25 @@ elements.loadSampleResponseButton.addEventListener("click", () => {
   renderResponses();
 });
 
+function invalidateAnalysis() {
+  if (latestAnalysis) {
+    elements.analysisSummary.textContent = "Inputs changed. Recalculate to update results. The displayed results are from the previous calculation.";
+  }
+  latestAnalysis = null;
+  elements.exportAnalysisButton.disabled = true;
+  elements.sensitivityToggle.disabled = true;
+  sensitivityPlanningActive = false;
+  elements.sensitivityToggle.setAttribute("aria-pressed", "false");
+  elements.sensitivityPanel.classList.add("hidden");
+}
+
+elements.objectiveDataMatrix.addEventListener("input", (event) => {
+  event.target.removeAttribute("aria-invalid");
+  invalidateAnalysis();
+});
+
 elements.calculateAnalysisButton.addEventListener("click", () => {
+  invalidateAnalysis();
   try {
     clearErrors();
     if (!loadedResponses.length) {
@@ -2390,6 +2440,7 @@ elements.calculateAnalysisButton.addEventListener("click", () => {
     }
     latestAnalysis = calculateAhp(loadedResponses, { objectiveValues: readObjectiveValues() });
     renderAnalysis(latestAnalysis);
+    elements.sensitivityToggle.disabled = false;
   } catch (error) {
     setError(elements.analysisError, error.message);
   }

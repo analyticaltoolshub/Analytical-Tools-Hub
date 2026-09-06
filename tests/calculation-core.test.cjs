@@ -403,15 +403,37 @@ test("AHP calculates global weights for one sub-criteria level", () => {
 
 test("AHP rejects incompatible expert questionnaire structures", () => {
   const base = {
-    questionnaire: { criteria: ["Cost"], alternatives: ["A", "B"] },
-    answers: { criteria: {}, alternatives: { "a-0-0-1": 2 } },
+    questionnaire: { criteria: ["Cost", "Service"], alternatives: ["A", "B"] },
+    answers: { criteria: { "c-0-1": 1 }, alternatives: { "a-0-0-1": 2, "a-1-0-1": 1 } },
   };
   const incompatible = {
-    questionnaire: { criteria: ["Quality"], alternatives: ["A", "B"] },
-    answers: { criteria: {}, alternatives: { "a-0-0-1": 2 } },
+    questionnaire: { criteria: ["Quality", "Service"], alternatives: ["A", "B"] },
+    answers: { criteria: { "c-0-1": 1 }, alternatives: { "a-0-0-1": 2, "a-1-0-1": 1 } },
   };
 
   assert.throws(() => ahp.calculateAhp([base, incompatible]), /same questionnaire structure/);
+});
+
+test("AHP rejects missing objective values but preserves explicit zero", () => {
+  const criterion = { name: "Quality", direction: "higher" };
+  for (const value of ["", "  ", null, undefined, true, NaN, Infinity]) {
+    assert.throws(() => ahp.calculateObjectivePriorities(criterion, [value, 80]), /numeric measured value/);
+  }
+  assert.deepEqual(ahp.calculateObjectivePriorities(criterion, [0, 80]).weights, [0, 1]);
+});
+
+test("AHP validates comparison scale, IDs and hierarchy before calculation", () => {
+  const questionnaire = { criteria: ["Cost", "Service"], alternatives: ["A", "B"] };
+  const valid = { criteria: { "c-0-1": 1 }, alternatives: { "a-0-0-1": 2, "a-1-0-1": -9 } };
+  assert.doesNotThrow(() => ahp.validateAnswers(questionnaire, valid));
+  for (const value of [99, -10, 1.5, 0, "", null, true]) {
+    assert.throws(() => ahp.validateAnswers(questionnaire, { ...valid, criteria: { "c-0-1": value } }));
+  }
+  assert.throws(() => ahp.validateAnswers(questionnaire, { ...valid, criteria: {} }));
+  assert.throws(() => ahp.validateAnswers(questionnaire, { ...valid, criteria: { "c-0-1": 1, "c-0-99": 1 } }));
+  for (const criterion of [{ name: "Cost", type: "unknown" }, { name: "Cost", direction: "unknown" }, { name: "Cost", children: [{ name: "Only child" }] }]) {
+    assert.throws(() => ahp.validateStructure({ ...questionnaire, criteria: [criterion, "Service"] }));
+  }
 });
 
 test("ABC keeps the item that crosses a cutoff in the higher-priority class", () => {

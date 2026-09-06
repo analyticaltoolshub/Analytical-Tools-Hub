@@ -21,7 +21,7 @@
 
   function judgementToRatio(value) {
     const number = Number(value);
-    if (!Number.isFinite(number) || number === 0) {
+    if ((typeof value !== "number" && typeof value !== "string") || String(value).trim() === "" || !Number.isInteger(number) || number === 0 || Math.abs(number) > 9) {
       throw new Error("AHP comparison values must be valid Saaty scale numbers.");
     }
     return number > 0 ? number : 1 / Math.abs(number);
@@ -34,6 +34,7 @@
       const parts = key.split("-").map((part) => Number(part));
       const i = prefix === "c" ? parts[1] : parts[2];
       const j = prefix === "c" ? parts[2] : parts[3];
+      if (!Number.isInteger(i) || !Number.isInteger(j) || i < 0 || j >= size || i >= j || key !== `${prefix}-${i}-${j}`) throw new Error("Invalid AHP comparison indices.");
       const ratio = judgementToRatio(value);
       matrix[i][j] = ratio;
       matrix[j][i] = 1 / ratio;
@@ -139,7 +140,7 @@
       throw new Error("Objective criteria values must be provided for every alternative.");
     }
     return row.slice(0, alternativeCount).map((value) => {
-      const number = Number(value);
+      const number = objectiveNumber(value);
       if (!Number.isFinite(number)) {
         throw new Error("Objective criteria values must be numeric.");
       }
@@ -148,7 +149,7 @@
   }
 
   function calculateObjectivePriorities(criterion, rawValues) {
-    const values = rawValues.map(Number);
+    const values = rawValues.map(objectiveNumber);
     let transformedValues;
     if (criterion.direction === "lower") {
       if (values.some((value) => value <= 0)) {
@@ -212,11 +213,53 @@
   }
 
   function requirePairwiseAnswers(answers, ids) {
+    if (!answers || typeof answers !== "object" || Array.isArray(answers) || Object.keys(answers).some((id) => !ids.includes(id))) {
+      throw new Error("AHP response contains unexpected comparison IDs.");
+    }
     ids.forEach((id) => {
       if (!Number.isFinite(Number(answers?.[id]))) {
         throw new Error("AHP calculation is missing one or more required pairwise answers.");
       }
+      judgementToRatio(answers[id]);
     });
+  }
+
+  function objectiveNumber(value) {
+    if ((typeof value !== "string" && typeof value !== "number") || String(value).trim() === "" || !Number.isFinite(Number(value))) {
+      throw new Error("Enter a numeric measured value for every alternative; blank values are not zero.");
+    }
+    return Number(value);
+  }
+
+  function validateStructure(questionnaire) {
+    if (!questionnaire || !Array.isArray(questionnaire.criteria) || !Array.isArray(questionnaire.alternatives) || questionnaire.criteria.length < 2 || questionnaire.criteria.length > 10 || questionnaire.alternatives.length < 2 || questionnaire.alternatives.length > 10) {
+      throw new Error("AHP requires between two and ten criteria and alternatives.");
+    }
+    if (questionnaire.criteriaMeta !== undefined && (!Array.isArray(questionnaire.criteriaMeta) || questionnaire.criteriaMeta.length !== questionnaire.criteria.length)) {
+      throw new Error("Criterion metadata must match the criteria.");
+    }
+    function check(item, depth) {
+      if (typeof item === "string" && item.trim()) return;
+      if (!item || typeof item !== "object" || typeof item.name !== "string" || !item.name.trim()) throw new Error("Every criterion needs a name.");
+      if (item.type !== undefined && !["subjective", "objective"].includes(item.type)) throw new Error("Select a valid criterion type.");
+      if (item.criterionType !== undefined && !["subjective", "objective"].includes(item.criterionType)) throw new Error("Select a valid criterion type.");
+      if (item.direction !== undefined && !["higher", "lower"].includes(item.direction)) throw new Error("Select a valid objective direction.");
+      if (item.children !== undefined && !Array.isArray(item.children)) throw new Error("Sub-criteria must be a list.");
+      if (item.children?.length) {
+        if (depth || item.children.length < 2 || item.children.length > 8) throw new Error("Use one level of two to eight sub-criteria per parent.");
+        item.children.forEach((child) => check(child, depth + 1));
+      }
+    }
+    (questionnaire.criteriaMeta || questionnaire.criteria).forEach((item) => check(item, 0));
+    if (questionnaire.alternatives.some((name) => typeof name !== "string" || !name.trim())) throw new Error("Every alternative needs a name.");
+  }
+
+  function validateAnswers(questionnaire, answers) {
+    validateStructure(questionnaire);
+    const criteria = criteriaFromQuestionnaire(questionnaire);
+    requirePairwiseAnswers(answers?.criteria, pairIds("c", criteria.length));
+    requirePairwiseAnswers(answers?.subcriteria || {}, criteria.flatMap((criterion, index) => pairIds(`s-${index}`, criterion.children.length)));
+    requirePairwiseAnswers(answers?.alternatives || {}, leafCriteriaFromCriteria(criteria).flatMap((criterion, index) => criterion.type === "objective" ? [] : pairIds(`a-${index}`, questionnaire.alternatives.length)));
   }
 
   function pairIds(prefix, size) {
@@ -230,6 +273,8 @@
   }
 
   function calculateAhp(responses, options = {}) {
+    if (!Array.isArray(responses) || !responses.length) throw new Error("Load at least one completed response.");
+    responses.forEach((response) => validateAnswers(response.questionnaire, response.answers));
     const questionnaire = responses[0].questionnaire;
     const criteria = criteriaFromQuestionnaire(questionnaire);
     const criteriaNames = criteria.map((criterion) => criterion.name);
@@ -246,7 +291,6 @@
       ) {
         throw new Error("All response files must use the same questionnaire structure.");
       }
-      requirePairwiseAnswers(response.answers.criteria, pairIds("c", criteriaCount));
     });
 
     const criteriaMatrices = responses.map((response) =>
@@ -258,9 +302,6 @@
     const subcriteriaResults = criteria.map((criterion, criterionIndex) => {
       if (!criterion.children || !criterion.children.length) return null;
       const prefix = `s-${criterionIndex}`;
-      responses.forEach((response) => {
-        requirePairwiseAnswers(response.answers.subcriteria || {}, pairIds(prefix, criterion.children.length));
-      });
       const matrices = responses.map((response) =>
         matrixFromAnswers(criterion.children.length, response.answers.subcriteria || {}, prefix)
       );
@@ -317,9 +358,6 @@
       }
 
       const prefix = `a-${leafIndex}`;
-      responses.forEach((response) => {
-        requirePairwiseAnswers(response.answers.alternatives, pairIds(prefix, alternativeCount));
-      });
       const matrices = responses.map((response) =>
         matrixFromAnswers(alternativeCount, response.answers.alternatives, prefix)
       );
@@ -352,6 +390,9 @@
   }
 
   return {
+    objectiveNumber,
+    validateStructure,
+    validateAnswers,
     RI,
     normaliseCriterion,
     normaliseCriteria,

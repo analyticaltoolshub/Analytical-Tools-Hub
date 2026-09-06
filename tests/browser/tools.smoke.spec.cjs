@@ -244,6 +244,25 @@ for (const entry of pages) {
       await page.locator('[data-structure-item="criteria"]').first().locator('[data-subcriterion-type]').nth(1).selectOption('subjective');
       await page.locator('#previewQuestionnaireButton').click();
       await expect(page.locator('#questionnairePreview')).toContainText('sub-criteria comparison questions');
+      await page.locator('[data-subcriterion-name]').first().fill('Updated Coverage');
+      const questionnaireDownload = page.waitForEvent('download');
+      await page.locator('#exportQuestionnaireButton').click();
+      const questionnaireFile = await questionnaireDownload;
+      const questionnaire = JSON.parse(fs.readFileSync(await questionnaireFile.path(), 'utf8'));
+      expect(questionnaire.criteriaMeta[0].children[0].name).toBe('Updated Coverage');
+      await page.locator('#questionnaireFile').setInputFiles({ name: 'valid.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(questionnaire)) });
+      await page.locator('#loadQuestionnaireButton').click();
+      await expect(page.locator('#surveyError')).toBeEmpty();
+      const malformed = structuredClone(questionnaire);
+      malformed.questions.criteria[0].rightIndex = 99;
+      await page.locator('#questionnaireFile').setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(malformed)) });
+      await page.locator('#loadQuestionnaireButton').click();
+      await expect(page.locator('#surveyError')).toContainText('invalid criteria comparison');
+      const answers = Object.fromEntries(Object.entries(questionnaire.questions).map(([group, questions]) => [group, Object.fromEntries(questions.map((question) => [question.id, 1]))]));
+      answers.criteria[questionnaire.questions.criteria[0].id] = 99;
+      await page.locator('#responseFiles').setInputFiles({ name: 'invalid-response.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ type: 'ahp-survey-response', questionnaire, answers })) });
+      await page.locator('#loadResponsesButton').click();
+      await expect(page.locator('#analysisError')).toContainText('Saaty');
       await page.locator('#loadSampleResponseButton').click();
     }
     if (entry.calculate) {
@@ -288,6 +307,39 @@ for (const entry of pages) {
         if (testInfo.project.name === 'mobile-chromium') {
           expect(objectiveMatrixLayout.scrollable).toBe(true);
         }
+        const objectiveInput = page.locator('#objectiveDataMatrix input[data-objective-criterion-index="1"]').first();
+        await objectiveInput.fill('');
+        await expect(page.locator('#analysisSummary')).toContainText('Inputs changed');
+        await expect(page.locator('#exportAnalysisButton')).toBeDisabled();
+        await expect(page.locator('#sensitivityToggle')).toBeDisabled();
+        await page.locator('#calculateAnalysisButton').click();
+        await expect(page.locator('#analysisError')).toContainText('Enter a numeric');
+        await expect(objectiveInput).toHaveAttribute('aria-invalid', 'true');
+        await expect(page.locator('#exportAnalysisButton')).toBeDisabled();
+        await objectiveInput.fill('0');
+        await page.locator('#calculateAnalysisButton').click();
+        await expect(page.locator('#analysisError')).toBeEmpty();
+        await expect(page.locator('#exportAnalysisButton')).toBeEnabled();
+        await expect(page.locator('#sensitivityToggle')).toBeEnabled();
+        await page.evaluate(() => {
+          const criteria = [
+            { name: 'Total Cost', type: 'objective', direction: 'lower' },
+            { name: 'Quality Performance', type: 'objective', direction: 'higher' },
+            { name: 'Delivery Reliability', type: 'objective', direction: 'higher' },
+            { name: 'Supply Risk', children: [
+              { name: 'Financial Stability', type: 'objective', direction: 'higher' },
+              { name: 'Continuity of Supply', type: 'objective', direction: 'higher' },
+            ] },
+            { name: 'Scalability', type: 'objective', direction: 'higher' },
+          ];
+          const questionnaire = makeQuestionnaire('Supplier Selection', criteria, ['Supplier A', 'Supplier B']);
+          const answers = Object.fromEntries(Object.entries(questionnaire.questions).map(([group, questions]) => [group, Object.fromEntries(questions.map((question) => [question.id, 1]))]));
+          renderAnalysis(ATHAhp.calculateAhp([{ questionnaire, answers }], { objectiveValues: { 0: [10, 20], 1: [80, 90], 2: [90, 95], 3: [70, 85], 4: [60, 80], 5: [60, 70] } }));
+        });
+        await expect(page.locator('#hierarchyStructure')).toContainText('Local weight');
+        await expect(page.locator('#hierarchyStructure')).toContainText('Overall weight');
+        await expect(page.locator('#hierarchyStructure')).not.toContainText('Global:');
+        await page.locator('#hierarchyStructure').screenshot({ path: testInfo.outputPath('ahp-hierarchy.png') });
       }
     }
 
