@@ -16,6 +16,123 @@ const dea = require("../calculation-core/dea.js");
 const multivariateEstimator = require("../calculation-core/multivariate-estimator.js");
 const supplyChainNetwork = require("../calculation-core/supply-chain-network.js");
 
+test("Estimator R-squared and adjusted R-squared are invariant to output units", () => {
+  for (const curved of [false, true]) {
+    for (const scale of [1, 1e-12, 1e-120, 1e100]) {
+      const result = multivariateEstimator.analyse({ inputNames: ['x'], outputNames: ['y'], modelType: 'linear',
+        rows: Array.from({ length: 25 }, (_, i) => { const x = i - 12; return { inputs: [x], outputs: [scale * (curved ? 10 + x * x : 50 + 2 * x)] }; }) }).selected.outputs[0];
+      // Symmetric x has zero covariance with x^2; the best line is the mean.
+      approximatelyEqual(result.rSquared, curved ? 0 : 1, 1e-8);
+      approximatelyEqual(result.adjustedRSquared, curved ? -1 / 23 : 1, 1e-8);
+    }
+  }
+});
+
+test("AHP normalisation and expert aggregation remain finite at extreme scales", () => {
+  for (const [direction, values, expected] of [['higher', [1e308, 1e308], [.5, .5]], ['lower', [1e-310, 2e-310], [2 / 3, 1 / 3]]]) {
+    const result = ahp.calculateObjectivePriorities({ name: 'Value', direction }, values);
+    result.weights.forEach((weight, i) => approximatelyEqual(weight, expected[i]));
+  }
+  const matrix = [[1, 9], [1 / 9, 1]];
+  const result = ahp.aggregateMatrices(Array.from({ length: 400 }, () => matrix));
+  approximatelyEqual(result[0][1], 9, 1e-10);
+  approximatelyEqual(result[1][0], 1 / 9, 1e-10);
+});
+
+test("AHP reports individual inconsistency when group judgements cancel", () => {
+  const questionnaire = { criteria: ['Cost', 'Quality', 'Delivery'], alternatives: ['A', 'B'] };
+  const responses = [1, -1].map((sign, index) => ({ expertName: `Expert ${index + 1}`, questionnaire, answers: {
+    criteria: { 'c-0-1': 9 * sign, 'c-0-2': -9 * sign, 'c-1-2': 9 * sign },
+    alternatives: { 'a-0-0-1': 1, 'a-1-0-1': 1, 'a-2-0-1': 1 }
+  } }));
+  const result = ahp.calculateAhp(responses);
+  approximatelyEqual(result.criteriaResult.cr, 0);
+  assert.equal(result.individualConsistency.filter((item) => item.cr > .1).length, 2);
+  result.individualConsistency.filter((item) => item.cr > .1).forEach((item) => approximatelyEqual(item.cr, 6.130268199, 1e-8));
+  assert.ok(result.diagnostics.some((item) => item.level === 'high-risk'));
+});
+
+test("Result snapshots are deeply isolated and CSV fields round-trip safely", () => {
+  const data = require('../calculation-core/data-utils.js');
+  const source = { inputs: [1, 2], result: { estimate: 3 } };
+  const snapshot = data.snapshot(source);
+  source.inputs[0] = 99;
+  assert.equal(snapshot.inputs[0], 1);
+  assert.ok(Object.isFrozen(snapshot.result));
+  assert.equal(data.csv([['Name', 'A,"B"\nC'], [1, null]]), '"Name","A,""B""\nC"\r\n"1",""');
+});
+
+test("Explicit validation rejects gaps, coercion and partial invalid datasets", () => {
+  const data = require('../calculation-core/data-utils.js');
+  for (const value of ['', ' ', null, undefined, true, '2kg', Infinity]) assert.throws(() => data.number(value, 'Demand'));
+  assert.equal(data.number('0', 'Demand'), 0);
+  assert.deepEqual(data.series(['0', '2', '', '']), [0, 2]);
+  assert.throws(() => data.series(['1', '', '3']), /Period 2/);
+  assert.throws(() => abc.calculateAbcAnalysis([{ name: 'valid', calculatedValue: 10 }, { name: 'bad', calculatedValue: -1 }]), /bad/);
+  assert.throws(() => gantt.validateTasks([{ task: 'Invalid', start: '2026-02-30', end: '2026-03-02', progress: 0, milestone: false }]), /date/i);
+});
+
+test("Network distance matrix rejects duplicate lanes and unknown endpoints", () => {
+  const facilities = [{ name: 'DC', latitude: 0, longitude: 0, capacity: 10, fixedCost: 0 }];
+  const customers = [{ name: 'Region', latitude: 1, longitude: 1, demand: 5 }];
+  const lane = { facility: 'DC', customer: 'Region', distanceKm: 10 };
+  const run = (routeDistances) => supplyChainNetwork.optimizeNetwork({ facilities, customers, transportCostPerUnitKm: 1, routeDistances });
+  assert.throws(() => run([lane, { ...lane, distanceKm: 20 }]), /duplicate/i);
+  assert.throws(() => run([{ ...lane, customer: 'Typo' }]), /unknown/i);
+});
+
+test("ABC rejects an invalid row instead of silently removing it", () => {
+  assert.throws(() => abc.calculateAbcAnalysis([{ name: 'valid', calculatedValue: 10 }, { name: 'bad', calculatedValue: -1 }]), /bad/);
+});
+
+test("Monte Carlo truncated normal samples tails without artificial boundary mass", () => {
+  for (const [min, max] of [[8, 9], [-9, -8], [.1, .10001]]) {
+    const rng = monteCarlo.createRng(42);
+    const values = Array.from({ length: 2000 }, () => monteCarlo.sampleVariable({ distribution: 'normal', params: { mean: 0, sd: 1, min, max } }, rng));
+    assert.ok(values.every((value) => value >= min && value <= max));
+    assert.ok(new Set(values).size > 1900);
+    if (min === 8) approximatelyEqual(values.reduce((a, b) => a + b, 0) / values.length, 8.12118899, .015);
+  }
+  assert.throws(() => monteCarlo.sampleVariable({ distribution: 'normal', params: { mean: 0, sd: 0, min: 8, max: 9 } }, monteCarlo.createRng(1)), /standard deviation/i);
+});
+
+test("Estimator automatic selection is independent of output units", () => {
+  const run = (scale) => multivariateEstimator.analyse({ inputNames: ['x'], outputNames: ['A', 'B'], modelType: 'auto',
+    rows: Array.from({ length: 25 }, (_, i) => { const x = (i - 12) / 3; return { inputs: [x], outputs: [5 + 2 * x + (i % 3 - 1) * .5, scale * (10 + x * x)] }; }) });
+  const base = run(1);
+  for (const scale of [1e-12, .001, 1000]) {
+    const result = run(scale);
+    assert.equal(result.selected.modelType, base.selected.modelType);
+    result.candidates.forEach((candidate, i) => approximatelyEqual(candidate.selectionScore, base.candidates[i].selectionScore, 1e-6));
+  }
+});
+
+test("Estimator classifies rank-deficient historical space in its affine span", () => {
+  const model = multivariateEstimator.analyse({ inputNames: ['x', '2x'], outputNames: ['y'], modelType: 'linear',
+    rows: Array.from({ length: 12 }, (_, i) => ({ inputs: [i + 1, 2 * (i + 1)], outputs: [3 * i + 1] })) }).selected;
+  for (const point of [[6, 12], [6.5, 13]]) {
+    const support = multivariateEstimator.estimateScenario(model, point).support;
+    assert.notEqual(support.classification, 'EXTRAPOLATION');
+    assert.equal(support.hull.inside, true);
+  }
+  for (const point of [[6, 13], [13, 26]]) {
+    assert.equal(multivariateEstimator.estimateScenario(model, point).support.classification, 'EXTRAPOLATION');
+  }
+});
+
+test("DEA completes radial efficiency with maximal slacks across input units", () => {
+  for (const scale of [1e-6, 1, 1e6]) {
+    const result = dea.analyseDea({ inputNames: ['x1', 'x2'], outputNames: ['y'], model: 'bcc', orientation: 'input', dmus: [
+      { name: 'A', inputs: [1, 2 * scale], outputs: [1] },
+      { name: 'B', inputs: [1, scale], outputs: [1] },
+    ] }).results[0];
+    approximatelyEqual(result.efficiency, 1);
+    assert.equal(result.efficient, false);
+    approximatelyEqual(result.inputTargets[1] / scale, 1);
+    approximatelyEqual(result.inputSlacks[1] / scale, 1);
+  }
+});
+
 function approximatelyEqual(actual, expected, tolerance = 1e-9) {
   assert.ok(
     Math.abs(actual - expected) <= tolerance,

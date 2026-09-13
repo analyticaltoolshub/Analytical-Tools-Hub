@@ -39,11 +39,16 @@
       const sd = Number(p.sd);
       const min = p.min === "" || p.min === null || p.min === undefined ? -Infinity : Number(p.min);
       const max = p.max === "" || p.max === null || p.max === undefined ? Infinity : Number(p.max);
+      if (!Number.isFinite(mean) || !Number.isFinite(sd) || sd <= 0) throw new Error('Normal mean must be finite and standard deviation must be positive.');
+      if (Number.isNaN(min) || Number.isNaN(max) || min >= max) throw new Error('Normal truncation requires minimum below maximum.');
       for (let attempt = 0; attempt < 120; attempt += 1) {
         const value = mean + sd * normalSample(rng);
         if (value >= min && value <= max) return value;
       }
-      return Math.min(max, Math.max(min, mean));
+      const a = (min - mean) / sd;
+      const b = (max - mean) / sd;
+      if (a === Infinity || b === -Infinity || a === b) throw new Error('Normal truncation bounds exceed numerical resolution.');
+      return mean + sd * truncatedStandardNormal(a, b, rng);
     }
     if (variable.distribution === "lognormal") {
       const value = Math.exp(Number(p.meanLog) + Number(p.sdLog) * normalSample(rng));
@@ -61,6 +66,27 @@
       return Number(rows[rows.length - 1]?.value || 0);
     }
     throw new Error(`Unsupported distribution for ${variable.name}.`);
+  }
+
+  function truncatedStandardNormal(a, b, rng) {
+    if (b < 0) return -truncatedStandardNormal(-b, -a, rng);
+    // Rejection proposals avoid subtracting near-identical tail CDF values.
+    const narrow = Number.isFinite(b - a) && b - a < 1 / Math.max(1, a);
+    const mode = Math.max(a, Math.min(b, 0));
+    const rate = a > 0 ? a / 2 + Math.hypot(a, 2) / 2 : 0;
+    for (let attempt = 0; attempt < 10000; attempt += 1) {
+      if (narrow) {
+        const z = a + (b - a) * rng();
+        if (Math.log(Math.max(rng(), Number.MIN_VALUE)) <= -.5 * (z - mode) * (z + mode)) return z;
+      } else if (a > 0) {
+        const z = a - Math.log(Math.max(rng(), Number.MIN_VALUE)) / rate;
+        if (z <= b && Math.log(Math.max(rng(), Number.MIN_VALUE)) <= -.5 * (z - rate) ** 2) return z;
+      } else {
+        const z = normalSample(rng);
+        if (z >= a && z <= b) return z;
+      }
+    }
+    throw new Error('Normal truncation sampling did not converge; review the bounds.');
   }
 
   function tokenize(expression) {

@@ -110,6 +110,9 @@
   }
 
   function renderData() {
+    state.analysis = null;
+    state.estimate = null;
+    hideResults();
     $('#dataTable').innerHTML = `
       <thead><tr><th>Observation</th>${state.columns.map((name) => `<th>${escapeHtml(name)}</th>`).join('')}<th>Remove</th></tr></thead>
       <tbody>${state.rows.map((row, rowIndex) => `
@@ -293,7 +296,7 @@
     clearError();
     try {
       const result = window.ATHMultivariateEstimator.analyse({ ...getDatasetConfig(), modelType: $('#modelType').value });
-      state.analysis = result;
+      state.analysis = ATHData.snapshot(result);
       state.estimate = null;
       renderScenarioInputs();
       renderDiagnostics();
@@ -316,13 +319,15 @@
 
   function estimateOutputs() {
     clearError();
+    state.estimate = null;
+    $('#results').classList.add('hidden');
     if (!state.analysis) {
       showError('Fit a model before estimating outputs.');
       return;
     }
     try {
       const inputs = [...document.querySelectorAll('[data-scenario-input]')].map((input) => input.value);
-      state.estimate = window.ATHMultivariateEstimator.estimateScenario(state.analysis.selected, inputs);
+      state.estimate = ATHData.snapshot({ ...window.ATHMultivariateEstimator.estimateScenario(state.analysis.selected, inputs), generatedAt: new Date().toISOString() });
       renderResults();
       $('#results').classList.remove('hidden');
       $('#resultsNavLink').hidden = false;
@@ -344,7 +349,7 @@
       return `
         <tr${selected ? ' class="selected-row"' : ''}>
           <td><strong>${escapeHtml(window.ATHMultivariateEstimator.modelDisplayName(candidate.modelType))}</strong>${selected ? ' <span class="status-pill interpolation">Selected</span>' : ''}</td>
-          <td>${formatNumber(candidate.averageCvRmse)}</td>
+          <td>${formatNumber(candidate.selectionScore, 4)}</td>
           <td>${escapeHtml(parameterNote)}</td>
           <td>${escapeHtml(definition.interpretation)}</td>
         </tr>`;
@@ -356,7 +361,7 @@
         <td>Not fitted</td>
         <td>${escapeHtml(candidate.reason)}</td>
       </tr>`);
-    $('#candidateComparisonTable').innerHTML = `<thead><tr><th>Candidate model</th><th>Average CV RMSE</th><th>Model terms</th><th>Interpretation</th></tr></thead><tbody>${[...candidateRows, ...unavailableRows].join('')}</tbody>`;
+    $('#candidateComparisonTable').innerHTML = `<thead><tr><th>Candidate model</th><th>Mean normalised CV RMSE (RMSE / output SD)</th><th>Model terms</th><th>Interpretation</th></tr></thead><tbody>${[...candidateRows, ...unavailableRows].join('')}</tbody>`;
     $('#diagnosticsTable').innerHTML = `<thead><tr><th>Output</th><th>R2</th><th>Adjusted R2</th><th>RMSE</th><th>MAE</th><th>CV RMSE</th><th>Observations</th></tr></thead><tbody>${model.outputs.map((output) => `
       <tr><td><strong>${escapeHtml(output.name)}</strong></td><td>${formatPercent(output.rSquared)}</td><td>${output.adjustedRSquared === null ? 'n/a' : formatPercent(output.adjustedRSquared)}</td><td>${formatNumber(output.rmse)}</td><td>${formatNumber(output.mae)}</td><td>${formatNumber(output.crossValidatedRmse)}</td><td>${model.rows.length}</td></tr>`).join('')}</tbody>`;
     const termSummary = model.modelType === 'polynomial'
@@ -478,12 +483,12 @@
       ${warning}
     `;
 
-    const cvOrInfinity = (output) => Number.isFinite(output.crossValidatedRmse) ? output.crossValidatedRmse : Infinity;
-    const cvOrNegativeInfinity = (output) => Number.isFinite(output.crossValidatedRmse) ? output.crossValidatedRmse : -Infinity;
+    const cvOrInfinity = (output) => Number.isFinite(output.normalisedCvRmse) ? output.normalisedCvRmse : Infinity;
+    const cvOrNegativeInfinity = (output) => Number.isFinite(output.normalisedCvRmse) ? output.normalisedCvRmse : -Infinity;
     const bestOutput = [...model.outputs].sort((a, b) => cvOrInfinity(a) - cvOrInfinity(b))[0];
     const weakestOutput = [...model.outputs].sort((a, b) => cvOrNegativeInfinity(b) - cvOrNegativeInfinity(a))[0];
     $('#executiveSummary').innerHTML += `
-      <p><strong>Model interpretation:</strong> ${escapeHtml(bestOutput?.name || 'The strongest output')} has the lower cross-validated error in this run. ${escapeHtml(weakestOutput?.name || 'Any weaker output')} should be reviewed more carefully if its planning range is wide.</p>
+      <p><strong>Model interpretation:</strong> ${escapeHtml(bestOutput?.name || 'The strongest output')} has the lower cross-validated error relative to its historical standard deviation in this run. ${escapeHtml(weakestOutput?.name || 'Any weaker output')} should be reviewed more carefully if its planning range is wide.</p>
     `;
     $('#estimateTable').innerHTML = `<thead><tr><th>Output</th><th>Estimated value</th><th>Approx. planning range</th><th>Model RMSE</th><th>Cross-validated RMSE</th></tr></thead><tbody>${outputs.map((output) => {
       const spread = Number.isFinite(output.crossValidatedRmse) ? 1.96 * output.crossValidatedRmse : 1.96 * output.rmse;
@@ -771,8 +776,16 @@
     const diagnostics = window.ATHMultivariateEstimator.diagnoseEstimator(state.analysis, state.estimate);
     const lines = [
       ['Multivariate Input-Output Estimator'],
-      ['Generated at', new Date().toISOString()],
+      ['Generated at', state.estimate.generatedAt],
+      ['Historical data JSON', JSON.stringify({ inputNames: model.inputNames, outputNames: model.outputNames, rows: model.rows })],
+      ['Scenario inputs JSON', JSON.stringify(state.estimate.support.scenarioInputs)],
+      ['Assumptions', 'Historical supervised association, not causality; support classification and cross-validation do not guarantee future accuracy.'],
       ['Model', model.modelType],
+      ['Selection reason', state.analysis.reason],
+      ['Fitted model JSON', JSON.stringify(model)],
+      ['Selection measure', 'Equal-weight mean of CV RMSE / historical output standard deviation'],
+      ['Candidate', 'Normalised CV RMSE'],
+      ...state.analysis.candidates.map((candidate) => [candidate.label, candidate.selectionScore]),
       ['Scenario Classification', state.estimate.support.classification],
       ['Diagnostics', (window.ATHDiagnostics?.summarize(diagnostics) || []).join(' | ')],
       [],
@@ -824,6 +837,11 @@
     $('#chartInputSelect').addEventListener('change', () => { if (state.estimate) drawCharts(); });
     $('#chartOutputSelect').addEventListener('change', () => { if (state.estimate) drawCharts(); });
     document.addEventListener('input', (event) => {
+      if (event.target.matches('[data-scenario-input]')) {
+        state.estimate = null;
+        $('#results').classList.add('hidden');
+        $('#resultsNavLink').hidden = true;
+      }
       if (event.target.matches('[data-column-name], [data-row-label], [data-cell-row]')) {
         state.analysis = null;
         state.estimate = null;
@@ -832,6 +850,11 @@
       }
     });
     document.addEventListener('change', (event) => {
+      if (event.target.matches('#modelType')) {
+        state.analysis = null;
+        state.estimate = null;
+        hideResults();
+      }
       if (event.target.matches('[data-column-role]')) {
         updateStateFromInputs();
         state.analysis = null;

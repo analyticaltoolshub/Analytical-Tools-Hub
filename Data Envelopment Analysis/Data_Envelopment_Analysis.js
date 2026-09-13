@@ -901,7 +901,7 @@ function renderResults() {
   $('#efficiencyChart').innerHTML = results.slice().sort((a,b) => b.efficiency-a.efficiency).map((result) => `
     <div class="efficiency-row${result.efficient ? ' efficient' : ''}"><strong title="${escapeHtml(result.name)}">${escapeHtml(result.name)}</strong><span class="efficiency-track"><i style="--score:${Math.max(1, result.efficiency * 100)}%"></i></span><span class="efficiency-value">${formatPercent(result.efficiency)}</span></div>
   `).join('');
-  $('#chartSummary').textContent = `${summary.efficientCount} units score 100% under the selected model. The chart presents relative radial efficiency and does not rank service quality beyond the outputs supplied.`;
+  $('#chartSummary').textContent = `${summary.efficientCount} units are strongly efficient after checking radial efficiency and remaining slacks. A 100% radial score alone does not rule out further input or output improvements. The chart presents relative radial efficiency and does not rank service quality beyond the outputs supplied.`;
 
   $('#actionSummaryTable').innerHTML = `<thead><tr><th>DMU</th><th>Efficiency</th><th>Management priority</th><th>Peer reference</th><th>Suggested action</th></tr></thead><tbody>${results.slice().sort((a,b) => a.rank-b.rank).map((result) => {
     const guidance = getDmuAction(result);

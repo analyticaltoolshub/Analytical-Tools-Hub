@@ -266,6 +266,13 @@
           </div>
 
           <div id="analysisSummary" class="interpretation" aria-live="polite"></div>
+          <div id="ahpDiagnostics" hidden></div>
+          <details>
+            <summary>Individual and group consistency checks</summary>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Individual and group consistency checks">
+              <table id="consistencyChecks"><caption>Consistency ratio by expert and matrix; review CR above 0.10.</caption></table>
+            </div>
+          </details>
           <p id="analysisChartSummary" class="sr-only"></p>
 
           <div class="results-grid">
@@ -450,6 +457,8 @@
     </div>
   </main>
 
+  <script src="../calculation-core/data-utils.js"></script>
+  <script src="../diagnostics.js"></script>
   <script src="../calculation-core/ahp.js"></script>
   <script src="Analytic_Hierarchy_Process.js"></script>
 </body>

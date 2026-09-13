@@ -91,6 +91,7 @@
   }
 
   function renderEditableTables() {
+    invalidateResult();
     selectors.facilityBody.textContent = "";
     state.facilities.forEach((facility, index) => {
       const row = document.createElement("tr");
@@ -443,8 +444,10 @@
   }
 
   function renderResults(result) {
-    state.result = result;
+    state.result = ATHData.snapshot({ ...result, generatedAt: new Date().toISOString(),
+      inputs: { facilities: state.facilities, customers: state.customers, routeDistances: state.routeDistances, transportCostPerUnitKm: selectors.transportCost.value } });
     selectors.results.hidden = false;
+    document.getElementById('exportCsvButton').disabled = false;
     selectors.mapSection.hidden = false;
     renderKpis(result);
     renderComparison(result);
@@ -455,6 +458,7 @@
   }
 
   function runOptimization() {
+    invalidateResult();
     clearError();
     syncStateFromTables();
     setWorkflow(2);
@@ -487,6 +491,13 @@
     }
   }
 
+  function invalidateResult() {
+    state.result = null;
+    selectors.results.hidden = true;
+    selectors.mapSection.hidden = true;
+    document.getElementById('exportCsvButton').disabled = true;
+  }
+
   function quoteCsv(value) {
     return `"${String(value ?? "").replace(/"/g, '""')}"`;
   }
@@ -499,7 +510,8 @@
     const result = state.result;
     const lines = [
       ["Section", "Metric", "Value"].map(quoteCsv).join(","),
-      ["Metadata", "Generated", new Date().toISOString()].map(quoteCsv).join(","),
+      ["Metadata", "Generated", result.generatedAt].map(quoteCsv).join(","),
+      ['Metadata', 'Snapshot inputs JSON', JSON.stringify(result.inputs)].map(quoteCsv).join(','),
       ["Metadata", "Method", "Exact open-facility enumeration with min-cost flow allocation"].map(quoteCsv).join(","),
       ["Metadata", "Distance source", result.distanceSource].map(quoteCsv).join(","),
       ["Metadata", "Uploaded distance lanes", result.distanceSummary.uploadedLaneCount].map(quoteCsv).join(","),
@@ -579,6 +591,9 @@
     reader.onload = () => {
       try {
         const parsed = core.parseNetworkCsv(String(reader.result || ""));
+        core.normaliseFacilities(parsed.facilities);
+        core.normaliseCustomers(parsed.customers);
+        core.buildDistanceMatrix(parsed.facilities, parsed.customers, 0, state.routeDistances);
         state.facilities = parsed.facilities;
         state.customers = parsed.customers;
         renderEditableTables();
@@ -605,12 +620,15 @@
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        state.routeDistances = core.parseRouteDistanceCsv(String(reader.result || ""));
+        const routes = core.parseRouteDistanceCsv(String(reader.result || ""));
+        syncStateFromTables();
+        core.buildDistanceMatrix(state.facilities, state.customers, 0, routes);
+        state.routeDistances = routes;
+        invalidateResult();
         selectors.routeDistanceStatus.textContent = `${state.routeDistances.length} route distance lane${state.routeDistances.length === 1 ? "" : "s"} imported. Run Optimize Network to apply matching uploaded distances.`;
         clearError();
       } catch (error) {
-        state.routeDistances = [];
-        selectors.routeDistanceStatus.textContent = "No valid distance matrix loaded.";
+        selectors.routeDistanceStatus.textContent = "Import rejected. The previous distance matrix is unchanged.";
         showError(error.message);
       }
     };
@@ -618,6 +636,7 @@
   }
 
   document.getElementById("loadSampleButton").addEventListener("click", loadSample);
+  [selectors.transportCost, selectors.facilityBody, selectors.customerBody].forEach((element) => element.addEventListener('input', invalidateResult));
   document.getElementById("resetButton").addEventListener("click", resetTool);
   document.getElementById("addFacilityButton").addEventListener("click", () => {
     syncStateFromTables();

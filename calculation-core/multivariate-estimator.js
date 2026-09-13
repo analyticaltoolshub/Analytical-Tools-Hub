@@ -276,11 +276,15 @@
 
   function metrics(actual, predicted, parameterCount) {
     const n = actual.length;
-    const avg = mean(actual);
     const sse = actual.reduce((sum, value, index) => sum + (value - predicted[index]) ** 2, 0);
     const sae = actual.reduce((sum, value, index) => sum + Math.abs(value - predicted[index]), 0);
-    const sst = actual.reduce((sum, value) => sum + (value - avg) ** 2, 0);
-    const rSquared = sst <= EPSILON ? 1 : 1 - (sse / sst);
+    // A common scale cancels in SSE/SST and avoids unit-dependent zero tests.
+    const scale = actual.reduce((largest, value) => Math.max(largest, Math.abs(value)), 0) || 1;
+    const scaledActual = actual.map(value => value / scale);
+    const scaledMean = mean(scaledActual);
+    const scaledSse = scaledActual.reduce((sum, value, index) => sum + (value - predicted[index] / scale) ** 2, 0);
+    const scaledSst = scaledActual.reduce((sum, value) => sum + (value - scaledMean) ** 2, 0);
+    const rSquared = scaledSst === 0 ? (scaledSse === 0 ? 1 : 0) : 1 - (scaledSse / scaledSst);
     const adjustedRSquared = n - parameterCount <= 0
       ? null
       : 1 - ((1 - rSquared) * (n - 1) / (n - parameterCount));
@@ -298,7 +302,7 @@
     return folds;
   }
 
-  function crossValidatedRmse(dataset, modelType, outputIndex) {
+  function crossValidatedRmse(dataset, modelType, outputIndex, options = {}) {
     const foldCount = Math.min(5, dataset.rows.length);
     const folds = buildFolds(dataset.rows.length, foldCount);
     const predictions = [];
@@ -306,7 +310,7 @@
     folds.forEach((fold) => {
       const trainRows = dataset.rows.filter((_, index) => !fold.includes(index));
       const testRows = dataset.rows.filter((_, index) => fold.includes(index));
-      const model = fitModel({ ...dataset, rows: trainRows }, modelType, { singleOutputIndex: outputIndex, skipValidation: true });
+      const model = fitModel({ ...dataset, rows: trainRows }, modelType, { ...options, singleOutputIndex: outputIndex, skipValidation: true });
       testRows.forEach((row) => {
         const estimated = estimateScenario(model, row.inputs);
         predictions.push(estimated.outputs[0].estimate);
@@ -338,7 +342,7 @@
     });
     outputNames.forEach((name, index) => {
       const values = rows.map((row) => row.outputs[index]);
-      if (Math.max(...values) - Math.min(...values) <= EPSILON) throw new Error(`Output ${name} is constant. Use a varying output measure.`);
+      if (Math.max(...values) === Math.min(...values)) throw new Error(`Output ${name} is constant. Use a varying output measure.`);
     });
 
     return { inputNames, outputNames, rows };
@@ -367,13 +371,16 @@
     const k = chooseK(dataset.rows.length);
     const outputs = outputIndexes.map((outputIndex) => {
       const y = dataset.rows.map((row) => row.outputs[outputIndex]);
-      const coefficients = modelType === 'knn'
+      const outputScale = options.unitIndependentPenalty ? Math.sqrt(variance(y)) || 1 : 1;
+      const scaledY = y.map((value) => value / outputScale);
+      const fittedCoefficients = modelType === 'knn'
         ? null
         : modelType === 'lasso'
-          ? fitLassoOutputModel(featureMatrix, y, penalty)
+          ? fitLassoOutputModel(featureMatrix, scaledY, penalty)
           : modelType === 'robust'
-            ? fitRobustOutputModel(featureMatrix, y, { penalty })
-            : fitOutputModel(featureMatrix, y, { penalty });
+            ? fitRobustOutputModel(featureMatrix, scaledY, { penalty })
+            : fitOutputModel(featureMatrix, scaledY, { penalty });
+      const coefficients = fittedCoefficients?.map((value) => value * outputScale) ?? null;
       const predicted = modelType === 'knn'
         ? featureMatrix.map((features, rowIndex) => {
           const trainingFeatures = featureMatrix.filter((_, index) => index !== rowIndex);
@@ -395,6 +402,7 @@
     return {
       modelType,
       inputNames: dataset.inputNames,
+      targetScaling: options.unitIndependentPenalty && modelType !== 'knn' ? 'training-output-standard-deviation' : 'none',
       outputNames: outputIndexes.map((index) => dataset.outputNames[index]),
       rows: dataset.rows,
       inputStats,
@@ -413,7 +421,7 @@
     const fitErrors = {};
     const candidateModels = AUTO_SELECT_MODEL_IDS.map((modelType) => {
       try {
-        return fitModel(dataset, modelType, { skipValidation: true });
+        return fitModel(dataset, modelType, { skipValidation: true, unitIndependentPenalty: true });
       } catch (error) {
         fitErrors[modelType] = error.message;
         return null;
@@ -422,9 +430,11 @@
 
     function attachCv(model) {
       model.outputs.forEach((output) => {
-        output.crossValidatedRmse = crossValidatedRmse(dataset, model.modelType, output.outputIndex);
+        output.crossValidatedRmse = crossValidatedRmse(dataset, model.modelType, output.outputIndex, { unitIndependentPenalty: true });
+        output.normalisedCvRmse = output.crossValidatedRmse / Math.sqrt(variance(output.actual));
       });
       model.averageCvRmse = mean(model.outputs.map((output) => output.crossValidatedRmse));
+      model.selectionScore = mean(model.outputs.map((output) => output.normalisedCvRmse));
       return model;
     }
 
@@ -440,7 +450,7 @@
     if (!linear) throw new Error(`Linear regression could not be fitted: ${fitErrors.linear || 'unknown error'}`);
     const selected = candidates.reduce((best, model) => {
       const needsMaterialGain = getModelDefinition(model.modelType).selectionThreshold;
-      return model.averageCvRmse < best.averageCvRmse * needsMaterialGain ? model : best;
+      return model.selectionScore < best.selectionScore * needsMaterialGain ? model : best;
     }, linear);
     const unavailable = Object.entries(fitErrors)
       .map(([modelType, message]) => `${modelDisplayName(modelType)} could not be fitted: ${message}`)
@@ -459,6 +469,7 @@
         modelType: model.modelType,
         label: modelDisplayName(model.modelType),
         averageCvRmse: model.averageCvRmse,
+        selectionScore: model.selectionScore,
         penalty: model.penalty,
         available: true
       })),
@@ -467,7 +478,7 @@
         label: modelDisplayName(modelType),
         reason: message
       })),
-      reason: reasonMap[selected.modelType]
+      reason: `${reasonMap[selected.modelType]} Selection uses the equal-weight mean of each output's CV RMSE divided by its historical standard deviation, not an average of unlike units. Auto Select applies Lasso's penalty in output-standard-deviation units within each training fold; manual Lasso retains its output-unit penalty.`
     };
   }
 
@@ -479,12 +490,14 @@
     selected.outputs.forEach((output) => {
       try {
         output.crossValidatedRmse = crossValidatedRmse(dataset, selected.modelType, output.outputIndex);
+        output.normalisedCvRmse = output.crossValidatedRmse / Math.sqrt(variance(output.actual));
       } catch (_) {
         output.crossValidatedRmse = NaN;
       }
     });
     const finiteCv = selected.outputs.map((output) => output.crossValidatedRmse).filter(Number.isFinite);
     selected.averageCvRmse = finiteCv.length ? mean(finiteCv) : NaN;
+    selected.selectionScore = mean(selected.outputs.map((output) => output.normalisedCvRmse));
     if (!finiteCv.length) {
       selected.warnings.push('Cross-validation could not be calculated because the training folds do not have enough observations for this model size.');
     }
@@ -494,6 +507,7 @@
         modelType: selected.modelType,
         label: modelDisplayName(selected.modelType),
         averageCvRmse: selected.averageCvRmse,
+        selectionScore: selected.selectionScore,
         penalty: selected.penalty,
         available: true
       }],
@@ -504,6 +518,36 @@
 
   function convexHullMembership(points, scenario) {
     const dimension = scenario.length;
+    // Work in the observed affine span; singular full-dimensional simplices are
+    // not evidence that a point lies outside the historical region.
+    if (dimension > 1) {
+      const origin = points[0];
+      const basis = [];
+      const residual = (point) => {
+        const vector = point.map((value, i) => value - origin[i]);
+        for (let pass = 0; pass < 2; pass += 1) {
+          basis.forEach((axis) => {
+            const projection = vector.reduce((sum, value, i) => sum + value * axis[i], 0);
+            vector.forEach((value, i) => { vector[i] = value - projection * axis[i]; });
+          });
+        }
+        return vector;
+      };
+      points.forEach((point) => {
+        const vector = residual(point);
+        const length = Math.hypot(...vector);
+        if (length > 1e-9) basis.push(vector.map((value) => value / length));
+      });
+      if (basis.length < dimension) {
+        if (Math.hypot(...residual(scenario)) > 1e-7) {
+          return { attempted: true, inside: false, method: 'scenario lies outside the historical affine span' };
+        }
+        if (!basis.length) return { attempted: true, inside: true, method: 'coincident historical input points' };
+        const project = (point) => basis.map((axis) => axis.reduce((sum, value, i) => sum + value * (point[i] - origin[i]), 0));
+        const result = convexHullMembership(points.map(project), project(scenario));
+        return { ...result, method: `historical affine-span projection (${basis.length} independent dimensions); ${result.method}` };
+      }
+    }
     if (dimension === 1) {
       const min = Math.min(...points.map((point) => point[0]));
       const max = Math.max(...points.map((point) => point[0]));

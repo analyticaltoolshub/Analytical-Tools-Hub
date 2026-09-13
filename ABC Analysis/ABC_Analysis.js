@@ -217,7 +217,10 @@ function addManualRow(item = "", val1 = "", val2 = "", monthlyValues = []) {
   removeButton.className =
     "manual-delete-btn";
   removeButton.textContent = "x";
-  removeButton.addEventListener("click", () => row.remove());
+  removeButton.addEventListener("click", () => {
+    row.remove();
+    resetOutputState();
+  });
   actionCell.appendChild(removeButton);
 
   row.append(itemCell, val1Cell, val2Cell, ...monthCells, actionCell);
@@ -227,12 +230,16 @@ function addManualRow(item = "", val1 = "", val2 = "", monthlyValues = []) {
 
 document
   .getElementById("btn-add-row")
-  .addEventListener("click", () => addManualRow());
+  .addEventListener("click", () => {
+    addManualRow();
+    resetOutputState();
+  });
 document
   .getElementById("btn-load-sample")
   .addEventListener("click", loadSampleData);
 document.getElementById("btn-clear-all").addEventListener("click", clearAllData);
 manualSearchInput.addEventListener("input", applyManualSearchFilter);
+manualTbody.addEventListener("input", resetOutputState);
 
 function updateAnalysisModeUI() {
   const useXyz = isXyzMode();
@@ -290,6 +297,7 @@ analysisModeSelect.addEventListener("change", () => {
 
 // Respond to structural formulas changing
 calcMethodSelect.addEventListener("change", (e) => {
+  resetOutputState();
   const isMultiply = e.target.value === "multiply";
   const useXyz = isXyzMode();
 
@@ -530,34 +538,28 @@ document.getElementById("btn-process-file").addEventListener("click", () => {
   const useXyz = isXyzMode();
   const monthKeys = MONTHS.map((month) => document.getElementById(`map-month-${month.key}`)?.value);
 
-  manualTbody.textContent = ""; // Wipe manual array context fields
-
-  uploadedRawData.forEach((row) => {
-    if (row[itemKey] !== undefined) {
+  let prepared;
+  try {
+    if (uploadedRawData.length > 10000) throw new Error('Use at most 10,000 items.');
+    prepared = uploadedRawData.map((row, index) => {
+      const name = String(row[itemKey] ?? '').trim();
+      if (!name) throw new Error(`Row ${index + 1} needs an item name.`);
+      const first = ATHData.number(row[val1Key], `${name}: value or unit cost`, 0);
       if (useXyz) {
-        const monthlyValues = monthKeys.map((monthKey) => {
-          if (!monthKey) return "";
-          const rawValue = row[monthKey];
-          if (rawValue === undefined || rawValue === null || String(rawValue).trim() === "") return "";
-          const parsedValue = Number(rawValue);
-          return Number.isFinite(parsedValue) ? parsedValue : "";
-        });
-        addManualRow(
-          row[itemKey],
-          "",
-          row[val1Key] || 0,
-          monthlyValues,
-        );
-        return;
+        const months = monthKeys.map((key) => !key || String(row[key] ?? '').trim() === '' ? '' : ATHData.number(row[key], `${name}: ${key}`, 0));
+        if (months.filter((value) => value !== '').length < 3) throw new Error(`${name} needs at least 3 months.`);
+        return [name, '', first, months];
       }
-
-      addManualRow(
-        row[itemKey],
-        row[val1Key] || 0,
-        isMultiply ? row[val2Key] || 0 : "",
-      );
-    }
-  });
+      return [name, first, isMultiply ? ATHData.number(row[val2Key], `${name}: unit cost`, 0) : ''];
+    });
+    if (useXyz && new Set(prepared.map((row) => row[3].map((value) => value !== '').join(','))).size > 1) throw new Error('Use the same observed months for every item so values are comparable.');
+  } catch (error) {
+    alert(`${error.message} Existing data is unchanged.`);
+    return;
+  }
+  resetOutputState();
+  manualTbody.textContent = '';
+  prepared.forEach((row) => addManualRow(...row));
 
   alert(
     `Successfully integrated ${uploadedRawData.length} records. Review the inputs and select Calculate Analysis.`,
@@ -663,6 +665,7 @@ function getValidatedXyzThresholds() {
 
 ["threshold-a", "threshold-b"].forEach((inputId) => {
   document.getElementById(inputId).addEventListener("input", () => {
+    resetOutputState();
     if (getValidatedThresholds().isValid) {
       clearThresholdWarning();
     }
@@ -671,6 +674,7 @@ function getValidatedXyzThresholds() {
 
 ["threshold-x", "threshold-y"].forEach((inputId) => {
   document.getElementById(inputId).addEventListener("input", () => {
+    resetOutputState();
     if (getValidatedXyzThresholds().isValid) {
       clearXyzThresholdWarning();
     }
@@ -704,19 +708,21 @@ document.getElementById("btn-calculate").addEventListener("click", () => {
   clearXyzThresholdWarning();
 
   // 1. Gather raw context inputs
+  const coverage = new Set();
+  try {
   items.forEach((elem, index) => {
     const name = elem.value.trim();
-    const v1 = parseFloat(val1s[index].value) || 0;
-    const v2 = isMultiply ? parseFloat(val2s[index].value) || 0 : 0;
+    const v1 = name && !useXyz ? ATHData.number(val1s[index].value, `${name}: value or quantity`, 0) : 0;
+    const v2 = name && isMultiply && !useXyz ? ATHData.number(val2s[index].value, `${name}: unit cost`, 0) : 0;
 
     if (name !== "") {
       if (useXyz) {
         const row = elem.closest("tr");
+        coverage.add(Array.from(row.querySelectorAll('.manual-month')).map((input) => input.value.trim() !== '').join(','));
         const monthlyValues = Array.from(row.querySelectorAll(".manual-month"))
           .map((input) => input.value.trim())
           .filter((value) => value !== "")
-          .map(Number)
-          .filter(Number.isFinite);
+          .map((value) => ATHData.number(value, `${name}: monthly quantity`, 0));
 
         if (monthlyValues.length < 3) {
           xyzRowsWithTooFewMonths.push(name);
@@ -724,7 +730,7 @@ document.getElementById("btn-calculate").addEventListener("click", () => {
         }
 
         const annualQuantity = sumNumbers(monthlyValues);
-        const unitCost = parseFloat(val2s[index].value) || 0;
+        const unitCost = ATHData.number(val2s[index].value, `${name}: unit cost`, 0);
         const averageMonthlyQuantity = annualQuantity / monthlyValues.length;
         const monthlyStdDev = getStandardDeviation(monthlyValues);
         const coefficientOfVariation = averageMonthlyQuantity > 0 ? monthlyStdDev / averageMonthlyQuantity : 0;
@@ -753,7 +759,11 @@ document.getElementById("btn-calculate").addEventListener("click", () => {
       });
     }
   });
-
+  if (coverage.size > 1) throw new Error('Use the same observed months for every item so values are comparable.');
+  } catch (error) {
+    alert(error.message);
+    return;
+  }
   if (useXyz && xyzRowsWithTooFewMonths.length > 0) {
     alert(
       `ABC + XYZ needs at least 3 entered monthly quantity values per item. Check: ${xyzRowsWithTooFewMonths.slice(0, 5).join(", ")}${xyzRowsWithTooFewMonths.length > 5 ? "..." : ""}. Four or five months can be used for a directional view; 6-12 months is better.`,

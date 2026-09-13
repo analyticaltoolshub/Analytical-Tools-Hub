@@ -49,5 +49,21 @@
     return addDays(getWeekStart(dateInput), 6);
   }
 
-  return { formatDate, addDays, daysBetween, getWeek, getWeekStart, getWeekEnd };
+  function validateTasks(tasks) {
+    if (!Array.isArray(tasks) || tasks.length > 1000) throw new Error('JSON must contain an array of at most 1,000 tasks.');
+    return tasks.map((task, index) => {
+      const label = `Task ${index + 1}`;
+      if (!task || typeof task.task !== 'string' || !task.task.trim()) throw new Error(`${label} needs a name.`);
+      for (const field of ['start', 'end']) {
+        const value = task[field];
+        if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || !Number.isFinite(Date.parse(value)) || new Date(value).toISOString().slice(0, 10) !== value) throw new Error(`${label}: invalid ${field} date.`);
+      }
+      if (task.end < task.start) throw new Error(`${label}: end date precedes start date.`);
+      if (typeof task.progress !== 'number' || !Number.isFinite(task.progress) || task.progress < 0 || task.progress > 100) throw new Error(`${label}: progress must be between 0 and 100.`);
+      if (typeof task.milestone !== 'boolean') throw new Error(`${label}: milestone must be true or false.`);
+      return { task: task.task, start: task.start, end: task.end, progress: task.progress, milestone: task.milestone };
+    });
+  }
+
+  return { formatDate, addDays, daysBetween, getWeek, getWeekStart, getWeekEnd, validateTasks };
 }));

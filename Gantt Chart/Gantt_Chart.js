@@ -467,26 +467,22 @@ taskTableBody.addEventListener("click", (event) => {
 fileInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.json') || file.size > 5 * 1024 * 1024) {
+    showError('Use a JSON plan file up to 5 MB. Existing tasks are unchanged.');
+    return;
+  }
 
   const reader = new FileReader();
   reader.onload = () => {
     try {
       const parsed = JSON.parse(reader.result);
-      if (!Array.isArray(parsed)) throw new Error("JSON must contain an array of tasks.");
-
-      tasks = parsed.map((task) => ({
-        task: String(task.task || "Untitled Task"),
-        start: task.start,
-        end: task.end,
-        progress: Number(task.progress) || 0,
-        milestone: Boolean(task.milestone),
-      }));
+      tasks = ATHGantt.validateTasks(parsed);
 
       clearError();
       renderTable();
       render();
     } catch (error) {
-      showError("Unable to load this JSON file. Please choose a valid Gantt plan file.");
+      showError(`Unable to load this JSON file: ${error.message} Existing tasks are unchanged.`);
     } finally {
       fileInput.value = "";
     }

@@ -2032,6 +2032,24 @@ function renderHierarchyStructure(analysis) {
 }
 
 function renderAnalysis(analysis) {
+  ATHDiagnostics.render('#ahpDiagnostics', analysis.diagnostics, { heading: 'AHP Consistency Diagnostics' });
+  const checks = document.getElementById('consistencyChecks');
+  checks.replaceChildren();
+  const header = document.createElement('tr');
+  ['Scope', 'Expert', 'Matrix', 'CR', 'Review'].forEach((label) => { const cell = document.createElement('th'); cell.textContent = label; header.appendChild(cell); });
+  const head = document.createElement('thead');
+  head.appendChild(header);
+  const body = document.createElement('tbody');
+  const rows = [
+    ...analysis.groupConsistency.map((item) => ['Group', 'Aggregated judgements', item.label, item.cr]),
+    ...analysis.individualConsistency.map((item) => ['Individual', item.expert, item.label, item.cr]),
+  ];
+  rows.forEach((values) => {
+    const row = document.createElement('tr');
+    [...values.slice(0, 3), values[3].toFixed(4), values[3] > .1 ? 'Review required' : 'Within guidance'].forEach((value) => { const cell = document.createElement('td'); cell.textContent = value; row.appendChild(cell); });
+    body.appendChild(row);
+  });
+  checks.append(head, body);
   elements.results.classList.remove("hidden");
   updateAhpWorkflow(2);
   renderWeightDistribution(analysis.questionnaire.criteria, analysis.criteriaResult.weights);
@@ -2066,14 +2084,14 @@ function renderAnalysis(analysis) {
 
   const winner = analysis.alternativeScores[0];
   const topCriterionIndex = analysis.criteriaResult.weights.indexOf(Math.max(...analysis.criteriaResult.weights));
-  const consistencyWarnings = consistencyItems.filter((item) => item.cr > 0.1).length;
+  const consistencyWarnings = consistencyItems.filter((item) => item.cr > 0.1).length + analysis.individualConsistency.filter((item) => item.cr > .1).length;
   const summarySentences = [
     `${analysis.questionnaire.projectTitle}: ${analysis.expertCount} expert response${analysis.expertCount === 1 ? "" : "s"} analysed.`,
     `${winner.alternative} ranks first with an overall priority of ${formatPercent(winner.score)}.`,
     `The most influential criterion is ${analysis.questionnaire.criteria[topCriterionIndex]} at ${formatPercent(analysis.criteriaResult.weights[topCriterionIndex])}.`,
     consistencyWarnings
       ? `${consistencyWarnings} consistency check${consistencyWarnings === 1 ? "" : "s"} should be reviewed before using the ranking.`
-      : "All displayed consistency ratios are within the common 0.10 review threshold.",
+      : "Individual and group consistency ratios are within the common 0.10 review threshold; this does not establish objective correctness.",
   ];
   elements.analysisSummary.replaceChildren(...summarySentences.map((sentence) => {
     const line = document.createElement("span");
@@ -2438,7 +2456,8 @@ elements.calculateAnalysisButton.addEventListener("click", () => {
     if (!loadedResponses.length) {
       throw new Error("Load at least one completed response before calculating.");
     }
-    latestAnalysis = calculateAhp(loadedResponses, { objectiveValues: readObjectiveValues() });
+    const objectiveValues = readObjectiveValues();
+    latestAnalysis = ATHData.snapshot({ ...calculateAhp(loadedResponses, { objectiveValues }), generatedAt: new Date().toISOString(), inputs: { responses: loadedResponses, objectiveValues } });
     renderAnalysis(latestAnalysis);
     elements.sensitivityToggle.disabled = false;
   } catch (error) {
@@ -2452,6 +2471,15 @@ elements.exportAnalysisButton.addEventListener("click", () => {
   }
 
   const rows = [
+    ['Method', 'AHP geometric-mean priorities and equal-expert geometric judgement aggregation'],
+    ['Generated at', latestAnalysis.generatedAt],
+    ['Snapshot inputs JSON', JSON.stringify(latestAnalysis.inputs)],
+    ['Assumptions', 'Comparable alternatives; positive reciprocal judgements; CR 0.10 is review guidance, not validation.'],
+    ['Scope', 'Expert', 'Matrix', 'Consistency ratio'],
+    ...latestAnalysis.groupConsistency.map((item) => ['Group', 'Aggregated judgements', item.label, item.cr]),
+    ...latestAnalysis.individualConsistency.map((item) => ['Individual', item.expert, item.label, item.cr]),
+    ['Diagnostics', ATHDiagnostics.summarize(latestAnalysis.diagnostics).join(' | ')],
+    [],
     ["Rank", "Alternative", "Overall Priority"],
     ...latestAnalysis.alternativeScores.map((item, index) => [index + 1, item.alternative, item.score.toFixed(6)]),
     [],

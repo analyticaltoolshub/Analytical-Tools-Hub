@@ -348,7 +348,7 @@ function renderParamFields(variable) {
   if (variable.distribution === 'uniform') return field('min', 'Minimum', p.min) + field('max', 'Maximum', p.max);
   if (variable.distribution === 'triangular') return field('min', 'Minimum', p.min) + field('mode', 'Most likely', p.mode) + field('max', 'Maximum', p.max);
   if (variable.distribution === 'normal') return field('mean', 'Mean', p.mean) + field('sd', 'Standard deviation', p.sd) + field('min', 'Minimum truncation', p.min) + field('max', 'Maximum truncation', p.max);
-  if (variable.distribution === 'lognormal') return field('meanLog', 'Mean of underlying normal', p.meanLog) + field('sdLog', 'SD of underlying normal', p.sdLog) + field('max', 'Optional maximum bound', p.max);
+  if (variable.distribution === 'lognormal') return field('meanLog', 'Mean of underlying normal', p.meanLog) + field('sdLog', 'SD of underlying normal', p.sdLog) + field('max', 'Optional maximum cap (not truncation)', p.max);
   return '';
 }
 

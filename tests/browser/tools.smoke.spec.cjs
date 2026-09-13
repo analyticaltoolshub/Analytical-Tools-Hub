@@ -52,6 +52,14 @@ for (const entry of pages) {
       await expect(page.locator(entry.sample)).toBeVisible();
       await page.locator(entry.sample).click({ force: true });
     }
+    if (entry.name === 'Gantt Chart') {
+      const task = { task: 'Saved plan', start: '2026-09-01', end: '2026-09-03', progress: 25, milestone: false };
+      await page.locator('#fileInput').setInputFiles({ name: 'valid.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify([task])) });
+      await expect(page.locator('#taskTable tbody tr')).toHaveCount(1);
+      await page.locator('#fileInput').setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify([task, { ...task, start: '2026-02-30' }])) });
+      await expect(page.locator('#ganttError')).toContainText('Existing tasks are unchanged');
+      await expect(page.locator('#taskTable tbody tr')).toHaveCount(1);
+    }
     if (entry.name === 'Data Envelopment Analysis') {
       await expect(page.locator('#templateSelect option')).toHaveCount(15);
       await expect(page.locator('#inputMeasures input').first()).toHaveValue('Staff FTE');
@@ -201,6 +209,9 @@ for (const entry of pages) {
       await expect(page.locator('#driverInsight')).toContainText('Local Evidence');
       await expect(page.locator('#equationList')).toContainText('nearest historical observations');
       await expect(page.locator('#driverStrengthSummary')).toContainText('similarity weight');
+      await page.locator('#scenarioInputs input').nth(0).fill('2000');
+      await expect(page.locator('#results')).toBeHidden();
+      await page.locator('#estimateButton').click();
     }
     if (entry.name === 'Analytic Hierarchy Process') {
       const expectedCriterionTypes = {
@@ -269,12 +280,63 @@ for (const entry of pages) {
       const calculate = page.locator(entry.calculate);
       await expect(calculate).toBeEnabled();
       await calculate.click({ force: true });
+      if (entry.name === 'ABC Analysis') {
+        await expect(page.locator('#output-dashboard')).toBeVisible();
+        const original = await page.evaluate(() => JSON.stringify(finalAnalysisResults));
+        // Exercise mapped-import validation without depending on the external spreadsheet parser.
+        await page.evaluate(() => {
+          uploadedRawData = [{ Item: 'Replacement', Value: 'invalid', Cost: 2 }];
+          populateColumnMappingSelectors(['Item', 'Value', 'Cost']);
+        });
+        await page.locator('#btn-process-file').click();
+        expect(await page.evaluate(() => JSON.stringify(finalAnalysisResults))).toEqual(original);
+        await expect(page.locator('#output-dashboard')).toBeVisible();
+        await page.evaluate(() => { uploadedRawData[0].Value = 100; });
+        await page.locator('#btn-process-file').click();
+        await expect(page.locator('#output-dashboard')).toBeHidden();
+        expect(await page.evaluate(() => finalAnalysisResults.length)).toBe(0);
+        await page.evaluate(() => window.exportData('csv'));
+        await page.locator('#btn-calculate').click();
+        await expect(page.locator('#output-dashboard')).toBeVisible();
+        await page.locator('.manual-val1').first().fill('200');
+        await expect(page.locator('#output-dashboard')).toBeHidden();
+        await page.locator('#btn-calculate').click();
+        await page.locator('#threshold-a').fill('75');
+        await expect(page.locator('#output-dashboard')).toBeHidden();
+        await page.locator('#btn-calculate').click();
+        await page.locator('.manual-delete-btn').first().click();
+        await expect(page.locator('#output-dashboard')).toBeHidden();
+        expect(await page.evaluate(() => finalAnalysisResults.length)).toBe(0);
+      }
       if (entry.name === 'Monte Carlo Risk Simulation') {
         await expect(page.locator('#simulationStatus')).not.toContainText('running', { timeout: 20000 });
         await expect(page.locator('#resultDiagnostics')).toContainText('Simulation Diagnostics');
       }
       if (entry.name === 'Exponential Smoothing') {
         await expect(page.locator('#forecastDiagnostics')).toContainText('Forecast Diagnostics');
+        const originalAlpha = await page.locator('#alpha').inputValue();
+        await page.locator('#alpha').fill('.4');
+        await expect(page.locator('#exportButton')).toBeDisabled();
+        await page.locator('#alpha').fill(originalAlpha);
+        await page.locator('#calculateButton').click();
+        const second = page.locator('.manual-demand').nth(1);
+        const original = await second.inputValue();
+        await second.fill('');
+        await page.locator('#calculateButton').click();
+        await expect(page.locator('#error')).toContainText('Period 2');
+        await second.fill(original);
+        await page.locator('#calculateButton').click();
+        const exports = [];
+        for (let i = 0; i < 2; i += 1) {
+          const pending = page.waitForEvent('download');
+          await page.locator('#exportButton').click();
+          exports.push(fs.readFileSync(await (await pending).path(), 'utf8'));
+        }
+        expect(exports[0]).toEqual(exports[1]);
+        expect(exports[0]).toContain('"Alpha","' + originalAlpha + '"');
+        expect(exports[0]).toContain('"MAE","');
+        expect(exports[0]).not.toContain('"MAE",""');
+        expect(exports[0]).toContain('"Next forecast","');
       }
       if (entry.name === 'Newsvendor Model Optimizer') {
         await expect(page.locator('#resultDiagnostics')).toContainText('Decision Diagnostics');
@@ -285,6 +347,21 @@ for (const entry of pages) {
         await expect(page.locator('#kpiGrid')).toContainText('Total optimized cost');
         await expect(page.locator('#allocationTable tbody tr').first()).toBeVisible();
         await expect(page.locator('#networkMapShell')).toBeVisible();
+        await page.locator('#transportCost').fill('0.04');
+        await expect(page.locator('#results')).toBeHidden();
+        await page.locator('#optimizeButton').click();
+        const route = 'Facility,Customer,Distance km\nNorthern DC,Leeds Region,30';
+        await page.locator('#routeDistanceFile').setInputFiles({ name: 'valid.csv', mimeType: 'text/csv', buffer: Buffer.from(route) });
+        await page.locator('#importRouteDistanceButton').click();
+        await expect(page.locator('#routeDistanceStatus')).toContainText('1 route distance lane imported');
+        await page.locator('#routeDistanceFile').setInputFiles({ name: 'invalid.csv', mimeType: 'text/csv', buffer: Buffer.from(route + '\nNorthern DC,Leeds Region,50') });
+        await page.locator('#importRouteDistanceButton').click();
+        await expect(page.locator('#routeDistanceStatus')).toContainText('previous distance matrix is unchanged');
+        await page.locator('#optimizeButton').click();
+        const pending = page.waitForEvent('download');
+        await page.locator('#exportCsvButton').click();
+        const csv = fs.readFileSync(await (await pending).path(), 'utf8');
+        expect(csv).toContain('"Uploaded distance lanes","1"');
       }
       if (entry.name === 'Analytic Hierarchy Process') {
         await expect(page.locator('#results')).toBeVisible();
@@ -340,6 +417,24 @@ for (const entry of pages) {
         await expect(page.locator('#hierarchyStructure')).toContainText('Overall weight');
         await expect(page.locator('#hierarchyStructure')).not.toContainText('Global:');
         await page.locator('#hierarchyStructure').screenshot({ path: testInfo.outputPath('ahp-hierarchy.png') });
+        await page.evaluate(() => {
+          const questionnaire = { projectTitle: 'Conflicting expert test', criteria: ['Cost', 'Quality', 'Delivery'], alternatives: ['A', 'B'] };
+          const responses = [1, -1].map((sign, index) => ({ expertName: `Expert ${index + 1}`, questionnaire, answers: {
+            criteria: { 'c-0-1': 9 * sign, 'c-0-2': -9 * sign, 'c-1-2': 9 * sign },
+            alternatives: { 'a-0-0-1': 1, 'a-1-0-1': 1, 'a-2-0-1': 1 },
+          } }));
+          latestAnalysis = ATHData.snapshot({ ...ATHAhp.calculateAhp(responses), generatedAt: '2026-09-13T00:00:00.000Z', inputs: { responses } });
+          renderAnalysis(latestAnalysis);
+        });
+        await expect(page.locator('#ahpDiagnostics')).toContainText('2 individual and 0 group');
+        await page.getByText('Individual and group consistency checks', { exact: true }).click();
+        await expect(page.locator('#consistencyChecks')).toContainText('6.1303');
+        await expect(page.locator('#consistencyChecks')).toContainText('Expert 2');
+        const pending = page.waitForEvent('download');
+        await page.locator('#exportAnalysisButton').click();
+        const exported = fs.readFileSync(await (await pending).path(), 'utf8');
+        expect(exported).toContain('"Individual","Expert 1","Criteria comparisons","6.130');
+        expect(exported).toContain('"Group","Aggregated judgements","Criteria comparisons","0"');
       }
     }
 

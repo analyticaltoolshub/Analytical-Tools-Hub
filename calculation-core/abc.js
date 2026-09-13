@@ -34,11 +34,15 @@
     const useXyz = Boolean(options.useXyz);
     validateThresholds(thresholdA, thresholdB, thresholdX, thresholdY, useXyz);
 
-    const sorted = items.map((item) => ({ ...item, calculatedValue: Number(item.calculatedValue) }))
-      .filter((item) => item.name && Number.isFinite(item.calculatedValue) && item.calculatedValue >= 0)
+    const sorted = items.map((item, index) => {
+      if (!item.name || !['number', 'string'].includes(typeof item.calculatedValue) || String(item.calculatedValue).trim() === '' || !Number.isFinite(Number(item.calculatedValue)) || Number(item.calculatedValue) < 0) {
+        throw new Error(`Invalid non-negative value for ${item.name || `row ${index + 1}`}.`);
+      }
+      return { ...item, calculatedValue: Number(item.calculatedValue) };
+    })
       .sort((left, right) => right.calculatedValue - left.calculatedValue);
     const totalValue = sorted.reduce((sum, item) => sum + item.calculatedValue, 0);
-    if (!sorted.length || totalValue <= 0) {
+    if (!sorted.length || !Number.isFinite(totalValue) || totalValue <= 0) {
       throw new Error("At least one item with a positive value is required.");
     }
 

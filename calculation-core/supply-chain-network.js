@@ -78,15 +78,21 @@
       if (!facility || !customer) throw new Error(`Route distance row ${index + 1} needs Facility and Customer names.`);
       const distanceKm = toNumber(route.distanceKm ?? route.distance ?? route["distance km"], `${facility} to ${customer} distance km`);
       if (distanceKm < 0) throw new Error(`${facility} to ${customer} distance cannot be negative.`);
-      lookup.set(`${facility.toLowerCase()}||${customer.toLowerCase()}`, distanceKm);
+      const key = JSON.stringify([facility.toLowerCase(), customer.toLowerCase()]);
+      if (lookup.has(key)) throw new Error(`Duplicate route distance for ${facility} to ${customer}.`);
+      lookup.set(key, distanceKm);
     });
     return { lookup, count: lookup.size };
   }
 
   function buildDistanceMatrix(facilities, customers, transportCostPerUnitKm, routeDistances = []) {
     const normalisedRoutes = normaliseRouteDistances(routeDistances);
+    const known = new Set(facilities.flatMap((facility) => customers.map((customer) => JSON.stringify([facility.name.toLowerCase(), customer.name.toLowerCase()]))));
+    for (const key of normalisedRoutes.lookup.keys()) {
+      if (!known.has(key)) throw new Error(`Unknown facility or customer in route distance: ${JSON.parse(key).join(' to ')}.`);
+    }
     return facilities.map((facility) => customers.map((customer) => {
-      const key = `${facility.name.toLowerCase()}||${customer.name.toLowerCase()}`;
+      const key = JSON.stringify([facility.name.toLowerCase(), customer.name.toLowerCase()]);
       const uploadedDistance = normalisedRoutes.lookup.get(key);
       const source = Number.isFinite(uploadedDistance) ? "uploaded" : "haversine";
       const distanceKm = source === "uploaded" ? uploadedDistance : haversineKm(facility, customer);
@@ -488,5 +494,5 @@
     }).filter(Boolean);
   }
 
-  return { optimizeNetwork, diagnoseNetwork, haversineKm, parseNetworkCsv, parseRouteDistanceCsv };
+  return { optimizeNetwork, diagnoseNetwork, haversineKm, parseNetworkCsv, parseRouteDistanceCsv, buildDistanceMatrix, normaliseFacilities, normaliseCustomers };
 }));

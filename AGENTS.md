@@ -292,6 +292,16 @@ one. Diagnostics must not contradict the result interpretation or exports.
 
 ### Exports and Persistence
 
+- `calculation-core/data-utils.js` exposes browser `ATHData` and a Node module.
+  Adopt `number` for required finite values (blank is not zero), `series` for
+  ordered demand observations (internal gaps are errors), `snapshot` for deeply
+  frozen plain-data results, and `csv` for quoted CSV records incrementally.
+  Validate an entire import before replacing existing application data.
+- Forecast, AHP, estimator, and network result snapshots retain calculation-time
+  settings/data. Export from the snapshot, not edited controls, and invalidate
+  results when relevant inputs change. This is not a claim that all legacy exports
+  have been migrated to one schema.
+
 - Use CSV/XLSX for tabular results, image export for individual charts, PDF only when
   a readable report is intentionally implemented, and JSON for reusable project state,
   templates, questionnaires, responses, or model configuration.
@@ -486,6 +496,10 @@ Available tools should be represented consistently:
 
 ### Data Envelopment Analysis
 
+- After the radial LP, hold its optimum fixed and maximize scale-normalized
+  input/output slacks. A radial score of 100% is not sufficient for strong
+  efficiency. Use the completed solution for peers and targets.
+
 - Present DEA as relative efficiency benchmarking among comparable decision-making
   units, not as an absolute productivity score or proof of managerial quality.
 - Keep CCR/constant-returns and BCC/variable-returns assumptions explicit, and explain
@@ -516,6 +530,13 @@ Available tools should be represented consistently:
   efficiency alone.
 
 ### Multivariate Input-Output Estimator
+
+- Auto Select compares the equal-weight mean of output-specific CV RMSE divided
+  by historical output standard deviation. Its coefficient models scale targets
+  within each training fold; manual model penalty semantics remain unchanged.
+  Do not average raw errors across unlike output units for model selection.
+- Rank-deficient historical input spaces must be checked in their observed affine
+  span, distinguishing an off-span point from failure of a full-dimensional solver.
 
 - Present the estimator as supervised prediction from historical input-output
   relationships, not as efficiency benchmarking, causality, optimization, or guaranteed

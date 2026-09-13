@@ -155,12 +155,14 @@
       if (values.some((value) => value <= 0)) {
         throw new Error(`${criterion.name} uses lower-is-better objective scoring, so every value must be greater than zero.`);
       }
-      transformedValues = values.map((value) => 1 / value);
+      const scale = Math.min(...values);
+      transformedValues = values.map((value) => scale / value);
     } else {
       if (values.some((value) => value < 0)) {
         throw new Error(`${criterion.name} uses higher-is-better objective scoring, so values cannot be negative.`);
       }
-      transformedValues = values.slice();
+      const scale = Math.max(...values) || 1;
+      transformedValues = values.map((value) => value / scale);
     }
 
     const total = transformedValues.reduce((sum, value) => sum + value, 0);
@@ -187,8 +189,8 @@
     const size = matrices[0].length;
     return Array.from({ length: size }, (_, row) =>
       Array.from({ length: size }, (_, col) => {
-        const product = matrices.reduce((total, matrix) => total * matrix[row][col], 1);
-        return Math.pow(product, 1 / matrices.length);
+        const logMean = matrices.reduce((total, matrix) => total + Math.log(matrix[row][col]) / matrices.length, 0);
+        return Math.exp(logMean);
       })
     );
   }
@@ -196,8 +198,7 @@
   function calculateWeights(matrix) {
     const size = matrix.length;
     const rowGeometricMeans = matrix.map((row) => {
-      const product = row.reduce((total, value) => total * value, 1);
-      return Math.pow(product, 1 / size);
+      return Math.exp(row.reduce((total, value) => total + Math.log(value) / size, 0));
     });
     const total = rowGeometricMeans.reduce((sum, value) => sum + value, 0);
     const weights = rowGeometricMeans.map((value) => value / total);
@@ -206,7 +207,7 @@
     );
     const consistencyVector = weightedSums.map((value, index) => value / weights[index]);
     const lambdaMax = consistencyVector.reduce((sum, value) => sum + value, 0) / size;
-    const ci = size <= 2 ? 0 : (lambdaMax - size) / (size - 1);
+    const ci = size <= 2 ? 0 : Math.max(0, (lambdaMax - size) / (size - 1));
     const ri = RI[size] || 1.49;
     const cr = ri === 0 ? 0 : ci / ri;
     return { weights, rowGeometricMeans, weightedSums, consistencyVector, lambdaMax, ci, cr };
@@ -296,6 +297,14 @@
     const criteriaMatrices = responses.map((response) =>
       matrixFromAnswers(criteriaCount, response.answers.criteria, "c")
     );
+    const individualConsistency = [];
+    function recordIndividuals(matrices, label) {
+      matrices.forEach((matrix, index) => individualConsistency.push({
+        expert: String(responses[index].expertName || `Expert ${index + 1}`), responseIndex: index,
+        label, ...calculateWeights(matrix),
+      }));
+    }
+    recordIndividuals(criteriaMatrices, 'Criteria comparisons');
     const criteriaMatrix = aggregateMatrices(criteriaMatrices);
     const criteriaResult = { matrix: criteriaMatrix, ...calculateWeights(criteriaMatrix) };
 
@@ -306,6 +315,7 @@
         matrixFromAnswers(criterion.children.length, response.answers.subcriteria || {}, prefix)
       );
       const matrix = aggregateMatrices(matrices);
+      recordIndividuals(matrices, `Sub-criteria under ${criterion.name}`);
       return {
         criterion: criterion.name,
         criterionIndex,
@@ -362,6 +372,7 @@
         matrixFromAnswers(alternativeCount, response.answers.alternatives, prefix)
       );
       const matrix = aggregateMatrices(matrices);
+      recordIndividuals(matrices, `Alternatives under ${criterion.label || criterion.name}`);
       return {
         criterion: criterion.label || criterion.name,
         criterionMeta: criterion,
@@ -377,8 +388,23 @@
       return { alternative, alternativeIndex, score };
     }).sort((a, b) => b.score - a.score);
 
+    const groupConsistency = [
+      { label: 'Criteria comparisons', cr: criteriaResult.cr },
+      ...subcriteriaResults.filter(Boolean).map((result) => ({ label: `Sub-criteria under ${result.criterion}`, cr: result.cr })),
+      ...alternativeResults.filter((result) => result.type === 'subjective').map((result) => ({ label: `Alternatives under ${result.criterion}`, cr: result.cr })),
+    ];
+    const individualFailures = individualConsistency.filter((item) => item.cr > .1);
+    const groupFailures = groupConsistency.filter((item) => item.cr > .1);
+    const diagnostics = [];
+    if (individualFailures.length || groupFailures.length) diagnostics.push({
+      level: 'high-risk', title: 'Pairwise consistency review required',
+      detected: `${individualFailures.length} individual and ${groupFailures.length} group matrix checks exceed CR 0.10.`,
+      why: 'Geometric aggregation can cancel opposing inconsistencies. A consistent group matrix does not validate individual judgements.',
+      consider: 'Review the identified expert and matrix comparisons before using this ranking; do not discard responses automatically.',
+    });
     return {
       questionnaire: { ...questionnaire, criteria: criteriaNames, criteriaMeta: criteria },
+      individualConsistency, groupConsistency, diagnostics,
       expertCount: responses.length,
       criteriaResult,
       subcriteriaResults,

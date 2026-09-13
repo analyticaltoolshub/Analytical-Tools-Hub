@@ -340,9 +340,26 @@
     if (scaleRestriction === 'vrs') constraints.push({ coefficients: [...Array(count).fill(1), 0], sense: '=', rhs: 1 });
     if (scaleRestriction === 'nirs') constraints.push({ coefficients: [...Array(count).fill(1), 0], sense: '<=', rhs: 1 });
 
-    const solved = solveLinearProgram(objective, constraints);
-    const lambdas = solved.solution.slice(0, count).map((value) => Math.max(0, value));
+    const scaledConstraints = constraints.map((constraint) => {
+      const scale = Math.max(Math.abs(constraint.rhs), ...constraint.coefficients.map(Math.abs)) || 1;
+      return { ...constraint, coefficients: constraint.coefficients.map((value) => value / scale), rhs: constraint.rhs / scale };
+    });
+    const solved = solveLinearProgram(objective, scaledConstraints);
     const radial = Math.max(EPSILON, solved.solution[radialIndex]);
+    // With the radial optimum fixed, maximize dimensionless input/output slacks.
+    const inputScales = evaluated.inputs.map((value, i) => Math.max(value, ...referenceDmus.map((dmu) => dmu.inputs[i])) || 1);
+    const outputScales = evaluated.outputs.map((value, i) => Math.max(value, ...referenceDmus.map((dmu) => dmu.outputs[i])) || 1);
+    const slackObjective = referenceDmus.map((dmu) =>
+      dmu.outputs.reduce((sum, value, i) => sum + value / outputScales[i], 0) -
+      dmu.inputs.reduce((sum, value, i) => sum + value / inputScales[i], 0)
+    );
+    const slackConstraints = scaledConstraints.map((constraint) => ({
+      ...constraint,
+      coefficients: constraint.coefficients.slice(0, count),
+      rhs: constraint.rhs - constraint.coefficients[radialIndex] * radial,
+    }));
+    const completed = solveLinearProgram(slackObjective, slackConstraints);
+    const lambdas = completed.solution.map((value) => Math.max(0, value));
     const efficiency = Math.min(1, orientation === 'input' ? radial : 1 / radial);
     const referenceInputs = evaluated.inputs.map((_, index) => lambdas.reduce((sum, lambda, j) => sum + lambda * referenceDmus[j].inputs[index], 0));
     const referenceOutputs = evaluated.outputs.map((_, index) => lambdas.reduce((sum, lambda, j) => sum + lambda * referenceDmus[j].outputs[index], 0));
@@ -359,7 +376,7 @@
       name: evaluated.name,
       efficiency,
       radialFactor: radial,
-      efficient: efficiency >= 1 - 1e-6 && inputSlacks.every((value) => value <= 1e-5) && outputSlacks.every((value) => value <= 1e-5),
+      efficient: efficiency >= 1 - 1e-6 && inputSlacks.every((value, i) => value / inputScales[i] <= 1e-7) && outputSlacks.every((value, i) => value / outputScales[i] <= 1e-7),
       peers: lambdas.map((lambda, index) => ({ name: referenceDmus[index].name, lambda })).filter((peer) => peer.lambda > 1e-6),
       lambdas,
       inputTargets: referenceInputs,

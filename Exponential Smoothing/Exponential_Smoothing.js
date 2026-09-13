@@ -1,6 +1,7 @@
 let chart;
 let uploadedRawData = [];
 let latestDiagnostics = [];
+let latestSnapshot = null;
 
 const alphaInput = document.getElementById("alpha");
 const betaInput = document.getElementById("beta");
@@ -60,11 +61,14 @@ methodInput.addEventListener("change", () => {
 });
 
 initializeManualRows();
+hideResults();
+[alphaInput, betaInput, gammaInput, seasonLengthInput, seasonalTypeInput, methodInput, manualTbody].forEach((element) => {
+    element.addEventListener('input', hideResults);
+    element.addEventListener('change', hideResults);
+});
 
 function getManualData() {
-    return Array.from(manualTbody.querySelectorAll(".manual-demand"))
-        .map((input) => parseFloat(input.value))
-        .filter((value) => Number.isFinite(value));
+    return ATHData.series(Array.from(manualTbody.querySelectorAll('.manual-demand'), (input) => input.value));
 }
 
 function getForecastData() {
@@ -98,6 +102,7 @@ function addManualRow(value = "") {
     deleteButton.className = "manual-delete-btn";
     deleteButton.textContent = "x";
     deleteButton.addEventListener("click", () => {
+        hideResults();
         row.remove();
         updateManualPeriods();
     });
@@ -115,22 +120,12 @@ function updateManualPeriods() {
     });
 }
 
-function addDemandValue(values, cell) {
-    if (cell === null || cell === undefined || cell === "") {
-        return;
-    }
-
-    const numericValue = typeof cell === "number"
-        ? cell
-        : Number(String(cell).replace(/,/g, "").trim());
-
-    if (Number.isFinite(numericValue)) {
-        values.push(numericValue);
-    }
-}
-
 function handleFile(file) {
     if (!file) {
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        errorDiv.innerText = 'Use a file up to 5 MB.';
         return;
     }
 
@@ -196,7 +191,8 @@ function sheetToRows(worksheet) {
 
     return XLSX.utils.sheet_to_json(worksheet, {
         defval: "",
-    }).filter((row) => Object.values(row).some((value) => String(value).trim() !== ""));
+        blankrows: true,
+    });
 }
 
 function populateDemandColumnSelector(headers) {
@@ -216,10 +212,15 @@ function populateDemandColumnSelector(headers) {
 }
 
 function processUploadedData() {
-    const values = [];
+    let values;
     const selectedColumn = demandColumn.value;
 
-    uploadedRawData.forEach((row) => addDemandValue(values, row[selectedColumn]));
+    try {
+        values = ATHData.series(uploadedRawData.map((row) => row[selectedColumn]), false);
+    } catch (error) {
+        errorDiv.innerText = `${error.message} Existing demand data is unchanged.`;
+        return;
+    }
 
     if (values.length < 2) {
         errorDiv.innerText = "The selected column needs at least 2 numeric demand values.";
@@ -237,7 +238,15 @@ function isValidSmoothingFactor(value) {
 }
 
 function calculate() {
-    const actual = getForecastData();
+    hideResults();
+    let actual;
+    try {
+        actual = getForecastData();
+    } catch (error) {
+        hideResults();
+        errorDiv.innerText = error.message;
+        return;
+    }
     const alpha = parseFloat(alphaInput.value);
     const beta = parseFloat(betaInput.value);
     const gamma = parseFloat(gammaInput.value);
@@ -299,6 +308,10 @@ function calculate() {
         seasonalType: seasonalTypeInput.value,
         horizon: 1,
     });
+    latestSnapshot = ATHData.snapshot({ generatedAt: new Date().toISOString(), actual, result: { ...result, mae },
+        settings: { method, alpha, beta, gamma, seasonLength, seasonalType: seasonalTypeInput.value }, diagnostics: latestDiagnostics });
+    document.getElementById('exportButton').disabled = false;
+    document.getElementById('exportImageButton').disabled = false;
     window.ATHDiagnostics?.render("#forecastDiagnostics", latestDiagnostics, {
         heading: "Forecast Diagnostics",
     });
@@ -422,6 +435,9 @@ function showResults() {
 }
 
 function hideResults() {
+    latestSnapshot = null;
+    document.getElementById('exportButton').disabled = true;
+    document.getElementById('exportImageButton').disabled = true;
     resultsSection.classList.add("hidden");
     chartSection.classList.add("hidden");
     resultsTable.textContent = "";
@@ -463,36 +479,33 @@ function loadSampleData() {
 }
 
 function exportCSV() {
-    const rows = document.querySelectorAll("#resultsTable tr");
-
-    if (rows.length === 0) {
+    if (!latestSnapshot) {
         errorDiv.innerText = "Calculate a forecast before exporting.";
         return;
     }
 
+    const { actual, result, settings, diagnostics, generatedAt } = latestSnapshot;
     const csv = [
         ["Analytical Tools Hub", "Exponential Smoothing"],
-        ["Generated at", new Date().toISOString()],
-        ["Method", methodInput.options[methodInput.selectedIndex]?.textContent || methodInput.value],
-        ["Alpha", alphaInput.value],
-        ["Beta", betaInput.value],
-        ["Gamma", gammaInput.value],
-        ["Season length", seasonLengthInput.value],
-        ["Seasonal type", seasonalTypeInput.value],
+        ['Snapshot schema', 'ath.forecast.v1'],
+        ["Generated at", generatedAt],
+        ["Method", settings.method],
+        ["Alpha", settings.alpha],
+        ["Beta", settings.method === 'simple' ? '' : settings.beta],
+        ["Gamma", settings.method === 'triple' ? settings.gamma : ''],
+        ["Season length", settings.method === 'triple' ? settings.seasonLength : ''],
+        ["Seasonal type", settings.method === 'triple' ? settings.seasonalType : ''],
+        ['Assumptions', 'Equally spaced periods; historical pattern continues; no causal interpretation.'],
+        ['Next forecast', result.nextForecast],
+        ['MAE', result.mae],
         [],
         ["Diagnostics"],
-        ...(window.ATHDiagnostics?.summarize(latestDiagnostics) || []).map((item) => [item]),
+        ...(window.ATHDiagnostics?.summarize(diagnostics) || []).map((item) => [item]),
         [],
+        ['Period', 'Actual', 'Forecast'],
+        ...actual.map((value, index) => [index + 1, value, result.forecast[index]]),
     ];
-
-    rows.forEach((row) => {
-        const cols = row.querySelectorAll("td, th");
-        const rowData = [];
-        cols.forEach((col) => rowData.push(col.innerText));
-        csv.push(rowData.join(","));
-    });
-
-    const blob = new Blob([csv.join("\n")], { type: "text/csv" });
+    const blob = new Blob([ATHData.csv(csv)], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
 
@@ -503,7 +516,7 @@ function exportCSV() {
 }
 
 function exportChartImage() {
-    if (!chart) {
+    if (!chart || !latestSnapshot) {
         errorDiv.innerText = "Calculate a forecast before exporting the chart image.";
         return;
     }
