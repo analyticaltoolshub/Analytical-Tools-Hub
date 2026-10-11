@@ -28,5 +28,29 @@
     return rows.map((row) => row.map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
   }
 
-  return { number, series, snapshot, csv };
+  function parseCsv(text) {
+    if (typeof text !== 'string') throw new Error('CSV text is required.');
+    const rows = []; let row = [], cell = '', quoted = false, closed = false;
+    const source = text.replace(/^\uFEFF/, '');
+    for (let i = 0; i < source.length; i++) {
+      const char = source[i];
+      if (quoted) {
+        if (char === '"') { if (source[i + 1] === '"') { cell += '"'; i++; } else { quoted = false; closed = true; } }
+        else cell += char;
+      } else if (char === ',' || char === '\n' || char === '\r') {
+        row.push(cell); cell = ''; closed = false;
+        if (char !== ',') { rows.push(row); row = []; if (char === '\r' && source[i + 1] === '\n') i++; }
+      } else if (char === '"') {
+        if (cell.length || closed) throw new Error('CSV quotes must surround a complete field.');
+        quoted = true;
+      } else {
+        if (closed) { if (!/\s/.test(char)) throw new Error('Unexpected text after a quoted CSV field.'); }
+        else cell += char;
+      }
+    }
+    if (quoted) throw new Error('CSV has an unclosed quoted field.');
+    if (cell.length || row.length || closed) { row.push(cell); rows.push(row); }
+    return rows;
+  }
+  return { number, series, snapshot, csv, parseCsv };
 }));

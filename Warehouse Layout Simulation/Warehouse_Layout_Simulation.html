@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warehouse Layout Simulation Tool | Analytical Tools Hub</title>
+  <meta name="description" content="Design warehouse rack layouts, simulate weighted SKU picking routes, and compare travel distance and time with reproducible Monte Carlo orders.">
+  <link rel="canonical" href="https://analyticaltoolshub.com/Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html">
+  <meta property="og:title" content="Warehouse Layout Simulation Tool | Analytical Tools Hub">
+  <meta property="og:description" content="Compare warehouse layouts using obstacle-aware picker routes and the same seeded orders.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://analyticaltoolshub.com/Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html">
+  <meta property="og:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Warehouse Layout Simulation Tool">
+  <meta name="twitter:description" content="Model rack locations, weighted demand, picker travel, and layout improvements in your browser.">
+  <meta name="twitter:image" content="https://analyticaltoolshub.com/assets/ath-logo-horizontal.png">
+  <link rel="icon" href="../assets/ath-favicon.png">
+  <link rel="stylesheet" href="../tool-theme.css">
+  <link rel="stylesheet" href="Warehouse_Layout_Simulation.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Warehouse Layout Simulation Tool","applicationCategory":"BusinessApplication","operatingSystem":"Any modern browser","url":"https://analyticaltoolshub.com/Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html","description":"Browser-based warehouse layout editing and seeded Monte Carlo picker-route comparison.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Analytical Tools Hub","item":"https://analyticaltoolshub.com/"},{"@type":"ListItem","position":2,"name":"Warehouse Layout Simulation","item":"https://analyticaltoolshub.com/Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html"}]}</script>
+</head>
+<body class="warehouse-page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="tool-topnav"><div class="tool-topnav-inner">
+    <a class="tool-brand" href="../index.html"><img src="../assets/ath-logo-horizontal.png" alt="Analytical Tools Hub logo"><span class="tool-brand-text"><strong class="tool-title">Warehouse Layout Simulation</strong><span>Operations workspace</span></span></a>
+    <nav class="tool-nav-actions" aria-label="ATH navigation"><a class="tool-home-link" href="../index.html">ATH Home</a><a class="tool-home-link" href="../index.html#featured-tools">Explore Tools</a></nav>
+  </div></header>
+  <main class="container" id="main-content">
+    <section class="tool-hero"><span class="tool-badge">Warehouse and Operations</span><h1>Warehouse Layout Simulation</h1><p>Compare rack arrangements and SKU placement before changing your picking operation.</p><div class="tool-reassurance"><span>Local processing</span><span>Obstacle-aware routes</span><span>Reproducible comparisons</span></div></section>
+    <section class="panel content-section"><h2>Why use this tool?</h2><div class="guidance-grid">
+      <div class="guidance-card"><span>Decision Supported</span><p>Which proposed layout reduces single-picker travel for the same demand?</p></div>
+      <div class="guidance-card"><span>What It Tells You</span><p>Per-order travel, picking time, location visits, and relative improvement.</p></div>
+      <div class="guidance-card"><span>Example Input</span><p>Two 28 by 24 m warehouses with 30 bays A1-F5, connected aisles, shared induction, and identical picking demand.</p></div>
+      <div class="guidance-card"><span>Sample Output Interpretation</span><p>Lower travel with unchanged pick time suggests a movement saving, not a guaranteed labour saving.</p></div>
+    </div></section>
+    <nav class="wl-workflow" aria-label="Simulation workflow"><a href="#editor" id="stepEditor" aria-current="step"><strong>1. Design</strong><span>Layouts and SKU locations</span></a><a href="#simulation" id="stepSimulate"><strong>2. Simulate</strong><span>The same demand in every layout</span></a><a href="#results" id="stepReview"><strong>3. Compare</strong><span>Travel, time, and uncertainty</span></a></nav>
+    <section class="panel" id="editor">
+      <div class="wl-heading"><h2>1. Layout Editor</h2><div class="wl-actions"><button type="button" id="loadSampleButton">Load Sample</button><button type="button" class="reset" id="resetButton">Reset Project</button></div></div>
+      <div class="wl-actions wl-project-actions"><button type="button" id="saveButton">Save in Browser</button><button type="button" id="restoreButton">Load Saved</button><button type="button" id="exportProjectButton">Export Project JSON</button><label class="wl-import">Import Project JSON<input id="importFile" type="file" accept=".json,application/json"></label></div>
+      <p class="privacy-note">Layouts and orders stay in your browser. Saving is explicit, device-specific, and may be cleared with browser data. JSON preserves all layouts and simulation settings; keep a copy for long-term reuse.</p>
+      <p id="status" role="status" aria-live="polite"></p><p id="error" class="wl-error" role="alert" hidden></p>
+      <div class="wl-layout-controls"><label>Active layout<select id="layoutSelect"></select></label><button type="button" id="newLayoutButton">New Layout</button><button type="button" id="duplicateLayoutButton">Duplicate Layout</button><button type="button" class="reset" id="removeLayoutButton">Delete Layout</button></div>
+      <fieldset id="layoutFields" class="wl-fields"><legend>Warehouse geometry</legend>
+        <label class="wl-field-wide">Layout name<input id="layoutName" maxlength="80"></label><label>Width (m)<input id="warehouseWidth" type="number" min="8" max="80" step="1"></label><label>Depth (m)<input id="warehouseHeight" type="number" min="8" max="80" step="1"></label><label class="wl-field-aisle">Clear aisle width (m)<input id="aisleWidth" type="number" min="1" max="6" step="1"></label>
+      </fieldset>
+      <fieldset id="pointFields"><legend>Induction and drop-off</legend><label class="wl-check"><input id="samePoint" type="checkbox" checked>Start and end are the same point</label>
+        <div id="pointGrid" class="wl-point-grid is-shared">
+          <fieldset class="wl-coordinate-pair"><legend>Induction/start</legend><label>X cell<input id="startX" type="number" min="0" step="1"></label><label>Y cell<input id="startY" type="number" min="0" step="1"></label></fieldset>
+          <fieldset id="endPointFields" class="wl-coordinate-pair" hidden><legend>Drop-off/end</legend><label id="endXLabel" hidden>X cell<input id="endX" type="number" min="0" step="1"></label><label id="endYLabel" hidden>Y cell<input id="endY" type="number" min="0" step="1"></label></fieldset>
+        </div>
+      </fieldset>
+      <div class="wl-editor-grid"><div class="wl-map-area">
+        <div class="wl-canvas-toolbar"><button type="button" id="addLocationButton">Add Location</button><label class="wl-check"><input id="heatmapToggle" type="checkbox">Visit heatmap</label><label class="wl-check"><input id="labelsToggle" type="checkbox" checked>Location labels</label><label>Selected object<select id="pointSelect"><option value="location">Storage location</option><option value="start">Induction/start</option><option value="end">Drop-off/end</option></select></label></div>
+        <div class="wl-canvas-frame"><canvas id="warehouseCanvas" width="1000" height="750" tabindex="0" role="img" aria-label="Warehouse layout. Rack positions and dimensions are also editable in the location fields below."></canvas></div>
+        <div class="wl-legend"><span><i class="wl-swatch rack"></i>Location</span><span><i class="wl-swatch depot"></i>Induction/start (circle)</span><span><i class="wl-swatch end"></i>Drop-off/end (square)</span><span><i class="wl-swatch route"></i>Route</span><span>Heat: pale yellow (fewer visits) to red (more visits)</span></div>
+        <p class="wl-muted">Pale green cells show walkable aisles and cross-aisles after clearance around racks and walls.</p>
+        <p id="canvasSummary" class="wl-muted"></p>
+        <div class="wl-route-controls"><label>Example order<select id="routeSelect" disabled></select></label><button type="button" id="playButton" disabled>Play Route</button><button type="button" id="stopButton" disabled>Stop</button><label>Animation speed<select id="animationSpeed"><option value="1">1x</option><option value="5" selected>5x</option><option value="20">20x</option></select></label></div>
+        <p id="routeSummary" role="status">Run a simulation to inspect the first 20 sampled routes.</p>
+      </div><aside class="wl-inspector" aria-labelledby="locationHeading"><h3 id="locationHeading">Selected Location</h3>
+        <label>Location<select id="locationSelect"></select></label>
+        <fieldset id="locationFields" class="wl-fields"><legend>Physical location</legend><label class="wl-field-wide">Unique location ID<input id="locationId" maxlength="80"></label><label>X (m)<input id="locationX" type="number" min="0" step="1"></label><label>Y (m)<input id="locationY" type="number" min="0" step="1"></label><label>Width (m)<input id="locationWidth" type="number" min="1" max="20" step="1"></label><label>Depth (m)<input id="locationHeight" type="number" min="1" max="20" step="1"></label><label class="wl-field-wide">Pick face<select id="locationSide"><option value="N">North</option><option value="S">South</option><option value="W">West</option><option value="E">East</option></select></label></fieldset>
+        <h3>SKU Assignments</h3><div id="assignments"></div><button type="button" id="addAssignmentButton">Assign SKU</button>
+        <button type="button" class="reset" id="removeLocationButton">Remove Location</button>
+        <p class="wl-muted">Location IDs are unique within each layout. A SKU can be stored in several locations, and a location can hold several SKUs. Available quantities reset before each order; the simulation does not deplete stock across orders.</p>
+      </aside></div>
+      <div class="wl-heading wl-demand-heading"><h3>Shared SKU Demand</h3><button type="button" id="addSkuButton">Add SKU</button></div>
+      <p>Frequency weight represents relative unit-pick demand: a SKU with weight 40 is drawn four times as often as one with weight 10. Probability = SKU weight / sum of all SKU weights. Higher-weight SKUs are fast movers. Enter historical unit picks for a representative period, or relative estimates; zero excludes a SKU. Adding another storage location does not change its demand.</p>
+      <div class="wl-actions wl-demand-import"><label>SKU demand CSV<input id="demandFile" type="file" accept=".csv,text/csv"></label><button id="importDemandButton" type="button">Import Demand CSV</button><button id="demandTemplateButton" type="button">Download CSV Template</button></div>
+      <p class="wl-muted">CSV columns: <code>SKU,FrequencyWeight</code>. Matching SKU names update their weights; new names are added. Other demand records and location assignments are retained. Up to 30 unique SKUs; files up to 1 MB. New SKUs must be assigned to locations before simulation. Files are processed in your browser.</p>
+      <p id="demandImportStatus" role="status" aria-live="polite"></p>
+      <div id="demandScroll" class="wl-table-scroll wl-demand-scroll" tabindex="0" role="region" aria-label="Shared SKU demand table"><table id="demandTable"><caption>One demand record per SKU, shared across all layouts</caption><thead><tr><th scope="col">SKU</th><th scope="col">Frequency weight</th><th scope="col">Pick probability</th><th scope="col">Action</th></tr></thead><tbody></tbody></table></div>
+    </section>
+    <section class="panel" id="simulation"><h2>2. Simulation Settings</h2>
+      <fieldset id="simulationFields" class="wl-fields"><legend>Shared across every compared layout</legend><label>Random orders<input id="orderCount" type="number" min="1" max="20000" value="3000"></label><label>Unit picks per order<input id="picksPerOrder" type="number" min="1" max="30" value="5"></label><label>Picker speed (m/s)<input id="pickerSpeed" type="number" min="0.1" max="5" step="0.1" value="1.2"></label><label>Pick time (s/unit)<input id="pickTime" type="number" min="0" max="600" value="8"></label><label class="wl-field-phone-wide">Random seed<input id="randomSeed" type="number" min="0" max="4294967295" value="42"></label><label class="wl-field-phone-wide">Pick sequence mode<select id="pickSequenceMode"><option value="nearest">Nearest eligible location</option><option value="fixed">Fixed pick sequence</option></select></label></fieldset>
+      <p id="sequenceExplanation" class="wl-muted"></p>
+      <fieldset id="compareLayouts"><legend>Layouts to compare (first checked layout in this list is the baseline)</legend><div id="compareChoices" class="wl-actions"></div></fieldset>
+      <div id="simulationError" class="wl-error" role="alert" hidden></div>
+      <div class="wl-actions"><button type="button" id="runButton">Run Simulation</button><button type="button" class="reset" id="cancelButton" disabled>Cancel</button><progress id="runProgress" max="1" value="0" aria-label="Simulation progress"></progress></div>
+      <p id="runStatus" role="status" aria-live="polite">No simulation has been run.</p>
+    </section>
+    <section class="panel" id="results"><div class="wl-heading"><h2>3. Results and Comparison</h2><button type="button" id="exportResultsButton" disabled>Export Results JSON</button></div>
+      <p id="resultEmpty">Simulate one layout or compare alternatives using identical SKU weights and seeded orders.</p>
+      <div id="resultContent" hidden><p id="interpretation" class="wl-interpretation" aria-live="polite"></p><div id="resultDiagnostics"></div><div id="kpis" class="wl-kpis"></div>
+        <div class="wl-table-scroll"><table id="comparisonTable"><caption>Per-order results; improvement is relative to the first selected layout</caption><thead><tr><th scope="col">Layout</th><th scope="col">Avg distance (m)</th><th scope="col">Min / max (m)</th><th scope="col">Avg travel (s)</th><th scope="col">Min / max travel (s)</th><th scope="col">Avg total (s)</th><th scope="col">Min / max total (s)</th><th scope="col">Distance improvement</th><th scope="col">Time improvement</th></tr></thead><tbody></tbody></table></div>
+        <div class="wl-charts">
+          <section><h3>Average Travel Distance</h3><div class="wl-chart"><canvas id="distanceChart" aria-label="Average distance in metres per layout" role="img"></canvas></div><p>Shorter routes reduce movement under the same sampled demand; this is not an optimality certificate.</p></section>
+          <section><h3>Average Order Time</h3><div class="wl-chart"><canvas id="timeChart" aria-label="Travel and picking seconds per layout" role="img"></canvas></div><p>Total time equals travel plus unit-picking time. Fixed picking time limits percentage time savings.</p></section>
+          <section class="wl-frequency"><h3>Location Visit Frequency</h3><div class="wl-chart"><canvas id="frequencyChart" aria-label="Order visits per storage location and layout" role="img"></canvas></div><p id="frequencyExplanation">Compare the concentration of picking activity across locations. The table below provides exact unit-pick and order-visit counts.</p>
+            <details id="frequencyDetails" class="wl-location-details"><summary>Actual Visits and Unit Picks by Location</summary><div class="wl-table-scroll"><table id="frequencyTable"><caption>Actual visits and unit picks allocated to each location</caption><thead><tr><th scope="col">Layout</th><th scope="col">Location</th><th scope="col">Unit picks</th><th scope="col">Order visits</th></tr></thead><tbody></tbody></table></div></details>
+          </section>
+        </div>
+      </div>
+    </section>
+    <section class="panel content-section" id="methodology"><h2>Methodology and Limitations</h2><div class="guidance-grid">
+      <div class="guidance-card"><span>Distance and aisles</span><p>A* finds shortest orthogonal paths on a 1 m cell grid around storage locations. Obstacles are expanded by (aisle width - 1 m) / 2; cell centres also retain half the aisle width from walls. Pick faces use the nearest conservative grid cell. Start/end coordinates identify cells, whose centres are at X + 0.5, Y + 0.5 m. Narrow or disconnected access is rejected.</p></div>
+      <div class="guidance-card"><span>Order generation</span><p>Each unit pick is drawn independently with replacement, with probability equal to SKU weight / total weight. Demand is stored once per SKU in the shared catalogue. Every layout receives the same orders. Available quantities reset before each order. An order that exceeds the total available quantity fails explicitly; replenishment and stock depletion across orders are excluded.</p></div>
+      <div class="guidance-card"><span>Routes and time</span><p>Nearest mode chooses each next location by distance and remaining stock. Fixed mode visits the required locations alphabetically from A to Z, with numeric bay ordering (A2 before A10). The baseline allocates units to stocked locations once; repeated picks at each location are combined, then all layouts follow the same sorted stops and quantities. Matching locations and stock are required. Neither method guarantees a globally shortest tour. Travel seconds = metres / speed; total seconds = travel seconds + units x pick time.</p></div>
+      <div class="guidance-card"><span>Fair comparisons</span><p>The shared SKU catalogue, generated orders, speed, and pick time apply to every layout. Location IDs, positions, assignments, and start/end points can differ. Keep dimensions and total available quantities comparable when isolating a placement change. Improvement = 100 x (baseline mean - alternative mean) / baseline mean; negative means worse. Min/max are sampled extremes, not future bounds.</p></div>
+    </div><p>One picker, constant speed, flat floor, and unrestricted two-way aisles are assumed. Congestion, turning delays, ergonomics, rack height, safety regulations, and labour scheduling are excluded. Aisle clearance is a geometric approximation, not a safety certification. Validate with measured warehouse trips and several seeds before committing to a layout.</p><p>Limits: six layouts per project, thirty locations per layout, thirty shared demand SKUs, 80 x 80 m, twenty thousand orders, and thirty unit picks per order. Saved results include inputs, seed, method, diagnostics, and sampled metrics.</p><p>Related decisions: <a href="../ABC%20Analysis/ABC_Analysis.html">ABC/XYZ inventory prioritization</a> and <a href="../Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html">facility-to-customer network allocation</a> answer different questions.</p></section>
+    <section class="panel content-section faq-section" id="faq"><h2>FAQ</h2>
+      <details><summary>Can the same SKU be stored in multiple locations?</summary><p>Yes. Create unique location IDs and assign the SKU and available quantity to each. Its frequency weight appears once in Shared SKU Demand. The picker chooses the nearest location with usable stock and can split a pick across locations.</p></details>
+      <details><summary>What does frequency weight mean for a fast mover?</summary><p>A higher weight gives a SKU a higher probability of being requested. Weights 40, 10, and 50 give probabilities 40%, 10%, and 50%; weights 4, 1, and 5 give the same probabilities. Weight is demand, not a location score or stock quantity. Use historical unit picks from the same period where available.</p></details>
+      <details><summary>Can induction and drop-off be in different places?</summary><p>Yes. Clear Start and end are the same point, then position each independently. When they are shared, moving the induction point also moves the drop-off point. Routes finish at the configured end point.</p></details>
+      <details><summary>What do the two sample layouts represent?</summary><p>Layout 1 has longitudinal rack banks and three picking aisles linked by front and rear cross-aisles. Layout 2 has transverse rack banks with side cross-aisles. Both have 30 bays A1-F5, the same 28 by 24 m footprint, matching SKU assignments, and the same induction point. Dimensions and demand are synthetic teaching inputs.</p></details>
+      <details><summary>How does Fixed pick sequence compare layouts?</summary><p>Order contents are randomly sampled, but location visit order is alphabetical. For example, required stops B5, B1, D4, C2, A2 become Start &gt; A2 &gt; B1 &gt; B5 &gt; C2 &gt; D4 &gt; End. Bay numbers sort numerically, so A2 precedes A10. Picks at the same location are combined into one stop, retaining all quantities. Every layout uses the same sorted stops. Nearest eligible location instead chooses each next stop by travel distance.</p></details>
+      <details><summary>Does this optimize the warehouse layout automatically?</summary><p>You create candidate layouts; the simulation compares their picking performance. It does not automatically search all possible placements. Use the results to review proposed arrangements under representative demand.</p></details>
+      <details><summary>Why might a wider aisle make a location unreachable?</summary><p>The model reserves clearance around locations and walls. Move the location, change its pick face, or widen the physical gap. Blocked start/end points and disconnected pick faces cannot produce a valid simulation.</p></details>
+      <details><summary>Can I open this without a server?</summary><p>Yes. Libraries are bundled locally, with a cancellable batch fallback when a local file cannot use Web Workers.</p></details>
+      <details><summary>What is stored or uploaded?</summary><p>No layout data is uploaded. Browser saving is explicit and device-specific. Project JSON preserves editable layouts and the shared demand catalogue; result JSON captures the calculation-time snapshot. Legacy version 1 projects are converted to unique location IDs with their original SKU assignments and ample per-order stock.</p></details>
+    </section>
+  </main>
+  <script src="../assets/vendor/astar-0.4.1.js"></script><script src="../assets/vendor/chart-4.4.8.js"></script><script src="../calculation-core/data-utils.js"></script><script src="../calculation-core/warehouse-layout.js"></script><script src="../diagnostics.js"></script><script src="Warehouse_Layout_Simulation.js"></script>
+</body>
+</html>

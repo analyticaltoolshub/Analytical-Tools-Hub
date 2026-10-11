@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 
 const pages = [
+  { name: 'Warehouse Layout Simulation', url: '/Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html', sample: '#loadSampleButton', calculate: '#runButton' },
   { name: 'Homepage', url: '/index.html' },
   { name: 'ABC Analysis', url: '/ABC%20Analysis/ABC_Analysis.html', sample: '#btn-load-sample', calculate: '#btn-calculate' },
   { name: 'Analytic Hierarchy Process', url: '/Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html', sample: '#loadSampleResponseButton', calculate: '#calculateAnalysisButton' },

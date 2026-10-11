@@ -1,0 +1,83 @@
+.warehouse-page [hidden] { display: none !important; }
+.warehouse-page fieldset { min-width: 0; border: 0; padding: 0; margin: 1rem 0; }
+.warehouse-page legend { font-weight: 700; font-size: .85rem; color: var(--text-secondary); margin-bottom: .6rem; }
+.warehouse-page .panel { margin-bottom: 1.25rem; }
+.wl-heading, .wl-actions, .wl-canvas-toolbar, .wl-route-controls, .wl-layout-controls { display: flex; flex-wrap: wrap; gap: .65rem; align-items: center; }
+.wl-heading { justify-content: space-between; margin-bottom: .8rem; }
+.wl-heading h2 { margin: 0; }
+.wl-layout-controls { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.wl-layout-controls > label { flex: 1 1 200px; }
+.wl-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.wl-fields > .wl-field-wide { grid-column: 1 / -1; }
+.wl-point-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: .8rem; }
+.wl-point-grid.is-shared { grid-template-columns: 1fr; }
+.warehouse-page .wl-coordinate-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin: 0; }
+#locationFields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#locationFields > .wl-field-wide { grid-column: 1 / -1 !important; }
+.warehouse-page label { display: grid; gap: .35rem; min-width: 0; font-size: .85rem; font-weight: 700; }
+.warehouse-page input, .warehouse-page select { min-width: 0; width: 100%; padding: .6rem .7rem; font: inherit; }
+.warehouse-page .privacy-note { padding: .75rem .85rem; }
+.warehouse-page button { min-height: 40px; white-space: normal; }
+.warehouse-page button:disabled { opacity: .5; cursor: not-allowed; }
+.warehouse-page .wl-check { display: inline-flex; align-items: center; gap: .45rem; font-weight: 600; }
+.warehouse-page .wl-check input { width: 18px; height: 18px; min-height: 18px; padding: 0; margin: 0; box-shadow: none; }
+.wl-import { max-width: 230px; }
+.wl-import input { font-size: .75rem; padding: .4rem; }
+.wl-demand-heading { margin-top: 1.5rem; }
+.wl-assignment { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; padding: .75rem 0; border-top: 1px solid var(--border); }
+.wl-assignment button { justify-self: start; }
+.wl-inspector #addAssignmentButton { margin-bottom: .5rem; }
+#demandTable { min-width: 500px; }
+#demandTable input { max-width: 260px; }
+.wl-demand-scroll { max-height: 15rem; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; overscroll-behavior: contain; }
+.wl-demand-scroll th { position: sticky; top: 0; z-index: 2; }
+.wl-demand-scroll caption { padding: .6rem; }
+.wl-demand-import { margin: .8rem 0; }
+.wl-location-details { border-top: 1px solid var(--border); margin-top: 1rem; }
+.wl-location-details > summary { padding: .85rem 0; cursor: pointer; font-weight: 700; color: var(--navy-950); }
+.wl-location-details > summary::marker { color: var(--blue-600); }
+.wl-swatch.end { background: #9f1239; }
+.wl-swatch.aisle { background: #e4f4ec; border: 1px solid #78a88c; }
+#pointFields > .wl-check { grid-column: 1 / -1; }
+.wl-editor-grid { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 1.1rem; align-items: start; }
+.wl-map-area, .wl-inspector, .wl-charts > section { min-width: 0; }
+.wl-inspector { border-left: 1px solid var(--border); padding-left: 1rem; }
+.wl-inspector .wl-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.wl-inspector .wl-fields > label:first-of-type, .wl-inspector .wl-fields > label:last-of-type { grid-column: 1 / -1; }
+.wl-canvas-toolbar { margin-bottom: .7rem; }
+.wl-canvas-frame { width: 100%; aspect-ratio: 4 / 3; border: 1px solid var(--border); background: #f1f5f9; border-radius: 8px; overflow: hidden; }
+#warehouseCanvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+#warehouseCanvas:active { cursor: grabbing; }
+.wl-legend { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .7rem; font-size: .75rem; color: var(--text-secondary); }
+.wl-legend > span { display: inline-flex; gap: .3rem; align-items: center; }
+.wl-swatch { width: 12px; height: 12px; display: inline-block; border-radius: 2px; }
+.wl-swatch.rack { background: #1f6feb; }.wl-swatch.depot { background: #0f766e; }.wl-swatch.route { background: #db2777; }
+.wl-muted, .wl-charts p, #routeSummary { color: var(--text-secondary); font-size: .85rem; line-height: 1.5; }
+.wl-error { color: #9f1239; border-left: 4px solid #e11d48; background: #fff1f2; padding: .8rem; }
+.wl-error a { display: block; margin-top: .5rem; text-decoration: underline; font-weight: 700; }
+.wl-field-error { display: block; margin-top: .35rem; color: #9f1239; font-size: .8rem; font-weight: 600; line-height: 1.4; }
+.warehouse-page input[aria-invalid="true"], .warehouse-page select[aria-invalid="true"] { border-color: #e11d48 !important; }
+.wl-interpretation { padding: 1rem; border-left: 4px solid var(--blue-600); background: #eff6ff; line-height: 1.6; }
+.wl-table-scroll { overflow-x: auto; max-width: 100%; }
+.wl-table-scroll table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.wl-table-scroll th, .wl-table-scroll td { padding: .65rem; text-align: left; border-bottom: 1px solid var(--border); }
+.wl-table-scroll th { background: var(--surface); }
+.wl-table-scroll caption { text-align: left; padding: .6rem 0; color: var(--text-secondary); }
+#comparisonTable { min-width: 900px; }
+.wl-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0; }
+.wl-kpis article { padding: .85rem; border: 1px solid var(--border); border-radius: 8px; min-width: 0; }
+.wl-kpis strong { display: block; font-size: 1.25rem; margin-top: .4rem; overflow-wrap: anywhere; }
+.wl-kpis span { font-size: .8rem; color: var(--text-secondary); }
+.wl-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+.wl-frequency { grid-column: 1 / -1; }
+.wl-chart { position: relative; height: 270px; min-width: 0; }
+.wl-workflow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin: 1.25rem 0; }
+.wl-workflow a { border: 1px solid var(--border); border-radius: 8px; padding: .85rem; text-decoration: none; color: var(--text-secondary); background: white; }
+.wl-workflow a[aria-current] { border-color: var(--blue-600); background: #eff6ff; color: var(--blue-600); }
+.wl-workflow a.is-complete { border-color: #16a34a; }
+.wl-workflow span { display: block; font-size: .8rem; margin-top: .25rem; }
+.warehouse-page progress { width: 180px; max-width: 100%; accent-color: var(--blue-600); }
+@media (max-width: 850px) { .wl-editor-grid { grid-template-columns: 1fr; } .wl-inspector { border-left: 0; border-top: 1px solid var(--border); padding: 1rem 0 0; } .wl-inspector .wl-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); } .wl-inspector .wl-fields > label { grid-column: auto !important; } .wl-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .wl-fields, .wl-inspector .wl-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } .wl-workflow, .wl-charts { grid-template-columns: 1fr; } .wl-frequency { grid-column: auto; } .wl-route-controls > label { flex: 1 1 130px; } .wl-project-actions { align-items: stretch; } }
+@media (max-width: 760px) { .wl-point-grid { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .wl-field-aisle, .wl-field-phone-wide { grid-column: 1 / -1; } }

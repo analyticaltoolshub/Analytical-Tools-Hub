@@ -18,6 +18,15 @@ const pillars = [
 ];
 
 const problems = [
+  ...[
+    'Which warehouse rack layout reduces picking travel?',
+    'How does moving fast-moving SKUs change picker travel time?',
+    'How can I compare warehouse layouts using the same random orders?',
+    'Which warehouse pick locations are visited most often?',
+    'How do aisle widths affect accessible picking routes?',
+    'How much time could a proposed warehouse layout save?',
+    'How can I simulate thousands of weighted SKU picking orders?'
+  ].map((title) => ({ title, detail: 'Recommended tool: Warehouse Layout Simulation', href: 'Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html' })),
   {
     title: 'Which inventory items need the most control?',
     detail: 'Recommended tool: ABC Analysis',
@@ -698,17 +707,27 @@ const featuredProblems = featuredProblemTitles
   .filter(Boolean);
 
 const categories = [
-  { title: 'Inventory and Supply Chain', benefit: 'Optimize stock, service levels, purchasing, network allocation, and supplier decisions.', count: '6 tools available', icon: 'boxes' },
+  { title: 'Inventory and Supply Chain', benefit: 'Review stock, service levels, warehouse layouts, network allocation, and supplier decisions.', count: '7 tools available', icon: 'boxes' },
   { title: 'Forecasting', benefit: 'Identify trends, seasonality, and future demand.', count: '1 tool available', icon: 'chart' },
-  { title: 'Operations', benefit: 'Benchmark relative efficiency, estimate output relationships, optimize network allocation, and review operating performance.', count: '3 tools available', icon: 'settings' },
+  { title: 'Operations', benefit: 'Benchmark efficiency, estimate outputs, optimize network allocation, and simulate warehouse picking.', count: '4 tools available', icon: 'settings' },
   { title: 'Statistics', benefit: 'Analyze distributions, uncertainty, regression relationships, samples, and probability-driven outcomes.', count: '2 tools available', icon: 'compare' },
   { title: 'Finance', benefit: 'Assess investments, costs, returns, and business viability.', count: '1 tool available', icon: 'calculator' },
   { title: 'Decision Science', benefit: 'Structure complex decisions, expert judgements, relationships, priorities, and trade-offs.', count: '3 tools available', icon: 'decision' },
   { title: 'Project Management', benefit: 'Plan schedules, resources, risk, and project economics.', count: '1 tool available', icon: 'settings' },
-  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '7 tools available', icon: 'chart' }
+  { title: 'Business Analysis', benefit: 'Compare scenarios and support strategic decisions.', count: '8 tools available', icon: 'chart' }
 ];
 
 const tools = [
+  {
+    name: 'Warehouse Layout Simulation',
+    description: 'Create rack layouts and compare obstacle-aware picking distance and time using the same weighted random orders.',
+    category: 'Operations',
+    input: 'Rack geometry, SKU frequencies, aisle width, and picking parameters',
+    output: 'Route animation, visit heatmap, travel metrics, and layout comparison',
+    cta: 'Open Warehouse Layout Simulation',
+    href: 'Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html',
+    categories: ['Inventory and Supply Chain', 'Operations', 'Business Analysis']
+  },
   {
     name: 'ABC Analysis',
     description: 'Classify inventory by annual consumption value, with optional XYZ demand variability segmentation.',

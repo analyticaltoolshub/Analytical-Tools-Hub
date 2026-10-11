@@ -20,6 +20,19 @@ Website: https://analyticaltoolshub.com/
 - Data Envelopment Analysis
 - Multivariate Input-Output Estimator
 - Supply Chain Network Optimizer
+- Warehouse Layout Simulation
+
+Warehouse Layout Simulation uses locally bundled A* routing and Chart.js, a separate
+calculation core, and a worker (with a local-file batch fallback). It compares
+single-picker induction-to-drop-off routes on a 1 m grid using identical seeded weighted
+orders. Unique locations hold editable SKU quantities; a shared SKU catalogue controls
+demand independently of storage assignments. Stock resets for each order. The sample
+loads longitudinal and transverse aisle arrangements with bays A1-F5; start/end
+points can be shared, separate, and dragged. Fixed pick sequence sorts required
+locations alphabetically with numeric bay ordering, combines picks per location,
+and replays the same stops across layouts; nearest mode selects stops by distance.
+Save/load is explicit browser-local storage; project and result JSON exports
+retain settings. It does not automatically optimize rack placement or model congestion.
 
 ## Run Locally
 

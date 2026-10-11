@@ -62,6 +62,7 @@ test("every HTML page has one H1 and no duplicate IDs", () => {
 
 test("production pages load the tested calculation modules before their UI scripts", () => {
   const expected = {
+    "Warehouse Layout Simulation/Warehouse_Layout_Simulation.html": ["../calculation-core/warehouse-layout.js", "Warehouse_Layout_Simulation.js"],
     "Break Even Analysis/Break_Even_Analysis.html": ["../calculation-core/break-even.js", "Break_Even_Analysis.js"],
     "Economic Order Quantity/Economic_Order_Quantity.html": ["../calculation-core/eoq.js", "Economic_Order_Quantity.js"],
     "Safety Stock & Reorder Point/Safety_Stock_Reorder_Point.html": ["../calculation-core/safety-stock.js", "Safety_Stock_Reorder_Point.js"],

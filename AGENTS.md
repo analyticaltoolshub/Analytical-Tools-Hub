@@ -358,8 +358,43 @@ Available tools should be represented consistently:
 - Data Envelopment Analysis
 - Multivariate Input-Output Estimator
 - Supply Chain Network Optimizer
+- Warehouse Layout Simulation
 
 ## Current Tool-Specific Rules
+
+### Warehouse Layout Simulation
+
+- Keep routing and simulation in `calculation-core/warehouse-layout.js`, separate
+  from canvas editing and rendering. Reuse shared diagnostics and snapshot utilities.
+- Reset the pinned A* graph between searches; preserve the independent BFS tests.
+- Routes use a 1 m orthogonal grid, aisle-clearance envelopes, one pick face per
+  unique location, and nearest eligible location sequencing from induction to drop-off. Do not claim globally
+  optimal tours or automatic rack-placement optimization.
+- Version 2 projects separate unique physical locations from a shared SKU demand
+  catalogue and SKU/quantity assignments. A SKU can occupy several locations.
+- Comparisons use the shared catalogue and seeded orders. Allocate outstanding units
+  from the nearest eligible location, split picks when required, and count visits by
+  actual location. Assigned stock resets before each order; disclose this explicitly.
+- Start/end points may be shared or distinct and support drag and coordinate edits.
+- Load Sample provides longitudinal and transverse rack-bank layouts, 30 locations
+  A1-F5, connected aisles/cross-aisles, and matching SKU assignments.
+- Fixed pick sequence sorts required location IDs alphabetically A-Z with natural
+  numeric bay ordering (A2 before A10). The baseline assigns locations once, combines
+  all picks per location without losing quantities, and every layout replays those
+  same sorted stops. Reject missing locations or stock. Random order contents do
+  not determine the visit sequence.
+- Nearest mode continues to choose eligible locations per layout. Save the mode in
+  snapshots/exports; default legacy projects to nearest mode. Highlight walkable
+  floor cells using the same clearance grid used in routing.
+- Preserve version 1 import/storage migration without overwriting older saves.
+- Preserve workers, cancellation, local-file batched fallback, explicit versioned
+  localStorage, atomic JSON imports, and immutable calculation-time result exports.
+- Explain excluded congestion, basket correlation, batching, replenishment, and
+  safety constraints. Geometric clearance is not safety approval.
+- Pinned browser-local libraries and licenses live in `assets/vendor`.
+- Shared demand uses a bounded, keyboard-scrollable table. Demand CSV imports merge
+  SKU/weight records only after complete validation, preserving existing assignments.
+  Keep Add SKU available and location-count details collapsed by default.
 
 ### ABC Analysis
 
