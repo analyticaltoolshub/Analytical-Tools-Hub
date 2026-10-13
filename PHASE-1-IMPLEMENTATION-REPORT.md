@@ -165,19 +165,19 @@ ATH import or export has been migrated to a common contract or schema.
 - `calculation-core/gantt.js`
 - `calculation-core/supply-chain-network.js`
 - `calculation-core/ahp.js`
-- `Data Envelopment Analysis/Data_Envelopment_Analysis.js`
-- `Multivariate Input-Output Estimator/Multivariate_Input_Output_Estimator.js`
-- `Multivariate Input-Output Estimator/Multivariate_Input_Output_Estimator.html`
-- `Monte Carlo Risk Simulation/monte-carlo.js`
-- `ABC Analysis/ABC_Analysis.js`
-- `ABC Analysis/ABC_Analysis.html`
-- `Gantt Chart/Gantt_Chart.js`
-- `Exponential Smoothing/Exponential_Smoothing.js`
-- `Exponential Smoothing/Exponential_Smoothing.html`
-- `Supply Chain Network Optimizer/Supply_Chain_Network_Optimizer.js`
-- `Supply Chain Network Optimizer/Supply_Chain_Network_Optimizer.html`
-- `Analytic Hierarchy Process/Analytic_Hierarchy_Process.js`
-- `Analytic Hierarchy Process/Analytic_Hierarchy_Process.html`
+- `Data_Envelopment_Analysis/Data_Envelopment_Analysis.js`
+- `Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.js`
+- `Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html`
+- `Monte_Carlo_Risk_Simulation/monte-carlo.js`
+- `ABC_Analysis/ABC_Analysis.js`
+- `ABC_Analysis/ABC_Analysis.html`
+- `Gantt_Chart/Gantt_Chart.js`
+- `Exponential_Smoothing/Exponential_Smoothing.js`
+- `Exponential_Smoothing/Exponential_Smoothing.html`
+- `Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.js`
+- `Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html`
+- `Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.js`
+- `Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html`
 - `tests/calculation-core.test.cjs`
 - `tests/browser/tools.smoke.spec.cjs`
 - `AGENTS.md`

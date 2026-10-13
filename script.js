@@ -26,662 +26,662 @@ const problems = [
     'How do aisle widths affect accessible picking routes?',
     'How much time could a proposed warehouse layout save?',
     'How can I simulate thousands of weighted SKU picking orders?'
-  ].map((title) => ({ title, detail: 'Recommended tool: Warehouse Layout Simulation', href: 'Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html' })),
+  ].map((title) => ({ title, detail: 'Recommended tool: Warehouse Layout Simulation', href: 'Warehouse_Layout_Simulation/Warehouse_Layout_Simulation.html' })),
   {
     title: 'Which inventory items need the most control?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which products contribute the most to inventory value or revenue?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which products have the most stable demand patterns?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which products have highly variable or unpredictable demand?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which SKUs require the highest management attention?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which inventory segments should receive safety-stock review priority?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which items can operate with lower inventory buffers?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'How can I reduce stockout risk using safety stock and reorder points?',
     detail: 'Recommended tool: Safety Stock & Reorder Point',
-    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+    href: 'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html'
   },
   {
     title: 'Which inventory segments should be reviewed for possible overstock?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which high-value SKUs may justify higher service-level targets?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which products require more accurate forecasting and planning?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which items should be reviewed more frequently for replenishment?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which SKUs should be candidates for make-to-order rather than make-to-stock?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which products require stronger supplier management or dual sourcing?',
     detail: 'Recommended tool: Kraljic Matrix',
-    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+    href: 'Kraljic_Matrix/Kraljic_Matrix.html'
   },
   {
     title: 'Which SKUs should be prioritized during inventory shortages?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which low-value, highly volatile items should be rationalized or discontinued?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'How should inventory policies differ across product categories?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Where should working capital be invested to maximize inventory performance?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'Which inventory segments represent the greatest business and planning risk?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'How should warehouse space and resources be allocated across SKUs?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'What is the recommended inventory strategy for each ABC-XYZ segment?',
     detail: 'Recommended tool: ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html'
+    href: 'ABC_Analysis/ABC_Analysis.html'
   },
   {
     title: 'How much stock should I order for a stable-demand item?',
     detail: 'Recommended tool: Economic Order Quantity',
-    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+    href: 'Economic_Order_Quantity/Economic_Order_Quantity.html'
   },
   {
     title: 'What order quantity balances ordering cost and holding cost?',
     detail: 'Recommended tool: Economic Order Quantity',
-    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+    href: 'Economic_Order_Quantity/Economic_Order_Quantity.html'
   },
   {
     title: 'How often should I place replenishment orders for a stable item?',
     detail: 'Recommended tool: Economic Order Quantity',
-    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+    href: 'Economic_Order_Quantity/Economic_Order_Quantity.html'
   },
   {
     title: 'Is my current order quantity costing more than the EOQ?',
     detail: 'Recommended tool: Economic Order Quantity',
-    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+    href: 'Economic_Order_Quantity/Economic_Order_Quantity.html'
   },
   {
     title: 'How does changing ordering cost or holding cost affect order quantity?',
     detail: 'Recommended tool: Economic Order Quantity',
-    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html'
+    href: 'Economic_Order_Quantity/Economic_Order_Quantity.html'
   },
   {
     title: 'How many units should I order for one uncertain selling period?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'What order quantity maximizes expected profit when demand is uncertain?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'How much seasonal or perishable inventory should I buy before demand is known?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'How should shortage cost and leftover cost affect my order quantity?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'What service level is economically justified for a single-period item?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'How does pack size change the best single-period order quantity?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'How does my current order quantity compare with the Newsvendor optimum?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'What are the expected sales, leftovers, and lost sales for my order quantity?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'How can I combine historical demand with an expert demand estimate?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'How much event, fashion, fresh-food, or end-of-life stock should I order?',
     detail: 'Recommended tool: Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html'
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html'
   },
   {
     title: 'How much buffer stock should I keep?',
     detail: 'Recommended tool: Safety Stock & Reorder Point',
-    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+    href: 'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html'
   },
   {
     title: 'When should I reorder inventory?',
     detail: 'Recommended tool: Safety Stock & Reorder Point',
-    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+    href: 'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html'
   },
   {
     title: 'What reorder point should I use when demand and lead time vary?',
     detail: 'Recommended tool: Safety Stock & Reorder Point',
-    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+    href: 'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html'
   },
   {
     title: 'How does service level change my safety stock requirement?',
     detail: 'Recommended tool: Safety Stock & Reorder Point',
-    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+    href: 'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html'
   },
   {
     title: 'Is my current inventory position below the reorder point?',
     detail: 'Recommended tool: Safety Stock & Reorder Point',
-    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+    href: 'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html'
   },
   {
     title: 'How many days of coverage do I have before I need to reorder?',
     detail: 'Recommended tool: Safety Stock & Reorder Point',
-    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+    href: 'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html'
   },
   {
     title: 'How can I forecast seasonal demand?',
     detail: 'Recommended tool: Exponential Smoothing',
-    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+    href: 'Exponential_Smoothing/Exponential_Smoothing.html'
   },
   {
     title: 'How can I forecast demand when there is a trend?',
     detail: 'Recommended tool: Exponential Smoothing',
-    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+    href: 'Exponential_Smoothing/Exponential_Smoothing.html'
   },
   {
     title: 'What is the next-period forecast from recent demand history?',
     detail: 'Recommended tool: Exponential Smoothing',
-    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+    href: 'Exponential_Smoothing/Exponential_Smoothing.html'
   },
   {
     title: 'Which smoothing method fits my demand pattern best?',
     detail: 'Recommended tool: Exponential Smoothing',
-    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+    href: 'Exponential_Smoothing/Exponential_Smoothing.html'
   },
   {
     title: 'How accurate is my forecast using MAE?',
     detail: 'Recommended tool: Exponential Smoothing',
-    href: 'Exponential%20Smoothing/Exponential_Smoothing.html'
+    href: 'Exponential_Smoothing/Exponential_Smoothing.html'
   },
   {
     title: 'Which purchasing categories need strategic supplier attention?',
     detail: 'Recommended tool: Kraljic Matrix',
-    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+    href: 'Kraljic_Matrix/Kraljic_Matrix.html'
   },
   {
     title: 'Which spend categories are high impact and high supply risk?',
     detail: 'Recommended tool: Kraljic Matrix',
-    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+    href: 'Kraljic_Matrix/Kraljic_Matrix.html'
   },
   {
     title: 'Which categories should use leverage, strategic, bottleneck, or routine sourcing strategies?',
     detail: 'Recommended tool: Kraljic Matrix',
-    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+    href: 'Kraljic_Matrix/Kraljic_Matrix.html'
   },
   {
     title: 'Which suppliers or categories create the highest procurement risk?',
     detail: 'Recommended tool: Kraljic Matrix',
-    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+    href: 'Kraljic_Matrix/Kraljic_Matrix.html'
   },
   {
     title: 'Where should procurement focus negotiation effort and supplier relationships?',
     detail: 'Recommended tool: Kraljic Matrix',
-    href: 'Kraljic%20Matrix/Kraljic_Matrix.html'
+    href: 'Kraljic_Matrix/Kraljic_Matrix.html'
   },
   {
     title: 'How can I plan project tasks over time?',
     detail: 'Recommended tool: Gantt Chart Planner',
-    href: 'Gantt%20Chart/Gantt_Chart.html'
+    href: 'Gantt_Chart/Gantt_Chart.html'
   },
   {
     title: 'How can I create a timeline for project tasks and milestones?',
     detail: 'Recommended tool: Gantt Chart Planner',
-    href: 'Gantt%20Chart/Gantt_Chart.html'
+    href: 'Gantt_Chart/Gantt_Chart.html'
   },
   {
     title: 'How can I see project progress across weeks and months?',
     detail: 'Recommended tool: Gantt Chart Planner',
-    href: 'Gantt%20Chart/Gantt_Chart.html'
+    href: 'Gantt_Chart/Gantt_Chart.html'
   },
   {
     title: 'How can I save and reload a project plan as JSON?',
     detail: 'Recommended tool: Gantt Chart Planner',
-    href: 'Gantt%20Chart/Gantt_Chart.html'
+    href: 'Gantt_Chart/Gantt_Chart.html'
   },
   {
     title: 'How many units do I need to sell to break even?',
     detail: 'Recommended tool: Break-Even Analysis',
-    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+    href: 'Break_Even_Analysis/Break_Even_Analysis.html'
   },
   {
     title: 'What sales volume is needed to reach a target profit?',
     detail: 'Recommended tool: Break-Even Analysis',
-    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+    href: 'Break_Even_Analysis/Break_Even_Analysis.html'
   },
   {
     title: 'How much margin of safety do I have at expected sales?',
     detail: 'Recommended tool: Break-Even Analysis',
-    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+    href: 'Break_Even_Analysis/Break_Even_Analysis.html'
   },
   {
     title: 'How do price, fixed cost, and variable cost affect profitability?',
     detail: 'Recommended tool: Break-Even Analysis',
-    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+    href: 'Break_Even_Analysis/Break_Even_Analysis.html'
   },
   {
     title: 'What revenue do I need to cover fixed and variable costs?',
     detail: 'Recommended tool: Break-Even Analysis',
-    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html'
+    href: 'Break_Even_Analysis/Break_Even_Analysis.html'
   },
   {
     title: 'Which option should I choose when several criteria matter?',
     detail: 'Recommended tool: Analytic Hierarchy Process',
-    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+    href: 'Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html'
   },
   {
     title: 'Which supplier is the best fit across cost, quality, delivery, and risk?',
     detail: 'Recommended tool: Analytic Hierarchy Process',
-    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+    href: 'Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html'
   },
   {
     title: 'Which 3PL partner should I select for service coverage and logistics performance?',
     detail: 'Recommended tool: Analytic Hierarchy Process',
-    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+    href: 'Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html'
   },
   {
     title: 'Which warehouse location is strongest across cost, access, labour, and customer proximity?',
     detail: 'Recommended tool: Analytic Hierarchy Process',
-    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+    href: 'Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html'
   },
   {
     title: 'Which transport mode should I choose when cost, speed, reliability, and emissions matter?',
     detail: 'Recommended tool: Analytic Hierarchy Process',
-    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+    href: 'Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html'
   },
   {
     title: 'Which inventory policy is best when service level, working capital, and stockout risk conflict?',
     detail: 'Recommended tool: Analytic Hierarchy Process',
-    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html'
+    href: 'Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html'
   },
   {
     title: 'What is the probability of achieving a target profit when demand and costs are uncertain?',
     detail: 'Recommended tool: Monte Carlo Risk Simulation',
-    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+    href: 'Monte_Carlo_Risk_Simulation/Monte_Carlo_Risk_Simulation.html'
   },
   {
     title: 'What project budget gives me an 80% or 90% confidence level?',
     detail: 'Recommended tool: Monte Carlo Risk Simulation',
-    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+    href: 'Monte_Carlo_Risk_Simulation/Monte_Carlo_Risk_Simulation.html'
   },
   {
     title: 'Which uncertain input has the strongest relationship with my result?',
     detail: 'Recommended tool: Monte Carlo Risk Simulation',
-    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+    href: 'Monte_Carlo_Risk_Simulation/Monte_Carlo_Risk_Simulation.html'
   },
   {
     title: 'What is the risk of stockout when demand and replenishment are uncertain?',
     detail: 'Recommended tool: Monte Carlo Risk Simulation',
-    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+    href: 'Monte_Carlo_Risk_Simulation/Monte_Carlo_Risk_Simulation.html'
   },
   {
     title: 'How can I model best case, likely case, and worst case expert estimates?',
     detail: 'Recommended tool: Monte Carlo Risk Simulation',
-    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html'
+    href: 'Monte_Carlo_Risk_Simulation/Monte_Carlo_Risk_Simulation.html'
   },
   {
     title: 'How can I structure relationships among complex factors?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which factors are foundational drivers and which are dependent outcomes?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'How can I turn expert relationship judgements into a structural hierarchy?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which supply-chain barriers have the strongest driving power?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'How do supply-chain resilience barriers influence one another?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which factors form the foundation of a supply-chain implementation hierarchy?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which barriers are dependent outcomes rather than root drivers?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'How can I structure expert judgements about relationships among supply-chain factors?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which digital or sustainable supply-chain barriers need early management attention?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'How can I build an ISM hierarchy from expert-defined V, A, X, and O relationships?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which supply-chain factors are autonomous, dependent, linkage, or driving factors?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which supplier selection barriers influence the rest of the evaluation process?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'What are the foundational barriers to sustainable supply-chain implementation?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'How are digital supply-chain adoption barriers structurally connected?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which circular supply-chain barriers should be addressed first?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which green procurement barriers drive other implementation difficulties?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'How do Industry 4.0 adoption challenges influence one another?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which blockchain adoption barriers sit at the base of the supply-chain hierarchy?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'How are supply-chain risk factors linked through direct and transitive relationships?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which logistics outsourcing barriers require early management action?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'What drives last-mile delivery challenges in our operating context?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which inventory management barriers are root drivers and which are outcomes?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'How should reverse logistics barriers be arranged in an implementation hierarchy?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which cold-chain implementation barriers have the greatest driving power?',
     detail: 'Recommended tool: Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html'
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html'
   },
   {
     title: 'Which comparable branches, warehouses, or operating units are relatively efficient within the observed peer group?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'Which observed peer units provide useful efficiency benchmarks?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'How much could an inefficient unit reduce its inputs while maintaining current outputs?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'How much could an operating unit increase its outputs using current resources?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'Which peer units define a mathematically feasible benchmark for an underperforming unit?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'What peer-based input, output, and slack targets should each operating unit review?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'Which distribution centres are below the observed efficiency frontier?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'How efficiently do comparable suppliers convert resources into service outputs?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'Which manufacturing plants convert labour and energy into good output most efficiently relative to peers?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'Which transport depots or last-mile hubs make the best relative use of available resources?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'Which maintenance or service teams have the greatest relative efficiency improvement opportunity?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'How do comparable retail branches perform when several resources and outcomes matter simultaneously?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'Which operating units have input excesses or output shortfalls after proportional efficiency adjustment?',
     detail: 'Recommended tool: Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html'
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html'
   },
   {
     title: 'What outputs should I expect from a new input scenario?',
     detail: 'Recommended tool: Multivariate Input-Output Estimator',
-    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+    href: 'Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html'
   },
   {
     title: 'How many orders or lines could be expected from planned labour, overtime, and floor area?',
     detail: 'Recommended tool: Multivariate Input-Output Estimator',
-    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+    href: 'Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html'
   },
   {
     title: 'Can I estimate multiple operational outputs from several input measures?',
     detail: 'Recommended tool: Multivariate Input-Output Estimator',
-    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+    href: 'Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html'
   },
   {
     title: 'Is a new operating scenario similar to historical conditions or an extrapolation?',
     detail: 'Recommended tool: Multivariate Input-Output Estimator',
-    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+    href: 'Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html'
   },
   {
     title: 'Which historical observations are closest to a proposed input plan?',
     detail: 'Recommended tool: Multivariate Input-Output Estimator',
-    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+    href: 'Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html'
   },
   {
     title: 'Should a linear or polynomial relationship be used for input-output prediction?',
     detail: 'Recommended tool: Multivariate Input-Output Estimator',
-    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+    href: 'Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html'
   },
   {
     title: 'How reliable is an output estimate when the planned inputs are outside historical experience?',
     detail: 'Recommended tool: Multivariate Input-Output Estimator',
-    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html'
+    href: 'Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html'
   },
   {
     title: 'Which warehouse should serve each customer region?',
     detail: 'Recommended tool: Supply Chain Network Optimizer',
-    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+    href: 'Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html'
   },
   {
     title: 'How should I allocate demand to facilities with capacity limits?',
     detail: 'Recommended tool: Supply Chain Network Optimizer',
-    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+    href: 'Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html'
   },
   {
     title: 'Which facilities should remain open to minimize network cost?',
     detail: 'Recommended tool: Supply Chain Network Optimizer',
-    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+    href: 'Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html'
   },
   {
     title: 'What is the cost saving from an optimized supply chain network?',
     detail: 'Recommended tool: Supply Chain Network Optimizer',
-    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+    href: 'Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html'
   },
   {
     title: 'How can I compare current and optimized facility-to-customer allocation?',
     detail: 'Recommended tool: Supply Chain Network Optimizer',
-    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html'
+    href: 'Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html'
   }
 ];
 
 const problemGroups = [
   {
     title: 'Inventory Prioritisation',
-    hrefs: ['ABC%20Analysis/ABC_Analysis.html']
+    hrefs: ['ABC_Analysis/ABC_Analysis.html']
   },
   {
     title: 'Ordering and Replenishment',
     hrefs: [
-      'Economic%20Order%20Quantity/Economic_Order_Quantity.html',
-      'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html',
-      'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html'
+      'Economic_Order_Quantity/Economic_Order_Quantity.html',
+      'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html',
+      'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html'
     ]
   },
   {
     title: 'Forecasting',
-    hrefs: ['Exponential%20Smoothing/Exponential_Smoothing.html']
+    hrefs: ['Exponential_Smoothing/Exponential_Smoothing.html']
   },
   {
     title: 'Procurement',
-    hrefs: ['Kraljic%20Matrix/Kraljic_Matrix.html']
+    hrefs: ['Kraljic_Matrix/Kraljic_Matrix.html']
   },
   {
     title: 'Finance',
-    hrefs: ['Break%20Even%20Analysis/Break_Even_Analysis.html']
+    hrefs: ['Break_Even_Analysis/Break_Even_Analysis.html']
   },
   {
     title: 'Project Planning',
-    hrefs: ['Gantt%20Chart/Gantt_Chart.html']
+    hrefs: ['Gantt_Chart/Gantt_Chart.html']
   },
   {
     title: 'Multi-Criteria Decisions',
-    hrefs: ['Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html']
+    hrefs: ['Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html']
   },
   {
     title: 'Risk and Uncertainty',
-    hrefs: ['Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html']
+    hrefs: ['Monte_Carlo_Risk_Simulation/Monte_Carlo_Risk_Simulation.html']
   },
   {
     title: 'Structural Analysis',
-    hrefs: ['Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html']
+    hrefs: ['Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html']
   },
   {
     title: 'Operational Efficiency',
-    hrefs: ['Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html']
+    hrefs: ['Data_Envelopment_Analysis/Data_Envelopment_Analysis.html']
   },
   {
     title: 'Network Optimization',
-    hrefs: ['Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html']
+    hrefs: ['Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html']
   }
 ];
 
@@ -725,7 +725,7 @@ const tools = [
     input: 'Rack geometry, SKU frequencies, aisle width, and picking parameters',
     output: 'Route animation, visit heatmap, travel metrics, and layout comparison',
     cta: 'Open Warehouse Layout Simulation',
-    href: 'Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html',
+    href: 'Warehouse_Layout_Simulation/Warehouse_Layout_Simulation.html',
     categories: ['Inventory and Supply Chain', 'Operations', 'Business Analysis']
   },
   {
@@ -735,7 +735,7 @@ const tools = [
     input: 'Annual value or monthly quantity plus unit cost',
     output: 'ABC classes, optional ABC-XYZ matrix, and Pareto chart',
     cta: 'Open ABC Analysis',
-    href: 'ABC%20Analysis/ABC_Analysis.html',
+    href: 'ABC_Analysis/ABC_Analysis.html',
     categories: ['Inventory and Supply Chain']
   },
   {
@@ -745,7 +745,7 @@ const tools = [
     input: 'Demand, order cost, holding cost',
     output: 'EOQ, cost curve, and reorder point',
     cta: 'Open Economic Order Quantity',
-    href: 'Economic%20Order%20Quantity/Economic_Order_Quantity.html',
+    href: 'Economic_Order_Quantity/Economic_Order_Quantity.html',
     categories: ['Inventory and Supply Chain']
   },
   {
@@ -755,7 +755,7 @@ const tools = [
     input: 'Demand distribution, prices, costs, and pack size',
     output: 'Optimal quantity, expected outcomes, profit comparison, and charts',
     cta: 'Open Newsvendor Model Optimizer',
-    href: 'Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html',
+    href: 'Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html',
     categories: ['Inventory and Supply Chain']
   },
   {
@@ -765,7 +765,7 @@ const tools = [
     input: 'Demand variability, lead time, service level',
     output: 'Safety stock, reorder point, and stock action',
     cta: 'Open Safety Stock & Reorder Point',
-    href: 'Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html',
+    href: 'Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html',
     categories: ['Inventory and Supply Chain']
   },
   {
@@ -775,7 +775,7 @@ const tools = [
     input: 'Historical demand series',
     output: 'Forecast table, error metric, and chart',
     cta: 'Open Exponential Smoothing',
-    href: 'Exponential%20Smoothing/Exponential_Smoothing.html',
+    href: 'Exponential_Smoothing/Exponential_Smoothing.html',
     categories: ['Forecasting']
   },
   {
@@ -784,7 +784,7 @@ const tools = [
     category: 'Procurement',
     input: 'Risk and impact ratings',
     output: 'Portfolio quadrant and strategy',
-    href: 'Kraljic%20Matrix/Kraljic_Matrix.html',
+    href: 'Kraljic_Matrix/Kraljic_Matrix.html',
     categories: ['Inventory and Supply Chain']
   },
   {
@@ -794,7 +794,7 @@ const tools = [
     input: 'Price, fixed cost, variable cost',
     output: 'Break-even quantity and margin',
     cta: 'Open Break-Even Analysis',
-    href: 'Break%20Even%20Analysis/Break_Even_Analysis.html',
+    href: 'Break_Even_Analysis/Break_Even_Analysis.html',
     categories: ['Finance', 'Business Analysis']
   },
   {
@@ -804,7 +804,7 @@ const tools = [
     input: 'Criteria, alternatives, expert pairwise comparisons',
     output: 'Criteria weights, consistency ratios, and ranked alternatives',
     cta: 'Open Analytic Hierarchy Process',
-    href: 'Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html',
+    href: 'Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html',
     categories: ['Decision Science', 'Business Analysis']
   },
   {
@@ -813,7 +813,7 @@ const tools = [
     category: 'Project Management',
     input: 'Tasks, dates, progress, milestones',
     output: 'Gantt timeline and JSON plan export',
-    href: 'Gantt%20Chart/Gantt_Chart.html',
+    href: 'Gantt_Chart/Gantt_Chart.html',
     categories: ['Project Management']
   },
   {
@@ -823,7 +823,7 @@ const tools = [
     input: 'Distributions, formula, target, seed',
     output: 'Outcome distribution, target probability, percentiles, and sensitivity',
     cta: 'Open Monte Carlo Simulation',
-    href: 'Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html',
+    href: 'Monte_Carlo_Risk_Simulation/Monte_Carlo_Risk_Simulation.html',
     categories: ['Statistics', 'Business Analysis']
   },
   {
@@ -833,7 +833,7 @@ const tools = [
     input: 'Editable factors and V, A, X, or O expert relationships',
     output: 'SSIM, reachability matrices, ISM hierarchy, and MICMAC-style classification',
     cta: 'Open Interpretive Structural Modeling',
-    href: 'Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html',
+    href: 'Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html',
     categories: ['Decision Science', 'Business Analysis']
   },
   {
@@ -843,7 +843,7 @@ const tools = [
     input: 'Comparable units with non-negative input and output measures',
     output: 'Efficiency scores, peer benchmarks, targets, slacks, and ranking',
     cta: 'Open Data Envelopment Analysis',
-    href: 'Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html',
+    href: 'Data_Envelopment_Analysis/Data_Envelopment_Analysis.html',
     categories: ['Operations', 'Decision Science', 'Business Analysis']
   },
   {
@@ -853,7 +853,7 @@ const tools = [
     input: 'Historical observations with input and output columns',
     output: 'Estimated outputs, diagnostics, and historical-support warning',
     cta: 'Open Multivariate Estimator',
-    href: 'Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html',
+    href: 'Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html',
     categories: ['Statistics', 'Operations', 'Business Analysis']
   },
   {
@@ -863,7 +863,7 @@ const tools = [
     input: 'Facilities, customers, coordinates, capacity, demand, fixed cost, and transport cost',
     output: 'Optimized allocation, KPIs, route map, diagnostics, and current-vs-optimized comparison',
     cta: 'Open Supply Chain Network Optimizer',
-    href: 'Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html',
+    href: 'Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html',
     categories: ['Inventory and Supply Chain', 'Operations', 'Business Analysis']
   }
 ];
@@ -1222,7 +1222,7 @@ function initSavedTools() {
   try {
     const storedTools = JSON.parse(localStorage.getItem(savedToolsStorageKey) || '[]');
     if (Array.isArray(storedTools)) {
-      savedTools = new Set(storedTools.filter((item) => typeof item === 'string'));
+      savedTools = new Set(storedTools.filter((item) => typeof item === 'string').map(ATHPaths.migrate));
     }
   } catch {
     savedTools = new Set();

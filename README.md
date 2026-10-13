@@ -36,6 +36,12 @@ retain settings. It does not automatically optimize rack placement or model cong
 
 ## Run Locally
 
+Tool folder names use underscores instead of spaces. Internal links, canonical URLs,
+and the sitemap use those paths. The custom GitHub Pages `404.html` forwards old
+space-containing tool URLs to their renamed pages, preserving query strings and
+fragments. This browser redirect requires JavaScript; existing saved-tool bookmarks
+are migrated on homepage load.
+
 ```bash
 python -m http.server 8000
 ```

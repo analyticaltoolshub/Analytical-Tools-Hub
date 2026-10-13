@@ -2,22 +2,22 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 
 const pages = [
-  { name: 'Warehouse Layout Simulation', url: '/Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html', sample: '#loadSampleButton', calculate: '#runButton' },
+  { name: 'Warehouse Layout Simulation', url: '/Warehouse_Layout_Simulation/Warehouse_Layout_Simulation.html', sample: '#loadSampleButton', calculate: '#runButton' },
   { name: 'Homepage', url: '/index.html' },
-  { name: 'ABC Analysis', url: '/ABC%20Analysis/ABC_Analysis.html', sample: '#btn-load-sample', calculate: '#btn-calculate' },
-  { name: 'Analytic Hierarchy Process', url: '/Analytic%20Hierarchy%20Process/Analytic_Hierarchy_Process.html', sample: '#loadSampleResponseButton', calculate: '#calculateAnalysisButton' },
-  { name: 'Break-Even Analysis', url: '/Break%20Even%20Analysis/Break_Even_Analysis.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
-  { name: 'Economic Order Quantity', url: '/Economic%20Order%20Quantity/Economic_Order_Quantity.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
-  { name: 'Exponential Smoothing', url: '/Exponential%20Smoothing/Exponential_Smoothing.html', sample: '#exampleButton', calculate: '#calculateButton' },
-  { name: 'Gantt Chart', url: '/Gantt%20Chart/Gantt_Chart.html' },
-  { name: 'Interpretive Structural Modeling', url: '/Interpretive%20Structural%20Modeling/Interpretive_Structural_Modeling.html', sample: '#loadSampleResponseButton' },
-  { name: 'Kraljic Matrix', url: '/Kraljic%20Matrix/Kraljic_Matrix.html', sample: '#sampleBtn' },
-  { name: 'Monte Carlo Risk Simulation', url: '/Monte%20Carlo%20Risk%20Simulation/Monte_Carlo_Risk_Simulation.html', calculate: '#runSimulationButton' },
-  { name: 'Newsvendor Model Optimizer', url: '/Newsvendor%20Model%20Optimizer/Newsvendor_Model_Optimizer.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
-  { name: 'Data Envelopment Analysis', url: '/Data%20Envelopment%20Analysis/Data_Envelopment_Analysis.html', template: { selector: '#templateSelect', value: 'distribution-centres' }, sample: '#loadSampleButton' },
-  { name: 'Multivariate Input-Output Estimator', url: '/Multivariate%20Input-Output%20Estimator/Multivariate_Input_Output_Estimator.html', sample: '#loadSampleButton' },
-  { name: 'Supply Chain Network Optimizer', url: '/Supply%20Chain%20Network%20Optimizer/Supply_Chain_Network_Optimizer.html', sample: '#loadSampleButton', calculate: '#optimizeButton' },
-  { name: 'Safety Stock and Reorder Point', url: '/Safety%20Stock%20%26%20Reorder%20Point/Safety_Stock_Reorder_Point.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
+  { name: 'ABC Analysis', url: '/ABC_Analysis/ABC_Analysis.html', sample: '#btn-load-sample', calculate: '#btn-calculate' },
+  { name: 'Analytic Hierarchy Process', url: '/Analytic_Hierarchy_Process/Analytic_Hierarchy_Process.html', sample: '#loadSampleResponseButton', calculate: '#calculateAnalysisButton' },
+  { name: 'Break-Even Analysis', url: '/Break_Even_Analysis/Break_Even_Analysis.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
+  { name: 'Economic Order Quantity', url: '/Economic_Order_Quantity/Economic_Order_Quantity.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
+  { name: 'Exponential Smoothing', url: '/Exponential_Smoothing/Exponential_Smoothing.html', sample: '#exampleButton', calculate: '#calculateButton' },
+  { name: 'Gantt Chart', url: '/Gantt_Chart/Gantt_Chart.html' },
+  { name: 'Interpretive Structural Modeling', url: '/Interpretive_Structural_Modeling/Interpretive_Structural_Modeling.html', sample: '#loadSampleResponseButton' },
+  { name: 'Kraljic Matrix', url: '/Kraljic_Matrix/Kraljic_Matrix.html', sample: '#sampleBtn' },
+  { name: 'Monte Carlo Risk Simulation', url: '/Monte_Carlo_Risk_Simulation/Monte_Carlo_Risk_Simulation.html', calculate: '#runSimulationButton' },
+  { name: 'Newsvendor Model Optimizer', url: '/Newsvendor_Model_Optimizer/Newsvendor_Model_Optimizer.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
+  { name: 'Data Envelopment Analysis', url: '/Data_Envelopment_Analysis/Data_Envelopment_Analysis.html', template: { selector: '#templateSelect', value: 'distribution-centres' }, sample: '#loadSampleButton' },
+  { name: 'Multivariate Input-Output Estimator', url: '/Multivariate_Input-Output_Estimator/Multivariate_Input_Output_Estimator.html', sample: '#loadSampleButton' },
+  { name: 'Supply Chain Network Optimizer', url: '/Supply_Chain_Network_Optimizer/Supply_Chain_Network_Optimizer.html', sample: '#loadSampleButton', calculate: '#optimizeButton' },
+  { name: 'Safety Stock and Reorder Point', url: '/Safety_Stock_%26_Reorder_Point/Safety_Stock_Reorder_Point.html', sample: '#loadSampleButton', calculate: '#calculateButton' },
 ];
 
 test.beforeEach(async ({ page }) => {

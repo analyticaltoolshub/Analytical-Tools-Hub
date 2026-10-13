@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Page Not Found | Analytical Tools Hub</title>
+  <base href="/">
+  <link rel="icon" href="assets/ath-favicon.png">
+  <link rel="stylesheet" href="tool-theme.css">
+</head>
+<body class="warehouse-page">
+  <main class="container"><section class="panel"><h1>Page Not Found</h1><p>The requested page may have moved. <a id="destination" href="index.html#featured-tools">Explore ATH tools</a>.</p></section></main>
+  <script src="tool-paths.js"></script>
+  <script>
+    const destination = ATHPaths.migrate(location.pathname);
+    if (destination !== location.pathname) {
+      document.getElementById('destination').href = destination + location.search + location.hash;
+      location.replace(destination + location.search + location.hash);
+    }
+  </script>
+</body>
+</html>

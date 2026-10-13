@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const core = require('../../calculation-core/warehouse-layout.js');
-const URL = '/Warehouse%20Layout%20Simulation/Warehouse_Layout_Simulation.html';
+const URL = '/Warehouse_Layout_Simulation/Warehouse_Layout_Simulation.html';
 
 test.beforeEach(async ({ page }) => {
   page.on('dialog', (dialog) => dialog.accept());
@@ -183,7 +183,7 @@ test('warehouse repeated SKU assignments and draggable separate/shared endpoints
 test('warehouse runs directly from local HTML without external requests', async ({ page }) => {
   await page.unroute('**/*');
   const remote = []; page.on('request', (request) => { if (/^https?:/.test(request.url())) remote.push(request.url()); });
-  await page.goto(pathToFileURL(path.resolve(__dirname, '../../Warehouse Layout Simulation/Warehouse_Layout_Simulation.html')).href);
+  await page.goto(pathToFileURL(path.resolve(__dirname, '../../Warehouse_Layout_Simulation/Warehouse_Layout_Simulation.html')).href);
   await page.locator('#loadSampleButton').click(); await page.locator('#runButton').click();
   await expect(page.locator('#runStatus')).toContainText('3,000 orders');
   expect(remote).toEqual([]);

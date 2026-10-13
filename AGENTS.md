@@ -44,24 +44,24 @@ Root files:
 
 Tool folders follow this pattern:
 
-- `ABC Analysis/ABC_Analysis.html`
-- `ABC Analysis/ABC_Analysis.css`
-- `ABC Analysis/ABC_Analysis.js`
+- `ABC_Analysis/ABC_Analysis.html`
+- `ABC_Analysis/ABC_Analysis.css`
+- `ABC_Analysis/ABC_Analysis.js`
 
 The same folder/file pattern is used for:
 
-- `Exponential Smoothing`
-- `Kraljic Matrix`
-- `Gantt Chart`
-- `Break Even Analysis`
-- `Economic Order Quantity`
-- `Safety Stock & Reorder Point`
-- `Analytic Hierarchy Process`
-- `Interpretive Structural Modeling`
-- `Newsvendor Model Optimizer`
-- `Data Envelopment Analysis`
+- `Exponential_Smoothing`
+- `Kraljic_Matrix`
+- `Gantt_Chart`
+- `Break_Even_Analysis`
+- `Economic_Order_Quantity`
+- `Safety_Stock_&_Reorder_Point`
+- `Analytic_Hierarchy_Process`
+- `Interpretive_Structural_Modeling`
+- `Newsvendor_Model_Optimizer`
+- `Data_Envelopment_Analysis`
 
-`Monte Carlo Risk Simulation` follows the same static tool-page pattern but also uses
+`Monte_Carlo_Risk_Simulation` follows the same static tool-page pattern but also uses
 `monte-carlo-worker.js` for background simulation.
 
 ## Page Architecture Pattern
