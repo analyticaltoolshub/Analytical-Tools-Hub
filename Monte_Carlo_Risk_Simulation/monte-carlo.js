@@ -39,7 +39,7 @@ const templates = {
       { name: 'Labour Cost', id: 'Labour_Cost', unit: '£', distribution: 'triangular', params: { min: 140000, mode: 165000, max: 210000 }, description: 'Internal and contracted labour cost.' },
       { name: 'Material Cost', id: 'Material_Cost', unit: '£', distribution: 'normal', params: { mean: 190000, sd: 25000, min: 0, max: '' }, description: 'Material purchase uncertainty.' },
       { name: 'Equipment Cost', id: 'Equipment_Cost', unit: '£', distribution: 'uniform', params: { min: 85000, max: 120000 }, description: 'Equipment and tooling cost.' },
-      { name: 'Contingency Cost', id: 'Contingency_Cost', unit: '£', distribution: 'triangular', params: { min: 25000, mode: 45000, max: 85000 }, description: 'Known risk contingency range.' }
+      { name: 'Contingency Cost', id: 'Contingency_Cost', unit: '£', distribution: 'triangular', params: { min: 25000, mode: 45000, max: 85000 }, description: 'Additional incurred risk costs not already included in labour, materials or equipment; not an unused budget reserve.' }
     ]
   },
   inventory: {
@@ -63,13 +63,16 @@ const templates = {
     outputName: 'Inventory Before Replenishment',
     unitType: 'units',
     unitSymbol: 'units',
-    formula: 'Opening_Inventory - Daily_Demand * Supplier_Lead_Time',
+    formula: 'Opening_Inventory - Backlog - Reserved_Stock - Daily_Demand * (Supplier_Lead_Time + Receiving_Delay)',
     targetValue: 0,
     targetCondition: 'gte',
     variables: [
       { name: 'Opening Inventory', id: 'Opening_Inventory', unit: 'units', distribution: 'uniform', params: { min: 900, max: 1100 }, description: 'Usable inventory available when the order is placed.' },
-      { name: 'Daily Demand', id: 'Daily_Demand', unit: 'units/day', distribution: 'normal', params: { mean: 85, sd: 15, min: 0, max: '' }, description: 'Demand expected per day during supplier lead time.' },
-      { name: 'Supplier Lead Time', id: 'Supplier_Lead_Time', unit: 'days', distribution: 'triangular', params: { min: 7, mode: 10, max: 18 }, description: 'Elapsed time from ordering until replenishment is available.' }
+      { name: 'Daily Demand', id: 'Daily_Demand', unit: 'units/day', distribution: 'normal', params: { mean: 85, sd: 15, min: 0, max: '' }, description: 'Uncertain average daily demand rate applied throughout each simulated lead time; not independent daily demand draws.' },
+      { name: 'Supplier Lead Time', id: 'Supplier_Lead_Time', unit: 'days', distribution: 'triangular', params: { min: 7, mode: 10, max: 18 }, description: 'Days from ordering to delivery, excluding separately entered receiving delay.' },
+      { name: 'Receiving Delay', id: 'Receiving_Delay', unit: 'days', distribution: 'fixed', params: { value: 0 }, description: 'Additional days until delivered stock is usable; leave zero if already included in lead time.' },
+      { name: 'Backlog', id: 'Backlog', unit: 'units', distribution: 'fixed', params: { value: 0 }, description: 'Outstanding units to fulfil from opening stock; exclude from future daily demand.' },
+      { name: 'Reserved Stock', id: 'Reserved_Stock', unit: 'units', distribution: 'fixed', params: { value: 0 }, description: 'Stock unavailable for future demand; leave zero if already excluded from opening inventory.' }
     ]
   },
   transportCost: {
@@ -136,8 +139,8 @@ const templates = {
   },
   warehouseCapacity: {
     name: 'Warehouse Capacity Risk',
-    summary: 'Estimate whether uncertain inbound flow and outbound demand will exceed available storage capacity.',
-    outputName: 'Peak Storage Requirement',
+    summary: 'Compare the closing storage balance with capacity under uncertain inbound and outbound volumes; this does not estimate the within-period peak.',
+    outputName: 'Closing Storage Balance',
     unitType: 'units',
     unitSymbol: 'pallet positions',
     formula: 'Opening_Stock + Inbound_Quantity - Outbound_Demand',
@@ -155,13 +158,13 @@ const templates = {
     outputName: 'Saleable Production',
     unitType: 'units',
     unitSymbol: 'units',
-    formula: 'Planned_Production * Yield_Rate / 100 - Downtime_Loss',
+    formula: '(Planned_Production - Downtime_Loss) * Yield_Rate / 100',
     targetValue: 9000,
     targetCondition: 'gte',
     variables: [
       { name: 'Planned Production', id: 'Planned_Production', unit: 'units', distribution: 'fixed', params: { value: 10000 }, description: 'Gross production planned before yield and downtime losses.' },
       { name: 'Yield Rate', id: 'Yield_Rate', unit: '%', distribution: 'triangular', params: { min: 90, mode: 95, max: 98 }, description: 'Share of produced units expected to meet the required quality standard.' },
-      { name: 'Downtime Loss', id: 'Downtime_Loss', unit: 'units', distribution: 'triangular', params: { min: 100, mode: 300, max: 900 }, description: 'Output lost because of equipment or process downtime.' }
+      { name: 'Downtime Loss', id: 'Downtime_Loss', unit: 'units', distribution: 'triangular', params: { min: 100, mode: 300, max: 900 }, description: 'Gross units not produced because of downtime, before applying quality yield. Must not exceed planned production.' }
     ]
   },
   custom: {
@@ -178,6 +181,20 @@ const templates = {
       { name: 'B', id: 'B', unit: 'units', distribution: 'fixed', params: { value: 5 }, description: 'Second custom variable.' }
     ]
   }
+};
+
+const templateAssumptions = {
+  "profit": "Price less variable cost, multiplied by units sold, less fixed costs. All inputs must cover the same year; demand is assumed fully served and sold. Excludes tax, financing and capacity limits.",
+  "cost": "Sum mutually exclusive incurred project costs. Contingency Cost represents additional realised risk costs, not an unused budget reserve. Do not count the same risk in both base costs and contingency.",
+  "inventory": "Opening stock plus receipts minus period demand is a net closing balance. Negative means unmet demand or backlog, not negative physical stock. Receipt timing is ignored, so a positive closing balance does not rule out an earlier stockout.",
+  "leadTimeStockout": "Units/day multiplied by days gives lead-time demand. The original Opening_Inventory - Daily_Demand * Supplier_Lead_Time is valid when there are no prior commitments or additional receiving delays. Optional inputs default to zero to preserve that model. Negative means shortage; zero just covers demand. Opening stock must be gross of any backlog or reservations entered separately. One demand rate is sampled per trial and held over the entire lead time; independent day-to-day variation, interim receipts and demand/lead-time correlation are not modelled. Replenishment quantity is excluded because this balance is measured just before receipt. Set the target above zero to test a required buffer.",
+  "transportCost": "Sum shipment-level monetary charges on the same basis. Enter fuel as money, not a percentage. Accessorial and delay costs must not overlap; related exceptions are sampled independently.",
+  "cashFlow": "Receipts less operating, capital and debt cash payments gives net flow for one period. This is not closing cash or minimum liquidity: opening cash, taxes and other financing are excluded unless explicitly added. Cash timing within the period is not modelled.",
+  "procurementCost": "Unit price multiplied by purchased units, plus incremental expediting and quality costs. Keep costs in the same annual period and currency; exclude amounts already included in unit price or another cost category. Quantity is assumed purchased, without price breaks or capacity constraints.",
+  "supplierDelay": "Actual minus required lead time gives a signed schedule deviation: negative is early, zero on time, positive late. The result is not a non-negative count of late days. Both lead times must start from the same ordering date and use the same day convention.",
+  "warehouseCapacity": "Opening stock plus inbound minus outbound is a net closing balance, not peak occupancy. Receipts may exceed capacity before dispatches occur. Negative values signal unmet outbound demand or an inconsistent flow plan, not negative occupied space. Use the same pallet-position equivalent throughout; this is not a time-phased warehouse simulation.",
+  "productionYield": "Subtract gross downtime losses from planned gross production first, then apply quality yield as a percentage. Downtime loss must be between zero and planned production, and yield between 0 and 100%. Do not deduct downtime again if already included in planned production or yield. Fractional units are continuous planning estimates.",
+  "custom": "Check units and arithmetic using known examples. Inputs are sampled independently once per trial. Add Variable creates an input; insert its identifier into the formula to use it. Supported operators do not include functions, conditional logic or time-series simulation."
 };
 
 const state = {
@@ -303,6 +320,7 @@ function applyTemplate(key) {
 function updateTemplateHelp(key) {
   const template = templates[key] || templates.profit;
   $('#modelTemplateHelp').textContent = template.summary;
+  $('#templateAssumptions').textContent = templateAssumptions[state.templateKey];
 }
 
 function renderVariables() {
@@ -801,7 +819,7 @@ function renderInterpretation(result) {
     cashFlow: {
       planning: `Use P10 (${formatValue(result.percentiles.P10)}) to review downside cash-flow exposure rather than relying only on the average result.`,
       action: probability >= 80
-        ? `Validate the assumption for ${driver} and confirm that downside liquidity remains acceptable.`
+        ? `Validate the assumption for ${driver} and review opening cash and within-period payment timing separately; net flow alone does not establish liquidity.`
         : `Review the timing or amount of ${driver}, then test cash-preservation actions before committing discretionary outflows.`
     },
     procurementCost: {
@@ -817,9 +835,9 @@ function renderInterpretation(result) {
         : `Review the supplier commitment, required date, contingency route, and the assumption for ${driver} before finalising the plan.`
     },
     warehouseCapacity: {
-      planning: `Use P90 (${formatValue(result.percentiles.P90)}) as a conservative peak-capacity requirement under the current flow assumptions.`,
+      planning: `Use P90 (${formatValue(result.percentiles.P90)}) as a conservative closing storage balance under the current flow assumptions. Check within-period peaks separately.`,
       action: probability >= 80
-        ? `Confirm the capacity and ${driver} assumptions, then retain an operating buffer for peak days.`
+        ? `Confirm the capacity and ${driver} assumptions, then check receipt and dispatch timing before sizing capacity.`
         : `Test inbound smoothing, additional storage, or faster outbound flow and review the assumption for ${driver}.`
     },
     productionYield: {

@@ -182,6 +182,19 @@ for (const entry of pages) {
       await expect(page.locator('#outputName')).toHaveValue('Delivery Delay');
       await page.locator('#advanced-settings summary').click();
       await expect(page.locator('#advanced-settings')).toHaveAttribute('open', '');
+      for (const [key, output, formulaText, note] of [
+        ['leadTimeStockout', 'Inventory Before Replenishment', 'Receiving_Delay', 'One demand rate'],
+        ['warehouseCapacity', 'Closing Storage Balance', 'Outbound_Demand', 'not peak occupancy'],
+        ['productionYield', 'Saleable Production', '(Planned_Production - Downtime_Loss)', 'gross downtime losses'],
+        ['supplierDelay', 'Delivery Delay', 'Actual_Lead_Time', 'negative is early']
+      ]) {
+        await modelSelect.selectOption(key);
+        await page.locator('#loadTemplateButton').click();
+        await expect(page.locator('#outputName')).toHaveValue(output);
+        expect(await page.locator('#formula').inputValue()).toContain(formulaText);
+        await expect(page.locator('#templateAssumptions')).toContainText(note);
+      }
+
     }
     if (entry.name === 'Multivariate Input-Output Estimator') {
       await expect(page.locator('#columnTable')).toContainText('Input');
@@ -280,7 +293,7 @@ for (const entry of pages) {
     if (entry.calculate) {
       const calculate = page.locator(entry.calculate);
       await expect(calculate).toBeEnabled();
-      await calculate.click({ force: true });
+      await calculate.click({ force: entry.name !== 'Monte Carlo Risk Simulation' });
       if (entry.name === 'ABC Analysis') {
         await expect(page.locator('#output-dashboard')).toBeVisible();
         const original = await page.evaluate(() => JSON.stringify(finalAnalysisResults));

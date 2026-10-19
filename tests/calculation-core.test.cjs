@@ -1,5 +1,6 @@
 const test = require("node:test");
 require('./warehouse-layout.test.cjs');
+require('./monte-carlo-templates.test.cjs');
 const assert = require("node:assert/strict");
 
 const breakEven = require("../calculation-core/break-even.js");
